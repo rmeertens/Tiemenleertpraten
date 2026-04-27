@@ -1,0 +1,7 @@
+# Local-only studiemateriaal — nooit publiek pushen
+materials/
+*.pdf
+.DS_Store
+.vscode/
+.idea/
+node_modules/
