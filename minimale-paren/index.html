@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Minimale Paren — scherp je oor voor fonologische contrasten." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Minimale Paren &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=3" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; 27 apr</div>
+  <main class="studio">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Minimale Paren</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <div class="modes" role="group" aria-label="Contrast-filter">
+      <button class="mode-btn" role="tab" aria-selected="true"  data-filter="alle">Alle</button>
+      <button class="mode-btn" role="tab" aria-selected="false" data-filter="stem">Stem</button>
+      <button class="mode-btn" role="tab" aria-selected="false" data-filter="plaats">Plaats</button>
+      <button class="mode-btn" role="tab" aria-selected="false" data-filter="manier">Manier</button>
+    </div>
+
+    <div class="drill">
+      <div class="drill__progress">
+        <span>Goed <strong id="mp-correct">0</strong></span>
+        <span>Streak <strong id="mp-streak">0</strong></span>
+        <span>Box <strong id="mp-box">1/5</strong></span>
+      </div>
+
+      <div class="drill__stage drill__stage--paren">
+        <p class="drill__prompt">Welk woord hoor je?</p>
+
+        <button class="play-btn play-btn--inline" id="mp-play" aria-label="Speel het woord opnieuw af">&#9658;</button>
+
+        <div class="paar-keuze">
+          <button class="paar-btn" id="mp-btn-a" type="button">
+            <span class="paar-btn__woord"></span>
+            <span class="paar-btn__ipa" hidden></span>
+          </button>
+          <button class="paar-btn" id="mp-btn-b" type="button">
+            <span class="paar-btn__woord"></span>
+            <span class="paar-btn__ipa" hidden></span>
+          </button>
+        </div>
+
+        <div class="feedback" id="mp-feedback"></div>
+
+        <p class="mp-hint" id="mp-hint" hidden></p>
+
+        <div class="drill__actions">
+          <button class="btn btn--ghost" id="mp-next" hidden>Volgende &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="audio-missing-note" id="mp-no-tts" hidden>
+      Je browser ondersteunt geen spraaksynthese. Probeer Chrome of Safari.
+    </p>
+  </main>
+
+  <script type="module" src="/minimale-paren/drill.js"></script>
+</body>
+</html>
