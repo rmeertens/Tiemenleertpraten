@@ -535,6 +535,23 @@ a { color: inherit; }
 
 .feedback strong { font-weight: 600; }
 
+.version-stamp {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 600;
+  z-index: 100;
+  pointer-events: none;
+}
+
 .sr-only {
   position: absolute;
   width: 1px; height: 1px;

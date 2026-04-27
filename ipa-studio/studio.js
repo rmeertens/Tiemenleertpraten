@@ -7,7 +7,7 @@ import {
   CONSONANTEN, KLINKERS, DIFTONGEN,
   PLAATSEN, MANIEREN, STEM,
   KLINKER_TONG, KLINKER_OPENING, KLINKER_ROND,
-} from "/ipa-studio/inventory.js";
+} from "/ipa-studio/inventory.js?v=2";
 
 const AUDIO_BASE = "/ipa-studio/audio/";
 const STORAGE_KEY = "tlp.ipa.v1";
