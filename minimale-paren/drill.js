@@ -9,8 +9,20 @@ const STORAGE_KEY = "tlp.mp.v1";
 
 // ── TTS ──────────────────────────────────────────────────────────
 
+// Chrome pauses speechSynthesis after ~15 s of silence; this keeps
+// the stream alive so audio works even after a long thinking pause.
+if (window.speechSynthesis) {
+  setInterval(() => {
+    if (window.speechSynthesis.speaking) return;
+    window.speechSynthesis.pause();
+    window.speechSynthesis.resume();
+  }, 10_000);
+}
+
 function speak(text) {
   if (!window.speechSynthesis) return;
+  // Resume first in case Chrome silently paused the stream
+  window.speechSynthesis.resume();
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
   utt.lang = "nl-NL";
