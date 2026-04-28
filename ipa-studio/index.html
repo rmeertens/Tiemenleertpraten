@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="IPA Studio — leer foutloos transcriberen voor module 4 spraak-taal." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>IPA Studio &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=3" />
+</head>
+<body>
+  <div class="version-stamp">v2 &middot; 27 apr</div>
+  <main class="studio">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">IPA Studio</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <div class="modes" role="tablist" aria-label="Modus">
+      <button class="mode-btn" role="tab" aria-selected="true"  data-mode="kaart">De Kaart</button>
+      <button class="mode-btn" role="tab" aria-selected="false" data-mode="drill">Drie Knoppen</button>
+    </div>
+
+    <!-- Modus A — De Kaart -->
+    <section id="modus-kaart" class="modus" aria-label="De Kaart">
+      <div class="kaart-section">
+        <h2 class="kaart-section__title">Medeklinkers</h2>
+        <div class="kaart-grid" data-grid="consonanten"></div>
+      </div>
+      <div class="kaart-section">
+        <h2 class="kaart-section__title">Klinkers</h2>
+        <div class="kaart-grid" data-grid="klinkers"></div>
+      </div>
+      <div class="kaart-section">
+        <h2 class="kaart-section__title">Tweeklanken</h2>
+        <div class="kaart-grid" data-grid="diftongen"></div>
+      </div>
+
+      <div class="phoneme-detail" id="phoneme-detail" aria-live="polite">
+        <span class="phoneme-detail__symbol" id="detail-symbol">·</span>
+        <div>
+          <p class="phoneme-detail__placeholder" id="detail-placeholder">
+            Klik op een symbool hierboven om de klank te horen en de drie knoppen te zien.
+          </p>
+          <div class="phoneme-detail__features" id="detail-features" hidden></div>
+          <p class="phoneme-detail__example" id="detail-example" hidden></p>
+        </div>
+        <button class="play-btn" id="play-btn" aria-label="Speel de klank af" disabled>&#9658;</button>
+      </div>
+      <p class="audio-missing-note" id="audio-missing-note" hidden>
+        Audio voor deze klank kon niet worden geladen. Wacht even of ververs
+        de pagina &mdash; meestal lost dat het op.
+      </p>
+    </section>
+
+    <!-- Modus B — Drie Knoppen -->
+    <section id="modus-drill" class="modus" aria-label="Drie Knoppen drill" hidden>
+      <div class="drill">
+        <div class="drill__progress">
+          <span>Goed <strong id="drill-correct">0</strong></span>
+          <span>Streak <strong id="drill-streak">0</strong></span>
+          <span>Box <strong id="drill-box">1/5</strong></span>
+        </div>
+        <div class="drill__stage">
+          <p class="drill__prompt" id="drill-prompt">Welke klank is dit?</p>
+          <div class="drill__symbol" id="drill-symbol">?</div>
+          <button class="play-btn" id="drill-play" aria-label="Speel de klank opnieuw">&#9658;</button>
+
+          <div class="knop-rows" id="drill-rows"></div>
+
+          <div class="feedback" id="drill-feedback"></div>
+
+          <div class="drill__actions">
+            <button class="btn btn--primary" id="drill-check">Controleer</button>
+            <button class="btn btn--ghost" id="drill-next" hidden>Volgende &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/ipa-studio/studio.js?v=2"></script>
+</body>
+</html>

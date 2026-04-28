@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Regelcheck — oefen de Schlichting-procedures met spraakherkenning. Geen AI, geen kosten." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Regelcheck &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=5" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; 28 apr</div>
+  <main class="studio">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Regelcheck</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <div class="modes" role="group" aria-label="Kies een scenario" id="rc-tabs">
+      <!-- gevuld door JS -->
+    </div>
+
+    <div class="rc-stage" id="rc-stage">
+      <p class="rc-prompt" id="rc-prompt"></p>
+
+      <div class="rc-input-area">
+        <button class="rc-mic-btn" id="rc-mic" type="button" aria-label="Start opname">
+          <span class="rc-mic-icon" aria-hidden="true">🎙</span>
+        </button>
+        <span class="rc-mic-label" id="rc-mic-label">Druk om te spreken</span>
+
+        <textarea
+          class="rc-textarea"
+          id="rc-transcript"
+          placeholder="Of typ hier je antwoord…"
+          rows="3"
+          aria-label="Jouw antwoord"
+          spellcheck="true"
+          lang="nl"
+        ></textarea>
+      </div>
+
+      <div class="rc-actions">
+        <button class="btn btn--primary" id="rc-check-btn" disabled>Controleer</button>
+        <button class="btn btn--ghost" id="rc-wis-btn">Wis</button>
+      </div>
+
+      <div class="rc-results" id="rc-results" hidden></div>
+    </div>
+
+    <p class="rc-no-speech" id="rc-no-speech" hidden>
+      Je browser ondersteunt geen spraakinvoer. Typ je antwoord in het tekstvak.
+      Probeer Chrome of Edge voor microfoon-ondersteuning.
+    </p>
+  </main>
+
+  <script src="checker.js"></script>
+</body>
+</html>
