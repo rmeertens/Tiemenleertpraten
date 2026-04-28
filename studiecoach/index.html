@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Studiecoach voor de Schlichting-afname. Beschrijf je afname, ontvang directe feedback." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; connect-src https://api.anthropic.com; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Studiecoach · Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=4" />
+</head>
+<body>
+  <div class="version-stamp">v4 &middot; 28 apr</div>
+  <main class="studio">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&#8592; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Studiecoach</h1>
+      <span></span>
+    </nav>
+
+    <!-- Stap 1: API-sleutel -->
+    <div id="setup" class="coach-setup">
+      <div class="coach-setup__card">
+        <h2 class="coach-setup__title">Verbind met de coach</h2>
+        <p class="coach-setup__body">
+          De studiecoach draait via de Anthropic API. Voer je eigen API-sleutel in.
+          De sleutel wordt alleen in dit tabblad bewaard en verdwijnt zodra je het sluit.
+        </p>
+        <div class="coach-setup__field">
+          <label for="api-key" class="coach-setup__label">Anthropic API-sleutel</label>
+          <input
+            type="password"
+            id="api-key"
+            class="coach-setup__input"
+            placeholder="sk-ant-…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <span id="setup-error" class="coach-setup__error" hidden></span>
+        </div>
+        <button id="setup-btn" class="btn btn--primary">Beginnen</button>
+        <p class="coach-setup__hint">
+          Geen sleutel? Maak een account op
+          <strong class="coach-link">console.anthropic.com</strong>
+        </p>
+      </div>
+    </div>
+
+    <!-- Stap 2: coach-interface -->
+    <div id="coach" class="coach" hidden>
+      <div class="modes">
+        <button class="mode-btn" aria-selected="true"  data-topic="taalbegrip">Taalbegrip-3</button>
+        <button class="mode-btn" aria-selected="false" data-topic="zinsontwikkeling">Zinsontwikkeling</button>
+      </div>
+
+      <div
+        id="chat-window"
+        class="coach-chat"
+        role="log"
+        aria-label="Gesprek met studiecoach"
+        aria-live="polite"
+        aria-relevant="additions"
+      ></div>
+
+      <form id="chat-form" class="coach-input-row" novalidate>
+        <label for="user-input" class="sr-only">Jouw bericht</label>
+        <textarea
+          id="user-input"
+          class="coach-textarea"
+          placeholder="Beschrijf je afname of stel een vraag… (Enter = versturen, Shift+Enter = nieuwe regel)"
+          rows="3"
+        ></textarea>
+        <button type="submit" id="send-btn" class="btn btn--primary coach-send">Stuur</button>
+      </form>
+
+      <div class="coach-footer">
+        <button id="reset-btn" class="btn btn--ghost coach-reset">Nieuw gesprek</button>
+        <button id="logout-btn" class="btn btn--ghost coach-reset">Andere sleutel</button>
+      </div>
+    </div>
+  </main>
+  <script src="coach.js"></script>
+</body>
+</html>
