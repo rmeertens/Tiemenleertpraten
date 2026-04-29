@@ -7,7 +7,8 @@ const domains = [
       concept("Spraak", "Basis", "Spraak is het hoorbaar maken van taal via klanken. Fonologie kiest en ordent klanken; fonetiek voert ze motorisch uit.", "Schriftelijk: onderscheid fonetisch/fonologisch. Mondeling: behandelkeuze bij spraakbeeld.", "Uitspraakproblemen direct als motorisch labelen zonder klanksysteem te onderzoeken.", "Leg in één zin uit waarom /k/ soms wel en soms niet lukt bij een fonologisch probleem."),
       concept("Taalniveaus", "Basis", "Fonologie, semantiek, syntaxis, morfologie, pragmatiek en metalinguïstiek vormen samen het taalprofiel. Elk niveau kan receptief en productief bekeken worden.", "Schriftelijk: open casussen vragen vaak om niveau-analyse.", "Een testscore noemen zonder te zeggen welk taalniveau die score vertegenwoordigt.", "Welke twee taalniveaus zijn vooral betrokken bij zinsontwikkeling?"),
       concept("Ontwikkelingsfasen", "Basis", "Van prelinguaal naar vroeglinguaal, differentiatiefase en voltooiing. Begrip loopt meestal vóór productie.", "Schriftelijk: leeftijdspassend of afwijkend beoordelen.", "Een peuter beoordelen met verwachtingen die bij een kleuter horen.", "Noem per fase één typische talige mijlpaal."),
-      concept("Voorwaarden", "Basis", "Taal- en spraakontwikkeling vragen gehoor, neurologische rijping, cognitie, motoriek, sociaal-emotionele drive, interactie en rijk taalaanbod.", "Schriftelijk en mondeling: differentiaaldiagnostiek en prognose.", "Alle problemen binnen taal zelf zoeken terwijl gehoor, aanbod of algemene ontwikkeling nog niet zijn gewogen.", "Welke interne en externe factor zou jij als eerste navragen?")
+      concept("Voorwaarden", "Basis", "Taal- en spraakontwikkeling vragen gehoor, neurologische rijping, cognitie, motoriek, sociaal-emotionele drive, interactie en rijk taalaanbod.", "Schriftelijk en mondeling: differentiaaldiagnostiek en prognose.", "Alle problemen binnen taal zelf zoeken terwijl gehoor, aanbod of algemene ontwikkeling nog niet zijn gewogen.", "Welke interne en externe factor zou jij als eerste navragen?"),
+      concept("Model van Levelt", "10-component", "Gebruik het spraakproductiemodel als klinische landkaart: conceptualiseerder voor intentie/pragmatiek, formulator voor semantiek, syntaxis, morfologie en fonologie, articulator voor motorische uitvoering, en monitoring voor zelfcorrectie.", "Schriftelijk: plaats fouten in het model. Mondeling: verantwoord of een fout eerder fonologisch, fonetisch, semantisch of pragmatisch past.", "Alle fouten op één hoop gooien. Een 10-student zegt waar in de keten het waarschijnlijk misgaat en wat je nog moet onderzoeken.", "Bij 'toek' voor 'koek': welke aanwijzingen heb je nodig om formulator versus articulator te onderscheiden?")
     ]
   },
   {
@@ -18,7 +19,9 @@ const domains = [
       concept("Schlichting-afname", "Diagnostiek", "Bij taalbegrip en taalproductie telt standaardisatie: rustige situatie, neutrale aanbieding, juiste itemvolgorde, correcte scoring en afbreekregels.", "Mondeling diagnostiek: kern van de performance assessment.", "Te snel spreken, helpen met intonatie of achteraf soepel scoren.", "Wat zeg je als je tijdens de afname een verspreking maakt?"),
       concept("Testkwaliteit", "Diagnostiek", "Gebruik tests kritisch: normering, validiteit, betrouwbaarheid en standaardisatie bepalen hoe sterk je conclusie is.", "Schriftelijk: testleer en instrumenteigenschappen.", "Normscores behandelen alsof ze absoluut zijn, zonder betrouwbaarheidsinterval of context.", "Waarom maakt afwijken van standaardafname de normvergelijking zwakker?"),
       concept("Normscores", "Diagnostiek", "Q-scores, T-scores, percentielen en stanines plaatsen een kind ten opzichte van een normgroep. Bij Q-score is 100 gemiddeld en 15 punten één SD.", "Schriftelijk: score-interpretatie en behandelindicatie.", "Leeftijdsequivalent gebruiken als bewijs voor een stoornis.", "Wat betekent Q70 klinisch ongeveer?"),
-      concept("Meertalige diagnostiek", "Diagnostiek", "Onderzoek aanbod en functioneren per taal. Weeg thuistaal, Nederlands, leerbaarheid, gehoor en context om NT2, TOS of combinatie te onderscheiden.", "Schriftelijk: casussen over meertaligheid. Mondeling: multidisciplinair advies.", "Alleen Nederlands testen en lage score automatisch TOS noemen.", "Welke drie vragen stel je in een meertalige anamnese?")
+      concept("Meertalige diagnostiek", "Diagnostiek", "Onderzoek aanbod en functioneren per taal. Weeg thuistaal, Nederlands, leerbaarheid, gehoor en context om NT2, TOS of combinatie te onderscheiden.", "Schriftelijk: casussen over meertaligheid. Mondeling: multidisciplinair advies.", "Alleen Nederlands testen en lage score automatisch TOS noemen.", "Welke drie vragen stel je in een meertalige anamnese?"),
+      concept("Procedurele precisie", "10-component", "Voor een ZG moet je testgedrag zichtbaar strak zijn: rustig tempo, neutrale toon, geen cueende intonatie, exacte itemaanbieding, juist scoren, juiste start- en afbreekregels, en direct reflecteren op afwijkingen.", "Mondeling: dit raakt bijna alle diagnostiekcriteria, vooral afname, scoring en criterium 10. Gebruik een rustig tempo als oefenrichtlijn; volg de officiële handleiding voor de echte norm.", "Denken dat inhoudelijke kennis genoeg is terwijl de uitvoering rommelig is. Eén hulpende intonatie kan de standaardisatie aantasten.", "Kun je na een fout zeggen: wat gebeurde er, raakt dit de validiteit, en wat doe ik professioneel?"),
+      concept("Betrouwbaarheidsinterval", "10-component", "Rapporteer testscores niet als losse waarheid. Combineer ruwe score, normscore, percentiel/SD waar relevant, betrouwbaarheidsinterval, observaties en hulpvraag.", "Schriftelijk: testleer en casusinterpretatie. Mondeling: verantwoorden waarom je voorzichtig of juist zeker concludeert.", "Alleen 'WQ 82 dus stoornis' zeggen. Een 10-student nuanceert met meetfout, normgroep en dagelijks functioneren.", "Hoe leg je aan ouders uit dat een score een bandbreedte heeft?")
     ]
   },
   {
@@ -29,7 +32,8 @@ const domains = [
       concept("Taalbegrip versus productie", "Taalstoornissen", "Sommige kinderen hebben vooral expressieve problemen; anderen hebben gecombineerd begrip- en productieproblemen. Begripsproblemen maken prognose en therapie vaak zwaarder.", "Mondeling: diagnose en behandelprioriteit onderbouwen.", "Een goed pratend kind overschatten terwijl begrip zwak is.", "Hoe check je begrip zonder alleen ja/nee-vragen te stellen?"),
       concept("Semantiek", "Taalstoornissen", "Semantiek gaat om betekenis, woordenschat, woordrelaties en het mentale lexicon. Let op woordvinding, categoriseren en concreet-abstracte ontwikkeling.", "Schriftelijk: casussen over woordenschat en woordvinding.", "Alleen woorden tellen en kwaliteit van woordgebruik vergeten.", "Noem een receptieve en productieve semantische taak."),
       concept("Morfosyntaxis", "Taalstoornissen", "Morfologie gaat over woordvormen; syntaxis over zinsbouw. Analyseer zinslengte, woordvolgorde, werkwoordvormen, meervoud, verkleiningen en samengestelde zinnen.", "Schriftelijk en mondeling: Schlichting productie, doelen bij zinsontwikkeling.", "Fouten als luiheid zien in plaats van ontwikkelingspatroon of stoornis.", "Maak van 'kind koek eten' een passende modelzin net boven niveau."),
-      concept("Pragmatiek", "Taalstoornissen", "Pragmatiek is taalgebruik in context: intentie, beurtwisseling, onderwerp, presuppositie, sociale functie en verhalen vertellen.", "Schriftelijk: discrepantie tussen testscores en dagelijks functioneren.", "Pragmatiek negeren omdat een kind goed scoort op formele taaltests.", "Welke observatie toont dat een kind onvoldoende rekening houdt met de luisteraar?")
+      concept("Pragmatiek", "Taalstoornissen", "Pragmatiek is taalgebruik in context: intentie, beurtwisseling, onderwerp, presuppositie, sociale functie en verhalen vertellen.", "Schriftelijk: discrepantie tussen testscores en dagelijks functioneren.", "Pragmatiek negeren omdat een kind goed scoort op formele taaltests.", "Welke observatie toont dat een kind onvoldoende rekening houdt met de luisteraar?"),
+      concept("Differentiaaldiagnostiek TOS", "10-component", "Onderbouw waarom het beeld past bij TOS, NT2/blootstellingsachterstand, verstandelijke beperking, gehoorprobleem, ASS/ADHD-invloed of een combinatie. Kijk naar beide talen, leerbaarheid, hardnekkigheid en dagelijks functioneren.", "Schriftelijk: open casussen. Mondeling: diagnose en advies verdedigen.", "TOS noemen zonder alternatieven actief uit te sluiten of mee te wegen.", "Welke gegevens heb je nodig om blootstellingsachterstand van hardnekkige taalstoornis te onderscheiden?")
     ]
   },
   {
@@ -40,7 +44,8 @@ const domains = [
       concept("Fonologisch probleem", "Spraak", "Het klanksysteem is onvoldoende georganiseerd. Fouten zijn vaak patroonmatig of contextgevoelig: processen, ontbrekende contrasten en wisselende realisaties.", "Schriftelijk: processen en feature-analyse.", "Alleen per losse klank behandelen en het contrast niet trainen.", "Welke contrasten onderzoek je bij d/t of k/t-fouten?"),
       concept("VOD en dysartrie", "Spraak", "VOD zit vooral in planning en programmering van spraakbewegingen; dysartrie in neurologische aansturing van de uitvoering.", "Schriftelijk: plaatsing in spraakproductiemodel.", "Zoekende, wisselende fouten verwarren met een gewone articulatiestoornis.", "Welke observatie past meer bij planning dan bij één klankmotorisch probleem?"),
       concept("Vereenvoudigingsprocessen", "Spraak", "Kinderen reduceren spraak via processen zoals clusterreductie, finale consonantdeletie, fronting, stopping of syllabeverlies. Leeftijd en consistentie bepalen ernst.", "Schriftelijk: normale versus afwijkende ontwikkeling.", "Een proces beoordelen zonder leeftijdsnorm of verstaanbaarheid mee te nemen.", "Is fronting op 4 jaar hetzelfde risico als op 2 jaar? Leg uit."),
-      concept("Spraaktherapie", "Spraak", "Fonetisch behandel je productie stapsgewijs; fonologisch behandel je contrasten, vaak met perceptie vóór productie. Generalisatie moet gepland worden.", "Mondeling therapie: doel, methode, vorm en duur onderbouwen.", "Mondmotorische oefeningen inzetten voor spraak zonder spraakdoel.", "Formuleer een kortetermijndoel voor clusterreductie.")
+      concept("Spraaktherapie", "Spraak", "Fonetisch behandel je productie stapsgewijs; fonologisch behandel je contrasten, vaak met perceptie vóór productie. Generalisatie moet gepland worden.", "Mondeling therapie: doel, methode, vorm en duur onderbouwen.", "Mondmotorische oefeningen inzetten voor spraak zonder spraakdoel.", "Formuleer een kortetermijndoel voor clusterreductie."),
+      concept("Consistentie-check", "10-component", "Onderzoek of foutpatronen stabiel of wisselend zijn. Veel variatie in herhaalde benoemingen wijst eerder richting inconsistente fonologische stoornis of planning/programmering dan naar een enkel fonetisch probleem.", "Schriftelijk: differentiaaldiagnose spraak. Mondeling: methodekeuze verantwoorden.", "Een kind met wisselende fouten behandelen alsof één klankmotorisch probleem centraal staat.", "Laat je hetzelfde woord drie keer benoemen: wat betekent het als het drie keer anders klinkt?")
     ]
   },
   {
@@ -51,7 +56,8 @@ const domains = [
       concept("Methodekeuze", "Therapie", "Kies methode op basis van diagnose: bijvoorbeeld taalstimulering, semantische netwerkopbouw, morfosyntactische interventie, Metaphon/minimale paren of Van Riper.", "Mondeling: criteria 14 en 15.", "Een bekende methode noemen zonder te motiveren waarom juist deze casus daarbij past.", "Welke methode past beter bij fonologisch contrastverlies dan bij distorsie?"),
       concept("Therapievorm", "Therapie", "Direct, indirect, individueel, groep, oudercoaching of schoolgerichte aanpak kies je op grond van leeftijd, aandacht, context, hulpvraag en generalisatie.", "Mondeling: criteria 16 en 17.", "Alleen sessies in de behandelkamer plannen terwijl probleem vooral op school zichtbaar is.", "Wanneer kies je oudercoaching als hoofdroute?"),
       concept("Prognose", "Therapie", "Een prognose weegt ernst, begrip, leeftijd, leerbaarheid, omgeving, motivatie, comorbiditeit, meertaligheid en behandelrespons.", "Mondeling: criterium 20.", "Alleen zeggen 'goed' of 'matig' zonder factoren en evaluatiemoment.", "Noem twee bevorderende en twee belemmerende factoren."),
-      concept("Multidisciplinair", "Therapie", "Werk samen met ouders, leerkracht, jeugdarts, KNO, audiologisch centrum, orthodontie, psycholoog/orthopedagoog of cluster-2 wanneer de casus daarom vraagt.", "Mondeling: criterium 19. Schriftelijk: richtlijn en ICF.", "Te lang monodisciplinair doorgaan bij weinig vooruitgang of brede ontwikkelingsvragen.", "Wanneer vraag je een multidisciplinair team om mee te kijken?")
+      concept("Multidisciplinair", "Therapie", "Werk samen met ouders, leerkracht, jeugdarts, KNO, audiologisch centrum, orthodontie, psycholoog/orthopedagoog of cluster-2 wanneer de casus daarom vraagt.", "Mondeling: criterium 19. Schriftelijk: richtlijn en ICF.", "Te lang monodisciplinair doorgaan bij weinig vooruitgang of brede ontwikkelingsvragen.", "Wanneer vraag je een multidisciplinair team om mee te kijken?"),
+      concept("ICF-brug", "10-component", "Maak steeds de brug van functie naar activiteit en participatie. Niet alleen 'morfosyntaxis is zwak', maar: daardoor vertelt het kind minder begrijpelijk, haakt af in kringgesprekken en heeft ondersteuning nodig in klasinteractie.", "Mondeling therapie: doelen, therapievorm, samenwerking en prognose. Schriftelijk: interventieplan.", "ICF-termen los noemen zonder concreet dagelijks gevolg.", "Kun je één functieprobleem vertalen naar één activiteit, één participatieprobleem en één omgevingsaanpassing?")
     ]
   },
   {
@@ -62,7 +68,8 @@ const domains = [
       concept("Functieonderzoek", "Mondgebied", "Bekijk rustpositie, slikken, drinken, kauwen, mondmotoriek en spreken. Let op lipsluiting, tongpositie, masseteractiviteit en compensaties.", "Schriftelijk: observatie en behandelindicatie.", "Alleen in actie kijken en rustgewoonten missen.", "Wat zegt tong naar voren bij slikken mogelijk over functie?"),
       concept("Afwijkende mondgewoonten", "Mondgebied", "Zuigen, mondademen, tongpersen, afwijkende lipgewoonten en verkeerde rustpositie kunnen vorm en functie beïnvloeden.", "Schriftelijk: OMFT en preventie.", "Articulatie trainen zonder hardnekkige gewoonte aan te pakken.", "Waarom start OMFT vaak met gewoonteafbouw?"),
       concept("Occlusie", "Mondgebied", "Beoordeel molaarrelatie, open beet, overbeet en krachtbalans tussen tong, lippen en wangen. Tandheelkundige termen helpen precies rapporteren.", "Schriftelijk: tandheelkundige basisbegrippen.", "Open beet en overbeet door elkaar halen.", "Wat is het verschil tussen verticale open beet en sagittale overbeet?"),
-      concept("OMFT", "Mondgebied", "OMFT herstelt spierbalans en functies rond de mond: gewoonteafbouw, spiertraining, sliktraining, articulatie en transfer naar dagelijks gedrag.", "Schriftelijk: behandelvolgorde en samenwerking.", "Alleen oefeningen geven zonder motivatie, herhaling en transferplan.", "Welke disciplines kunnen bij OMFT relevant zijn?")
+      concept("OMFT", "Mondgebied", "OMFT herstelt spierbalans en functies rond de mond: gewoonteafbouw, spiertraining, sliktraining, articulatie en transfer naar dagelijks gedrag.", "Schriftelijk: behandelvolgorde en samenwerking.", "Alleen oefeningen geven zonder motivatie, herhaling en transferplan.", "Welke disciplines kunnen bij OMFT relevant zijn?"),
+      concept("Triangle of Forces", "10-component", "Gebitsstand en mondfunctie worden beïnvloed door balans tussen tongdruk van binnenuit en lip-/wangdruk van buitenaf, waaronder m. orbicularis oris en m. buccinator. Verstoring kan bijdragen aan open beet, overbeet of tongpersgedrag.", "Schriftelijk: mondgebied, occlusie en OMFT. Mondeling: samenwerking met orthodontie/tandarts onderbouwen.", "Occlusie alleen als tandprobleem zien en de spierbalans vergeten.", "Welke spier- en tongkrachten kunnen een open beet onderhouden?")
     ]
   }
 ];
@@ -73,7 +80,11 @@ const oralPrompts = [
   "Je maakte één verspreking tijdens de afname. Formuleer professioneel hoe je dit in je reflectie benoemt.",
   "Formuleer een langetermijndoel en kortetermijndoel bij een kind met zwakke zinsontwikkeling.",
   "Onderbouw een therapievorm waarbij ouders actief worden betrokken. Wanneer is dit sterker dan alleen directe therapie?",
-  "Geef een prognose bij een meertalig kind met lage Nederlandse scores maar duidelijke groei na aanbod."
+  "Geef een prognose bij een meertalig kind met lage Nederlandse scores maar duidelijke groei na aanbod.",
+  "Plaats een spraakfout in het Model van Levelt: wat past bij formulator, wat bij articulator, en welk onderzoek maakt het scherper?",
+  "Maak een ICF-brug: koppel één zwakke taalfunctie aan activiteit, participatie en een omgevingsaanpassing.",
+  "Verantwoord een testscore met betrouwbaarheidsinterval: wat zeg je wel en wat zeg je niet tegen ouders?",
+  "Je mist een afbreekregel. Benoem dit zelf, leg de impact op validiteit uit en formuleer je herstel."
 ];
 
 const questions = [
@@ -111,6 +122,34 @@ const questions = [
     answers: ["Niet-spraak mondmotoriek", "Fonologische contrasttherapie met perceptie en productie", "Alleen voorlezen", "Wachten tot groep 3"],
     correct: 1,
     feedback: "Kies een fonologische aanpak: contrasten opbouwen, auditief onderscheiden, productie oefenen en generaliseren."
+  },
+  {
+    type: "Casusvraag",
+    question: "Een kind zegt 'toek' voor 'koek', maar kan /k/ soms wel nazeggen. Welke redenering past het best bij een 10-student?",
+    answers: ["Altijd fonetisch behandelen", "Alleen articulatoren inspecteren", "Via Levelt en consistentie onderzoeken of het fonologisch, fonetisch of planning is", "Geen diagnostiek nodig"],
+    correct: 2,
+    feedback: "Een 10-student lokaliseert het probleem klinisch: formulator, planning/programmering of articulator, en checkt consistentie en produceerbaarheid."
+  },
+  {
+    type: "Juist / onjuist",
+    question: "Bij testinterpretatie is één normscore zonder betrouwbaarheidsinterval en observaties genoeg voor een stevige conclusie.",
+    answers: ["Juist", "Onjuist"],
+    correct: 1,
+    feedback: "Onjuist. Combineer score, BI, normgroep, observaties, hulpvraag en dagelijks functioneren."
+  },
+  {
+    type: "Casusvraag",
+    question: "Een kind heeft zwakke morfosyntaxis en doet nauwelijks mee in de kring. Welke formulering is het sterkst?",
+    answers: ["Het kind heeft een grammaticaal probleem", "We oefenen werkwoorden", "De functiezwakte belemmert begrijpelijk vertellen en participatie in de kring; doelen richten zich op zinbouw in klascontext", "Alleen ouders krijgen huiswerk"],
+    correct: 2,
+    feedback: "Dit is de ICF-brug: functie → activiteit → participatie → contextgerichte interventie."
+  },
+  {
+    type: "Juist / onjuist",
+    question: "Veel variatie in herhaalde benoemingen kan wijzen op een ander behandelspoor dan een consistente fonetische articulatiefout.",
+    answers: ["Juist", "Onjuist"],
+    correct: 0,
+    feedback: "Juist. De consistentie-check helpt differentiëren tussen fonetisch, fonologisch inconsistent en planning/programmering."
   }
 ];
 
@@ -134,7 +173,7 @@ const cases = [
     situation: "Het kind laat beginmedeklinkers vaak weg en vervangt achterklanken door voorin gemaakte klanken. Gehoor en motoriek lijken voldoende.",
     steps: [
       "Conclusie: vermoedelijk fonologische achterstand of stoornis; ernst door verstaanbaarheid.",
-      "Aanvullend: drie-positie-onderzoek, spontane spraak, feature-analyse, consistentie.",
+      "Aanvullend: drie-positie-onderzoek, spontane spraak, feature-analyse, consistentie-check en plaatsing in Levelt.",
       "Doel: herstel van woordstructuur en plaatscontrast met meetbaar criterium.",
       "Aanpak: auditieve discriminatie, minimale paren/Metaphon, productie en generalisatie."
     ]
@@ -146,7 +185,7 @@ const cases = [
     situation: "Het kind hoort thuis Pools en op school Nederlands. Nederlandse woordenschat is laag; ouders melden ook in de thuistaal moeite met verhalen.",
     steps: [
       "Conclusie: TOS niet uitsluiten; lage NL-score kan niet los worden geïnterpreteerd.",
-      "Aanvullend: gehoor, meertalige anamnese, L1-informatie, dynamische diagnostiek.",
+      "Aanvullend: gehoor, meertalige anamnese, L1-informatie, dynamische diagnostiek en differentiaal NT2/TOS.",
       "Doel: taalvaardigheid en schoolse communicatie ondersteunen in beide talen waar mogelijk.",
       "Aanpak: ouders in thuistaal betrekken, visuele steun, scaffolding, schooloverleg."
     ]
