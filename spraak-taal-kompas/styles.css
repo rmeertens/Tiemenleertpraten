@@ -267,6 +267,22 @@ p {
   color: var(--ink-soft);
 }
 
+.panel__lede {
+  font-size: 15px;
+  margin: 0 0 12px;
+}
+
+.tool-link {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.tool-link:hover {
+  text-decoration: underline;
+}
+
 .concept-list {
   display: flex;
   flex-wrap: wrap;

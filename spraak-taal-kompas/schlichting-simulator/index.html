@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Schlichting oefensimulator — oefen rustig en neutraal testitems aanbieden met directe feedback." />
+    <meta name="color-scheme" content="light dark" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>Schlichting Oefensimulator &middot; Tiemen Leert Praten</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="simulator.css" />
+  </head>
+  <body>
+    <div class="version-stamp">v1 &middot; 30 apr</div>
+    <main class="studio">
+      <nav class="studio__nav">
+        <a class="studio__home" href="../">&larr; Spraak-Taal Kompas</a>
+        <h1 class="studio__title">Schlichting Oefensimulator</h1>
+        <span aria-hidden="true" style="width:8ch"></span>
+      </nav>
+
+      <section class="sim-hero">
+        <p class="eyebrow">Mondeling &middot; Diagnostiek</p>
+        <h2>Oefen alsof er een kind tegenover je zit.</h2>
+        <p>
+          Spreek de oefenaanbieding in. De simulator luistert mee, speelt een kindreactie
+          en geeft feedback op rust, neutraliteit, exacte formulering en verboden hulp.
+        </p>
+      </section>
+
+      <section class="sim-layout" aria-label="Schlichting oefensimulator">
+        <aside class="sim-card sim-panel">
+          <h2>Scenario</h2>
+          <label class="sim-label" for="scenario">Kies oefenonderdeel</label>
+          <select id="scenario" class="sim-select"></select>
+
+          <div class="child-card" aria-live="polite">
+            <div class="child-avatar" aria-hidden="true">kind</div>
+            <div>
+              <p class="child-name" id="childName"></p>
+              <p class="child-state" id="childState"></p>
+            </div>
+          </div>
+
+          <div class="target-box">
+            <h3>Jouw doel</h3>
+            <p id="targetText"></p>
+          </div>
+
+          <div class="target-box">
+            <h3>Let op</h3>
+            <ul id="watchList"></ul>
+          </div>
+        </aside>
+
+        <section class="sim-card practice-panel">
+          <div class="prompt-row">
+            <div>
+              <p class="eyebrow">Oefenitem</p>
+              <h2 id="itemTitle"></h2>
+            </div>
+            <button class="btn btn--ghost" id="nextItem" type="button">Nieuw item</button>
+          </div>
+
+          <p class="instruction" id="instructionText"></p>
+
+          <div class="recorder">
+            <button class="mic-button" id="recordBtn" type="button" aria-label="Start opname">
+              <span aria-hidden="true">🎙</span>
+            </button>
+            <p id="recordState">Druk om je aanbieding in te spreken.</p>
+          </div>
+
+          <label class="sim-label" for="transcript">Wat de tool hoorde</label>
+          <textarea id="transcript" class="sim-textarea" rows="4" placeholder="Je transcript verschijnt hier. Je kunt ook typen als spraakherkenning niet werkt."></textarea>
+
+          <div class="sim-actions">
+            <button class="btn btn--primary" id="checkBtn" type="button">Geef feedback</button>
+            <button class="btn btn--ghost" id="childBtn" type="button">Laat kind reageren</button>
+            <button class="btn btn--ghost" id="resetBtn" type="button">Wis</button>
+          </div>
+
+          <div class="child-response" id="childResponse" hidden></div>
+          <div class="feedback-list" id="feedbackList" aria-live="polite"></div>
+        </section>
+      </section>
+
+      <section class="sim-card mastery">
+        <h2>Route naar een 10</h2>
+        <div class="mastery-grid">
+          <div>
+            <h3>1. Automatisch</h3>
+            <p>Je hoeft niet meer na te denken over start, itemaanbieding en afbreekregel.</p>
+          </div>
+          <div>
+            <h3>2. Neutraal</h3>
+            <p>Geen intonatiehulp, geen complimenten tijdens scoring, geen aanwijzende cues.</p>
+          </div>
+          <div>
+            <h3>3. Reflectief</h3>
+            <p>Je benoemt een fout rustig, schat de impact in en zegt hoe je professioneel herstelt.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="simulator.js"></script>
+  </body>
+</html>
