@@ -29,6 +29,56 @@
         </p>
       </section>
 
+      <section class="sim-card age-trainer" aria-labelledby="age-title">
+        <div>
+          <p class="eyebrow">Stap 0 &middot; Leeftijd</p>
+          <h2 id="age-title">Bereken leeftijd en kies je startpunt.</h2>
+          <p>
+            Train de snelle toetsroute: datum onder elkaar, eventueel één maand lenen,
+            daarna leeftijd hardop formuleren en je startkeuze onderbouwen.
+          </p>
+        </div>
+
+        <div class="age-grid">
+          <label>
+            <span class="sim-label">Geboortedatum</span>
+            <input class="sim-input" id="birthDate" type="date" />
+          </label>
+          <label>
+            <span class="sim-label">Testdatum</span>
+            <input class="sim-input" id="testDate" type="date" />
+          </label>
+          <label>
+            <span class="sim-label">Jouw antwoord: jaren</span>
+            <input class="sim-input" id="ageYears" type="number" min="0" inputmode="numeric" placeholder="5" />
+          </label>
+          <label>
+            <span class="sim-label">Maanden</span>
+            <input class="sim-input" id="ageMonths" type="number" min="0" max="11" inputmode="numeric" placeholder="3" />
+          </label>
+          <label>
+            <span class="sim-label">Dagen</span>
+            <input class="sim-input" id="ageDays" type="number" min="0" max="31" inputmode="numeric" placeholder="12" />
+          </label>
+          <label>
+            <span class="sim-label">Jouw startkeuze</span>
+            <select class="sim-select" id="startChoice">
+              <option value="">Kies...</option>
+              <option value="jong">Jonge startsectie</option>
+              <option value="midden">Midden startsectie</option>
+              <option value="oud">Oudere startsectie</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="sim-actions">
+          <button class="btn btn--primary" id="checkAge" type="button">Check leeftijd</button>
+          <button class="btn btn--ghost" id="newAgeCase" type="button">Nieuwe datum</button>
+        </div>
+
+        <div class="age-output" id="ageOutput" aria-live="polite"></div>
+      </section>
+
       <section class="sim-layout" aria-label="Schlichting oefensimulator">
         <aside class="sim-card sim-panel">
           <h2>Scenario</h2>

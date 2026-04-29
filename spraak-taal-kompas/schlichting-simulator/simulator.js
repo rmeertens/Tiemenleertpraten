@@ -62,6 +62,14 @@ let current = 0;
 let recognition = null;
 let isRecording = false;
 
+const ageCases = [
+  { birth: "2019-11-18", test: "2025-03-07" },
+  { birth: "2020-02-29", test: "2025-02-28" },
+  { birth: "2018-06-14", test: "2024-11-03" },
+  { birth: "2021-09-25", test: "2026-04-10" },
+  { birth: "2019-01-31", test: "2024-03-01" },
+];
+
 const scenario = document.querySelector("#scenario");
 const childName = document.querySelector("#childName");
 const childState = document.querySelector("#childState");
@@ -78,6 +86,15 @@ const resetBtn = document.querySelector("#resetBtn");
 const nextItem = document.querySelector("#nextItem");
 const childResponse = document.querySelector("#childResponse");
 const feedbackList = document.querySelector("#feedbackList");
+const birthDate = document.querySelector("#birthDate");
+const testDate = document.querySelector("#testDate");
+const ageYears = document.querySelector("#ageYears");
+const ageMonths = document.querySelector("#ageMonths");
+const ageDays = document.querySelector("#ageDays");
+const startChoice = document.querySelector("#startChoice");
+const checkAge = document.querySelector("#checkAge");
+const newAgeCase = document.querySelector("#newAgeCase");
+const ageOutput = document.querySelector("#ageOutput");
 
 function normalize(text) {
   return text
@@ -118,6 +135,108 @@ function fillScenarioOptions() {
 
 function feedback(type, title, body) {
   return `<div class="feedback-item feedback-item--${type}"><strong>${title}</strong><br>${body}</div>`;
+}
+
+function parseDateInput(value) {
+  if (!value) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function daysInPreviousMonth(year, monthIndex) {
+  return new Date(year, monthIndex, 0).getDate();
+}
+
+function calculateAge(birth, test) {
+  let years = test.getFullYear() - birth.getFullYear();
+  let months = test.getMonth() - birth.getMonth();
+  let days = test.getDate() - birth.getDate();
+  const steps = [
+    `Jaren: ${test.getFullYear()} - ${birth.getFullYear()} = ${years}.`,
+    `Maanden: ${test.getMonth() + 1} - ${birth.getMonth() + 1} = ${months}.`,
+    `Dagen: ${test.getDate()} - ${birth.getDate()} = ${days}.`,
+  ];
+
+  if (days < 0) {
+    months -= 1;
+    const borrowedDays = daysInPreviousMonth(test.getFullYear(), test.getMonth());
+    days += borrowedDays;
+    steps.push(`Dagen negatief? Leen 1 maand: +${borrowedDays} dagen, maanden -1.`);
+  }
+
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+    steps.push("Maanden negatief? Leen 1 jaar: maanden +12, jaren -1.");
+  }
+
+  steps.push(`Leeftijd = ${years};${months};${days}. Spreek dit hardop uit als ${years} jaar, ${months} maanden en ${days} dagen.`);
+  return { years, months, days, steps };
+}
+
+function startBand(age) {
+  const totalMonths = age.years * 12 + age.months;
+  if (totalMonths < 54) return "jong";
+  if (totalMonths < 72) return "midden";
+  return "oud";
+}
+
+function startBandLabel(value) {
+  return {
+    jong: "jonge startsectie",
+    midden: "midden startsectie",
+    oud: "oudere startsectie",
+  }[value];
+}
+
+function renderAgeFeedback() {
+  const birth = parseDateInput(birthDate.value);
+  const test = parseDateInput(testDate.value);
+  if (!birth || !test || test < birth) {
+    ageOutput.innerHTML = `<div class="age-result age-result--warn"><strong>Check je datums.</strong><br>Vul een geboortedatum en latere testdatum in.</div>`;
+    return;
+  }
+
+  const age = calculateAge(birth, test);
+  const userYears = Number(ageYears.value);
+  const userMonths = Number(ageMonths.value);
+  const userDays = Number(ageDays.value);
+  const ageCorrect = userYears === age.years && userMonths === age.months && userDays === age.days;
+  const expectedBand = startBand(age);
+  const chosenBand = startChoice.value;
+  const startCorrect = chosenBand === expectedBand;
+  const ageClass = ageCorrect ? "age-result--good" : "age-result--warn";
+  const startClass = startCorrect ? "age-result--good" : "age-result--warn";
+
+  ageOutput.innerHTML = `
+    <div class="age-result ${ageClass}">
+      <strong>${ageCorrect ? "Leeftijd klopt." : "Leeftijd nog niet helemaal."}</strong><br>
+      Correct is: <strong>${age.years};${age.months};${age.days}</strong>.
+      <ol class="age-steps">${age.steps.map((step) => `<li>${step}</li>`).join("")}</ol>
+    </div>
+    <div class="age-result ${startClass}">
+      <strong>${startCorrect ? "Startkeuze past bij deze oefenregel." : "Startkeuze bijstellen."}</strong><br>
+      Voor deze oefentrainer hoort hierbij: <strong>${startBandLabel(expectedBand)}</strong>.
+      In de echte afname controleer je altijd de officiële handleiding/casusregel.
+    </div>
+    <div class="age-result age-result--warn">
+      <strong>Snelste tentamenstrategie</strong><br>
+      Schrijf testdatum boven geboortedatum. Trek dagen, maanden, jaren af. Is dagen negatief:
+      leen één maand. Is maanden negatief: leen één jaar. Zeg daarna direct:
+      “Het kind is ${age.years} jaar en ${age.months} maanden; start daarom bij ... volgens de handleiding.”
+    </div>
+  `;
+}
+
+function loadNewAgeCase() {
+  const item = ageCases[Math.floor(Math.random() * ageCases.length)];
+  birthDate.value = item.birth;
+  testDate.value = item.test;
+  ageYears.value = "";
+  ageMonths.value = "";
+  ageDays.value = "";
+  startChoice.value = "";
+  ageOutput.innerHTML = "";
 }
 
 function checkAnswer() {
@@ -246,6 +365,10 @@ resetBtn.addEventListener("click", () => {
   recordState.textContent = recognition ? "Druk om je aanbieding in te spreken." : recordState.textContent;
 });
 
+checkAge.addEventListener("click", renderAgeFeedback);
+newAgeCase.addEventListener("click", loadNewAgeCase);
+
 fillScenarioOptions();
 renderScenario();
 setupSpeechRecognition();
+loadNewAgeCase();
