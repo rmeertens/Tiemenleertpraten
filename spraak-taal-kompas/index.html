@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Spraak-Taal Kompas — kennisraamwerk en toetscoach voor spraak-taal in de Hanze Logopedie." />
+    <meta name="color-scheme" content="light dark" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>Spraak-Taal Kompas &middot; Tiemen Leert Praten</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="version-stamp">v1 &middot; 29 apr</div>
+    <main class="studio">
+      <nav class="studio__nav">
+        <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+        <h1 class="studio__title">Spraak-Taal Kompas</h1>
+        <span aria-hidden="true" style="width:8ch"></span>
+      </nav>
+
+      <nav class="modes tabs" aria-label="Hoofdonderdelen">
+        <button class="tab mode-btn is-active" data-view="framework" aria-selected="true">Raamwerk</button>
+        <button class="tab mode-btn" data-view="oral" aria-selected="false">Mondeling</button>
+        <button class="tab mode-btn" data-view="written" aria-selected="false">Schriftelijk</button>
+        <button class="tab mode-btn" data-view="coach" aria-selected="false">Coach</button>
+      </nav>
+
+      <section id="framework" class="view is-visible">
+        <div class="intro">
+          <div>
+            <h2>Kennisraamwerk spraak en taal</h2>
+            <p>
+              Gebruik dit als studiekaart: tik op een begrip voor uitleg, toetskoppeling,
+              valkuilen en een korte zelfcheck.
+            </p>
+          </div>
+          <div class="searchbox">
+            <label for="search">Zoek begrip</label>
+            <input id="search" type="search" placeholder="Bijv. fonologie, TOS, Schlichting..." />
+          </div>
+        </div>
+        <div id="domainGrid" class="domain-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="oral" class="view">
+        <div class="intro">
+          <div>
+            <h2>Mondelinge toets</h2>
+            <p>Een praktische checklist voor diagnostiek, therapie en verantwoording.</p>
+          </div>
+          <button id="startOralDrill" class="primary">Start 10-minutendril</button>
+        </div>
+        <div class="two-col">
+          <article class="panel">
+            <h3>Diagnostiek: Schlichting</h3>
+            <ul class="checklist">
+              <li>Testsituatie rustig, voorspelbaar en professioneel maken.</li>
+              <li>Instructies en stimuluszinnen neutraal, rustig en consequent aanbieden.</li>
+              <li>Items exact volgens handleiding aanbieden en scoren.</li>
+              <li>Startsectie en afbreekregels kunnen noemen bij de casus.</li>
+              <li>Eigen handelen evalueren: fouten benoemen, impact inschatten, herstellen.</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <h3>Therapiegesprek</h3>
+            <ul class="checklist">
+              <li>Logopedisch beeld samenvatten en vervolgstappen plaatsen in methodisch handelen.</li>
+              <li>Lange- en kortetermijndoelen SMART en passend bij beginsituatie formuleren.</li>
+              <li>Methode, therapievormen en duur onderbouwen met diagnose, leeftijd en context.</li>
+              <li>Samenwerking met ouders, school, arts, AC of multidisciplinair team benoemen.</li>
+              <li>Prognose geven: bevorderend, belemmerend, evaluatiemoment en bijstelcriteria.</li>
+            </ul>
+          </article>
+        </div>
+        <div id="oralDrill" class="drill"></div>
+      </section>
+
+      <section id="written" class="view">
+        <div class="intro">
+          <div>
+            <h2>Schriftelijk tentamen</h2>
+            <p>Train juist/onjuist-redeneren en casusantwoorden met korte feedback.</p>
+          </div>
+          <button id="newQuestion" class="primary">Nieuwe vraag</button>
+        </div>
+        <div class="two-col">
+          <article class="panel">
+            <h3>Wat je moet kunnen</h3>
+            <ul class="checklist">
+              <li>Normale ontwikkeling koppelen aan leeftijd, taalniveau en modaliteit.</li>
+              <li>Spraakproblemen differentiëren: fonetisch, fonologisch, VOD, dysartrie.</li>
+              <li>Testleer toepassen: normering, validiteit, betrouwbaarheid, SD, Q-score, percentiel.</li>
+              <li>Meertaligheid zuiver wegen: aanbod, thuistaal, NT2, TOS en leerbaarheid.</li>
+              <li>Behandelkeuzes verantwoorden vanuit diagnose, hulpvraag, ICF en context.</li>
+            </ul>
+          </article>
+          <article id="questionCard" class="panel question-card"></article>
+        </div>
+      </section>
+
+      <section id="coach" class="view">
+        <div class="intro">
+          <div>
+            <h2>Casuscoach</h2>
+            <p>Kies een casusprofiel en oefen hardop je conclusie, advies en behandelplan.</p>
+          </div>
+          <button id="newCase" class="primary">Nieuwe casus</button>
+        </div>
+        <article id="caseCard" class="case-card"></article>
+      </section>
+    </main>
+
+    <dialog id="conceptDialog" class="dialog">
+      <button id="closeDialog" class="icon-button" aria-label="Sluiten">×</button>
+      <p id="dialogDomain" class="eyebrow"></p>
+      <h2 id="dialogTitle"></h2>
+      <p id="dialogBody"></p>
+      <div class="dialog-grid">
+        <div>
+          <h3>Toetskoppeling</h3>
+          <p id="dialogExam"></p>
+        </div>
+        <div>
+          <h3>Valkuil</h3>
+          <p id="dialogPitfall"></p>
+        </div>
+      </div>
+      <div class="selfcheck">
+        <h3>Zelfcheck</h3>
+        <p id="dialogCheck"></p>
+      </div>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
