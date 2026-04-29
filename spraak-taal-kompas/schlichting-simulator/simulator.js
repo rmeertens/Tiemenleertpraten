@@ -221,8 +221,8 @@ function renderAgeFeedback() {
     </div>
     <div class="age-result age-result--warn">
       <strong>Snelste tentamenstrategie</strong><br>
-      Schrijf testdatum boven geboortedatum. Trek dagen, maanden, jaren af. Is dagen negatief:
-      leen één maand. Is maanden negatief: leen één jaar. Zeg daarna direct:
+      Schrijf testdatum boven geboortedatum. Trek dagen, maanden, jaren af. Is de bovenste dag te klein:
+      pak het aantal dagen van de vorige maand erbij en doe maanden min één. Is maanden negatief: leen één jaar. Zeg daarna direct:
       “Het kind is ${age.years} jaar en ${age.months} maanden; start daarom bij ... volgens de handleiding.”
     </div>
   `;

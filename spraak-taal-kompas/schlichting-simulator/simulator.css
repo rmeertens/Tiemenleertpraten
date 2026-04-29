@@ -106,6 +106,20 @@
   gap: 10px;
 }
 
+.panic-rule {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 12px 16px;
+}
+
+.panic-rule strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .age-result {
   border-radius: var(--radius);
   padding: 14px 16px;
