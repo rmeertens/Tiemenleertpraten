@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="ZG Training — ICF-Brug, Levelt Lab, MDO-Kruisverhoor en Criterium 10-Reflector." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>ZG Training &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=6" />
+  <link rel="stylesheet" href="zg.css" />
+</head>
+<body>
+  <main class="studio zg">
+    <nav class="studio__nav" aria-label="Hoofdnavigatie">
+      <a class="studio__home" href="/">← Tiemen Leert Praten</a>
+      <h1 class="studio__title">ZG Training</h1>
+      <a class="studio__home" href="/casus-studio/">Casus Studio</a>
+    </nav>
+
+    <header class="zg-hero">
+      <p class="eyebrow">De 10-vaardigheden</p>
+      <h2>Maak van kennis een ZG-antwoord.</h2>
+      <p>
+        Train precies wat vaak het verschil maakt: de ICF-brug, Levelt-denken,
+        professioneel verdedigen in een MDO en procedurefouten sterk reflecteren.
+      </p>
+    </header>
+
+    <nav class="zg-tabs" aria-label="ZG modules">
+      <button class="mode-btn" type="button" aria-selected="true" data-module="icf">ICF-Brug</button>
+      <button class="mode-btn" type="button" aria-selected="false" data-module="levelt">Levelt Lab</button>
+      <button class="mode-btn" type="button" aria-selected="false" data-module="mdo">MDO-Kruisverhoor</button>
+      <button class="mode-btn" type="button" aria-selected="false" data-module="reflector">Criterium 10</button>
+    </nav>
+
+    <section class="zg-layout">
+      <aside class="zg-case" aria-label="Oefening">
+        <p class="case-sheet__label" id="moduleLabel"></p>
+        <h2 id="scenarioTitle"></h2>
+        <div id="scenarioFacts" class="zg-facts"></div>
+        <button class="btn btn--ghost" id="newScenario" type="button">Nieuwe oefening</button>
+      </aside>
+
+      <section class="zg-work">
+        <div class="zg-template" id="template"></div>
+        <label class="zg-answer">
+          Jouw antwoord
+          <textarea id="answer" rows="8" placeholder="Typ je antwoord alsof je in de toets zit."></textarea>
+        </label>
+        <div class="zg-actions">
+          <button class="btn btn--primary" id="checkAnswer" type="button">Check ZG-componenten</button>
+          <button class="btn btn--ghost" id="showExample" type="button">Toon voorbeeld</button>
+          <button class="btn btn--ghost" id="clearAnswer" type="button">Wis</button>
+        </div>
+        <section class="zg-feedback" id="feedback" hidden aria-live="polite"></section>
+      </section>
+    </section>
+  </main>
+
+  <script src="zg.js"></script>
+</body>
+</html>

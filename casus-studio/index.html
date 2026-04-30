@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Casus Studio — complete toetssimulatie voor Spraak-Taal." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Casus Studio &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=6" />
+  <link rel="stylesheet" href="casus.css" />
+</head>
+<body>
+  <main class="studio casus">
+    <nav class="studio__nav" aria-label="Hoofdnavigatie">
+      <a class="studio__home" href="/">← Tiemen Leert Praten</a>
+      <h1 class="studio__title">Casus Studio</h1>
+      <a class="studio__home" href="/leerroute/">Leerroute</a>
+    </nav>
+
+    <header class="casus-hero">
+      <p class="eyebrow">Toetssimulatie</p>
+      <h2>Van casus naar ZG-antwoord.</h2>
+      <p>
+        Oefen de complete denklijn: signalen wegen, differentiaaldiagnose,
+        testinterpretatie, ICF-brug, doelen, methode, samenwerking en prognose.
+      </p>
+      <p class="casus-hero__link">
+        Vast op ICF, MDO of reflectie? <a href="/zg-training/">Open ZG Training &rarr;</a>
+      </p>
+    </header>
+
+    <section class="casus-layout">
+      <aside class="casus-sidebar" aria-label="Casus kiezen">
+        <label class="casus-select">
+          Kies casus
+          <select id="caseSelect"></select>
+        </label>
+
+        <div class="timer-card" aria-live="polite">
+          <span>Toetsmodus</span>
+          <strong id="timer">15:00</strong>
+          <button class="btn btn--ghost" id="timerToggle" type="button">Start timer</button>
+        </div>
+
+        <div class="score-card">
+          <span>Score-indicatie</span>
+          <strong id="scoreLabel">Nog niet nagekeken</strong>
+          <p id="scoreHint">Vul je antwoord in en controleer op ZG-componenten.</p>
+        </div>
+      </aside>
+
+      <section class="casus-main">
+        <article class="case-sheet">
+          <p class="case-sheet__label">Toetscasus</p>
+          <h2 id="caseTitle"></h2>
+          <div class="case-facts" id="caseFacts"></div>
+          <div class="sample-box">
+            <span>Kindspraak / taalvoorbeeld</span>
+            <p id="caseSample"></p>
+          </div>
+        </article>
+
+        <form class="answer-form" id="answerForm">
+          <div class="answer-step">
+            <label for="signals">1. Signalen en beginsituatie</label>
+            <textarea id="signals" rows="4" placeholder="Welke signalen vallen op? Noem leeftijd, hulpvraag, functioneren, testbeeld en observaties."></textarea>
+          </div>
+
+          <div class="answer-step">
+            <label for="diagnosis">2. Conclusie en differentiaaldiagnose</label>
+            <textarea id="diagnosis" rows="5" placeholder="Wat is je voorlopige conclusie? Waarom TOS, NT2, fonologisch, fonetisch, pragmatisch of iets anders? Wat sluit je uit?"></textarea>
+          </div>
+
+          <div class="answer-step">
+            <label for="scores">3. Testinterpretatie</label>
+            <textarea id="scores" rows="4" placeholder="Gebruik normscore, betrouwbaarheidsinterval, begrip/productie en observatie."></textarea>
+          </div>
+
+          <div class="answer-step">
+            <label for="icf">4. ICF-brug</label>
+            <textarea id="icf" rows="4" placeholder="Koppel functie/probleem aan activiteit, participatie en omgeving."></textarea>
+          </div>
+
+          <div class="answer-step">
+            <label for="therapy">5. Behandelplan</label>
+            <textarea id="therapy" rows="6" placeholder="Formuleer LT-doel, KT-doel, methode, therapievorm, duur, samenwerking en prognose."></textarea>
+          </div>
+
+          <div class="casus-actions">
+            <button class="btn btn--primary" type="submit">Controleer mijn casus</button>
+            <button class="btn btn--ghost" id="fillExample" type="button">Toon voorbeeldstructuur</button>
+            <button class="btn btn--ghost" id="clearAnswers" type="button">Wis</button>
+          </div>
+        </form>
+
+        <section class="rubric-results" id="results" hidden aria-live="polite"></section>
+      </section>
+    </section>
+  </main>
+
+  <script src="casus.js"></script>
+</body>
+</html>

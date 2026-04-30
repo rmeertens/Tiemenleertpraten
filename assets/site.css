@@ -86,6 +86,70 @@ a { color: inherit; }
   margin: 0;
 }
 
+.route-cta {
+  background: var(--bg-elevated);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+  margin: -24px 0 58px;
+  padding: 32px;
+}
+
+.route-cta__label,
+.goal-card__label {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.route-cta__title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4vw, 42px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.08;
+  margin: 0 0 10px;
+}
+
+.route-cta__body {
+  color: var(--ink-soft);
+  margin: 0;
+  max-width: 52ch;
+}
+
+.route-cta__button {
+  background: var(--accent);
+  border-radius: 999px;
+  color: #fff;
+  flex: 0 0 auto;
+  font-weight: 700;
+  padding: 12px 20px;
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.route-cta__button:hover,
+.route-cta__button:focus {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 720px) {
+  .route-cta {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-top: -8px;
+    padding: 26px;
+  }
+}
+
 .tools__heading {
   font-size: 13px;
   letter-spacing: 0.18em;
@@ -179,6 +243,166 @@ a { color: inherit; }
   border-top: 1px solid var(--rule);
   font-size: 13px;
   color: var(--ink-faint);
+}
+
+/* ============ Leerroute ============ */
+
+.route-page {
+  max-width: 1120px;
+}
+
+.route-hero {
+  margin: 42px 0 52px;
+}
+
+.route-hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 6vw, 68px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+  margin: 0 0 20px;
+}
+
+.route-hero__lede {
+  color: var(--ink-soft);
+  font-size: 19px;
+  margin: 0;
+  max-width: 64ch;
+}
+
+.goal-grid {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 56px;
+}
+
+.goal-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+  padding: 30px;
+}
+
+.goal-card h3,
+.route-step h3 {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+  margin: 0 0 12px;
+}
+
+.goal-card p {
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.flow-list {
+  counter-reset: flow;
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.flow-list li {
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 2px 14px;
+  grid-template-columns: auto 1fr;
+  padding: 14px;
+}
+
+.flow-list li::before {
+  align-items: center;
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--accent);
+  content: counter(flow);
+  counter-increment: flow;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  height: 30px;
+  justify-content: center;
+  width: 30px;
+}
+
+.flow-list a {
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.flow-list a:hover,
+.flow-list a:focus {
+  color: var(--accent);
+}
+
+.flow-list span {
+  color: var(--ink-soft);
+  font-size: 14px;
+  grid-column: 2;
+}
+
+.route-map {
+  border-top: 1px solid var(--rule);
+  padding-top: 34px;
+}
+
+.route-map__grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.route-step {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.route-step span {
+  color: var(--accent);
+  display: block;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.route-step h3 {
+  font-size: 24px;
+}
+
+.route-step p {
+  color: var(--ink-soft);
+  font-size: 15px;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .goal-card {
+    grid-template-columns: 1fr;
+  }
+
+  .route-map__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .route-map__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ============ IPA Studio ============ */
