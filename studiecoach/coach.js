@@ -113,6 +113,7 @@ PROFESSIONELE REFLECTIE
 let apiKey = sessionStorage.getItem('coach_api_key') || '';
 let topic = 'taalbegrip';
 let history = []; // [{role:'user'|'assistant', content:'...'}]
+const MODELS = ['claude-haiku-4-5-20251001', 'claude-3-5-haiku-latest'];
 
 // ============================================================
 // DOM refs
@@ -129,6 +130,7 @@ const sendBtn    = document.getElementById('send-btn');
 const resetBtn   = document.getElementById('reset-btn');
 const logoutBtn  = document.getElementById('logout-btn');
 const topicBtns  = document.querySelectorAll('[data-topic]');
+const promptBtns = document.querySelectorAll('[data-prompt]');
 
 // ============================================================
 // Boot
@@ -166,6 +168,13 @@ userInput.addEventListener('keydown', e => {
 });
 
 resetBtn.addEventListener('click', resetChat);
+
+promptBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    userInput.value = btn.dataset.prompt;
+    userInput.focus();
+  });
+});
 
 logoutBtn.addEventListener('click', () => {
   sessionStorage.removeItem('coach_api_key');
@@ -243,34 +252,10 @@ async function sendMessage(text) {
   const typingEl = appendTyping();
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 600,
-        system: buildSystemPrompt(),
-        messages: history,
-      }),
-    });
+    const data = await requestCoachReply();
 
     typingEl.remove();
 
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      const msg = body?.error?.message || `HTTP ${res.status}`;
-      appendErrorMsg(msg);
-      // Remove the failed user turn so history stays consistent
-      history.pop();
-      return;
-    }
-
-    const data = await res.json();
     const reply = data?.content?.[0]?.text ?? '';
     history.push({ role: 'assistant', content: reply });
     appendBotMsg(reply);
@@ -282,6 +267,47 @@ async function sendMessage(text) {
   } finally {
     setBusy(false);
   }
+}
+
+async function requestCoachReply() {
+  let lastError = null;
+
+  for (const model of MODELS) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 600,
+        system: buildSystemPrompt(),
+        messages: history,
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      const msg = body?.error?.message || `HTTP ${res.status}`;
+      lastError = new Error(readableApiError(msg, res.status));
+      if (res.status === 404 || /model/i.test(msg)) continue;
+      throw lastError;
+    }
+
+    return res.json();
+  }
+
+  throw lastError || new Error('De coach kon geen beschikbaar model vinden.');
+}
+
+function readableApiError(message, status) {
+  if (status === 401) return 'De API-sleutel wordt geweigerd. Controleer of je sleutel klopt.';
+  if (status === 429) return 'De API-limiet is bereikt. Wacht even en probeer opnieuw.';
+  if (status === 403) return 'De browseraanroep wordt geweigerd. Controleer of direct browsergebruik voor deze sleutel is toegestaan.';
+  return message;
 }
 
 // ============================================================

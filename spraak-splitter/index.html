@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Spraak Splitter — hak woorden in klankgroepen, lettergrepen en oefenstapjes." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Spraak Splitter &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=7" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; 3 mei</div>
+  <main class="studio splitter">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Spraak Splitter</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <section class="splitter-panel" aria-labelledby="splitter-heading">
+      <div class="splitter-copy">
+        <p class="eyebrow">Van woord naar oefenstap</p>
+        <h2 id="splitter-heading">Hak spraak in behapbare stukken.</h2>
+        <p>
+          Plak een woord of korte zin. De splitter zoekt klinkerkernen, klankgroepen,
+          clusters en lettergrepen, zodat je sneller een oefenopbouw kunt maken.
+        </p>
+      </div>
+
+      <form class="splitter-form" id="splitter-form">
+        <label class="sr-only" for="splitter-input">Woorden of zin</label>
+        <textarea
+          id="splitter-input"
+          class="splitter-input"
+          rows="4"
+          placeholder="Bijvoorbeeld: schroevendraaier, brandweerauto, kapotte stoel"
+          spellcheck="true"
+          lang="nl"
+        ></textarea>
+        <div class="splitter-actions">
+          <button class="btn btn--primary" type="submit">Split</button>
+          <button class="btn btn--ghost" type="button" id="clear-btn">Wis</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="splitter-tools" aria-label="Voorbeelden en weergave">
+      <div class="modes" role="group" aria-label="Weergave">
+        <button class="mode-btn" type="button" data-mode="full" aria-selected="true">Alles</button>
+        <button class="mode-btn" type="button" data-mode="syllables" aria-selected="false">Lettergrepen</button>
+        <button class="mode-btn" type="button" data-mode="sounds" aria-selected="false">Klanken</button>
+      </div>
+
+      <div class="splitter-examples" aria-label="Voorbeelden">
+        <button type="button" data-example="schroevendraaier">schroevendraaier</button>
+        <button type="button" data-example="brandweerauto">brandweerauto</button>
+        <button type="button" data-example="de kapotte stoel staat scheef">kapotte stoel</button>
+      </div>
+    </section>
+
+    <section class="splitter-results" id="splitter-results" aria-live="polite"></section>
+
+    <template id="word-template">
+      <article class="split-card">
+        <header class="split-card__header">
+          <div>
+            <p class="split-card__label">Woord</p>
+            <h3></h3>
+          </div>
+          <button class="split-speak" type="button" aria-label="Spreek woord uit">▶</button>
+        </header>
+        <div class="split-block split-block--syllables">
+          <h4>Lettergrepen</h4>
+          <div class="split-pills" data-slot="syllables"></div>
+        </div>
+        <div class="split-block split-block--sounds">
+          <h4>Klankgroepen</h4>
+          <div class="split-pills" data-slot="sounds"></div>
+        </div>
+        <div class="split-block split-block--pattern">
+          <h4>Profiel</h4>
+          <dl class="split-profile">
+            <div><dt>Klinkerkernen</dt><dd data-slot="vowels"></dd></div>
+            <div><dt>Clusters</dt><dd data-slot="clusters"></dd></div>
+            <div><dt>Oefenopbouw</dt><dd data-slot="steps"></dd></div>
+          </dl>
+        </div>
+      </article>
+    </template>
+  </main>
+
+  <script src="splitter.js"></script>
+</body>
+</html>
