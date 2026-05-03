@@ -816,6 +816,85 @@ a { color: inherit; }
   font-size: 14px;
 }
 
+.oral-guide {
+  margin-top: 16px;
+}
+
+.oral-extra-grid {
+  margin-top: 16px;
+}
+
+.oral-guide-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.oral-guide-grid article,
+.oral-drill {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.oral-guide-grid h4 {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.oral-guide-grid ul {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding-left: 18px;
+}
+
+.oral-guide-grid li,
+.oral-guide-grid p,
+.oral-drill p,
+.oral-drill span {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0;
+}
+
+.oral-drill {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.oral-drill strong {
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.oral-drill span {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.oral-redflags {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.oral-redflags li {
+  background: rgba(192, 57, 43, 0.08);
+  border: 1px solid rgba(192, 57, 43, 0.2);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  font-size: 14px;
+  list-style: none;
+  padding: 10px 12px;
+}
+
 .oral-case {
   display: grid;
   gap: 10px;
@@ -829,6 +908,51 @@ a { color: inherit; }
 
 .oral-case span {
   color: var(--ink-soft);
+}
+
+.oral-prep-tools {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin: 0 0 16px;
+  padding: 14px;
+}
+
+.oral-prep-tools h4 {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.oral-prep-tools div {
+  display: grid;
+  gap: 8px;
+}
+
+.oral-prep-tools a {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  text-decoration: none;
+}
+
+.oral-prep-tools a:hover,
+.oral-prep-tools a:focus {
+  border-color: var(--accent);
+}
+
+.oral-prep-tools strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.oral-prep-tools span {
+  color: var(--ink-soft);
+  font-size: 13px;
 }
 
 .oral-answer {

@@ -24,8 +24,9 @@
         <p class="eyebrow">Performance assessment Spraak-Taal</p>
         <h2>Train alsof de docent meekijkt.</h2>
         <p>
-          Oefen de live Schlichting-afname, je foutverantwoording en het therapiegesprek.
-          De tool stuurt op de criteria die punten opleveren.
+          Oefen Taalbegrip-3 volledig, Taalproductie-3 alleen Zinsontwikkeling,
+          je foutverantwoording en het therapiegesprek. De tool stuurt op de criteria
+          die punten opleveren.
         </p>
       </div>
       <aside class="oral-clock">
@@ -48,8 +49,8 @@
           <p class="oral-label">Onderdeel A</p>
           <h3>Schlichting live afnemen</h3>
           <p>
-            Je wordt beoordeeld op testsituatie, aanbod, scoring, startsectie,
-            afbreekregels en je professionele verantwoording.
+            Je wordt beoordeeld op testsituatie, Taalbegrip-3, Zinsontwikkeling,
+            scoring, startsectie, afbreekregels en je professionele verantwoording.
           </p>
           <div class="oral-prompt" id="diagnostic-prompt"></div>
           <div class="oral-actions">
@@ -63,6 +64,26 @@
           <h3>Vink je bewijs aan</h3>
           <div class="oral-checks" id="diagnostic-checks"></div>
           <button class="btn btn--primary" type="button" data-score="diagnostics">Bereken score</button>
+        </article>
+      </div>
+
+      <article class="oral-card oral-guide">
+        <p class="oral-label">Handleidingcheck</p>
+        <h3>Wat moet automatisch uit je mond komen?</h3>
+        <div class="oral-guide-grid" id="guide-grid"></div>
+      </article>
+
+      <div class="oral-grid oral-extra-grid">
+        <article class="oral-card">
+          <p class="oral-label">Overhoorstand</p>
+          <h3>Docentvraag</h3>
+          <div class="oral-drill" id="oral-drill"></div>
+          <button class="btn btn--primary" type="button" id="new-drill">Nieuwe vraag</button>
+        </article>
+        <article class="oral-card">
+          <p class="oral-label">Rode vlaggen</p>
+          <h3>Dit kost punten</h3>
+          <ul class="oral-redflags" id="red-flags"></ul>
         </article>
       </div>
     </section>
@@ -98,6 +119,7 @@
           <p class="oral-label">15 minuten voorbereiding</p>
           <h3 id="sim-title">Trek een toetskaart</h3>
           <div class="oral-case" id="sim-case"></div>
+          <div class="oral-prep-tools" id="prep-tools"></div>
           <button class="btn btn--primary" type="button" id="draw-card">Nieuwe toetskaart</button>
         </article>
 

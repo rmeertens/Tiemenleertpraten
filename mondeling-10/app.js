@@ -15,8 +15,12 @@ const diagnosticPrompt = document.getElementById('diagnostic-prompt');
 const therapyPrompt = document.getElementById('therapy-prompt');
 const diagnosticChecks = document.getElementById('diagnostic-checks');
 const therapyChecks = document.getElementById('therapy-checks');
+const guideGrid = document.getElementById('guide-grid');
+const oralDrill = document.getElementById('oral-drill');
+const redFlags = document.getElementById('red-flags');
 const simTitle = document.getElementById('sim-title');
 const simCase = document.getElementById('sim-case');
+const prepTools = document.getElementById('prep-tools');
 const oralAnswer = document.getElementById('oral-answer');
 const oralNote = document.getElementById('oral-note');
 const feedback = document.getElementById('oral-feedback');
@@ -31,13 +35,18 @@ let secondsLeft = 15 * 60;
 let timerId = null;
 let recognition = null;
 let recording = false;
+let activeDrill = data.drills[0];
 
 boot();
 
 function boot() {
   renderPrompts();
   renderChecks();
+  renderGuide();
+  renderDrill();
+  renderRedFlags();
   renderSimulation();
+  renderPrepTools();
   renderDashboard();
   bindEvents();
 }
@@ -69,6 +78,11 @@ function bindEvents() {
     renderSimulation();
   });
 
+  document.getElementById('new-drill').addEventListener('click', () => {
+    activeDrill = randomItem(data.drills);
+    renderDrill();
+  });
+
   document.getElementById('strict-feedback').addEventListener('click', strictFeedback);
   document.getElementById('record-main').addEventListener('click', () => toggleRecording('main'));
   document.getElementById('clear-main').addEventListener('click', () => {
@@ -97,6 +111,40 @@ function renderChecks() {
   therapyChecks.innerHTML = checksHtml('therapy', data.therapy.criteria);
 }
 
+function renderGuide() {
+  const startCard = `
+    <article>
+      <h4>Startpunten Taalbegrip</h4>
+      <ul>
+        ${data.startRules.map(([age, start, returnRule]) => `<li><strong>${escapeHtml(age)}:</strong> ${escapeHtml(start)}; ${escapeHtml(returnRule)}</li>`).join('')}
+      </ul>
+      <p><strong>Valkuil:</strong> startkeuze noemen zonder kalenderleeftijd te verantwoorden.</p>
+    </article>
+  `;
+  guideGrid.innerHTML = data.guideCards.map(card => `
+    <article>
+      <h4>${escapeHtml(card.title)}</h4>
+      <ul>
+        ${card.must.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
+      </ul>
+      <p><strong>Valkuil:</strong> ${escapeHtml(card.pitfall)}</p>
+    </article>
+  `).join('') + startCard;
+}
+
+function renderDrill() {
+  const [question, answer, criterion] = activeDrill;
+  oralDrill.innerHTML = `
+    <strong>${escapeHtml(question)}</strong>
+    <p>${escapeHtml(answer)}</p>
+    <span>${escapeHtml(criterion)}</span>
+  `;
+}
+
+function renderRedFlags() {
+  redFlags.innerHTML = data.redFlags.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+}
+
 function checksHtml(group, criteria) {
   return criteria.map(([id, label], index) => `
     <label>
@@ -111,6 +159,20 @@ function renderSimulation() {
   simCase.innerHTML = `
     <div><strong>Casusprikkel</strong><span>${escapeHtml(state.simCase.context)}</span></div>
     <div><strong>Jij moet</strong><span>${escapeHtml(state.simCase.task)}</span></div>
+  `;
+}
+
+function renderPrepTools() {
+  prepTools.innerHTML = `
+    <h4>Start je voorbereiding hier</h4>
+    <div>
+      ${data.prepTools.map(tool => `
+        <a href="${tool.href}">
+          <strong>${escapeHtml(tool.title)}</strong>
+          <span>${escapeHtml(tool.text)}</span>
+        </a>
+      `).join('')}
+    </div>
   `;
 }
 
@@ -134,7 +196,8 @@ function strictFeedback() {
   const rubricWords = [
     'beginsituatie', 'doel', 'methode', 'verantwoord', 'advies', 'samenwerking',
     'prognose', 'score', 'afbreekregel', 'start', 'intonatie', 'neutraal',
-    'handleiding', 'fout', 'betrouwbaar'
+    'handleiding', 'fout', 'betrouwbaar', 'testsituatie', 'tempo', 'prosodie',
+    'morfosyntaxis', 'terugkeerregel', 'respons', 'taalbegrip', 'zinsontwikkeling'
   ];
   const hits = rubricWords.filter(word => clean.includes(word));
   const structure = ['omdat', 'dus', 'daarom', 'passend', 'concreet'].filter(word => clean.includes(word));
@@ -191,7 +254,7 @@ function planFor(diagnostic, therapy) {
     return ['Vandaag: volledige simulatie zonder spiekkaart.', 'Morgen: alleen fouten verantwoorden en prognose oefenen.', 'Laatste check: 30 minuten in tweetal op echt toetsritme.'];
   }
   if (diagnostic < therapy) {
-    return ['Vandaag: Taalbegrip neutrale toon en Taalproductie intonatie hardop oefenen.', 'Daarna: startsectie en afbreekregels zonder aarzeling reproduceren.', 'Eindig met criterium 10: benoem één fout en verantwoord de invloed.'];
+    return ['Vandaag: Taalbegrip-3 neutrale toon en Zinsontwikkeling-intonatie hardop oefenen.', 'Daarna: leeftijd berekenen, startsectie kiezen en afbreekregels zonder aarzeling reproduceren.', 'Eindig met criterium 10: benoem één fout en verantwoord de invloed.'];
   }
   return ['Vandaag: LT-doel en KT-doel voor drie casussen formuleren.', 'Daarna: methode, therapievorm en duur steeds verantwoorden.', 'Eindig met samenwerking en prognose in maximaal 60 seconden.'];
 }
