@@ -6,6 +6,7 @@ Gehost als statische site op GitHub Pages: <https://tiemenleertpraten.meertens.d
 
 ## Tools
 
+- **Pak de 10** (`/pak-de-10/`) — toetsmachine voor kindcasuïstiek: casusroute, criteria-engine, kennischeck, oefenvragen, strenge feedback, mondeling trainen en toetsklaar-score.
 - **IPA Studio** (`/ipa-studio/`) — IPA-trainer voor module 4 (Spraak-Taal 2), eerstejaars deeltijd logopedie Hanze Groningen. Twee modi:
   - **De Kaart** — klikbaar IPA-rooster met audio en de drie kenmerken (plaats / manier / stem).
   - **Drie Knoppen** — drillmodus met Leitner-spaced-repetition.

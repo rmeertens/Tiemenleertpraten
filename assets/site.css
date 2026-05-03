@@ -245,6 +245,422 @@ a { color: inherit; }
   color: var(--ink-faint);
 }
 
+/* ============ Pak de 10 ============ */
+
+.ten-app {
+  max-width: 1180px;
+}
+
+.ten-hero {
+  align-items: stretch;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  margin: 36px 0 22px;
+}
+
+.ten-hero h2 {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 6vw, 72px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+  margin: 0 0 18px;
+  max-width: 820px;
+}
+
+.ten-hero p {
+  color: var(--ink-soft);
+  margin: 0;
+  max-width: 760px;
+}
+
+.ten-scorecard,
+.ten-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+}
+
+.ten-scorecard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+}
+
+.ten-scorecard span,
+.ten-card__label {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.ten-scorecard strong {
+  font-family: var(--font-display);
+  font-size: 58px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.ten-scorecard p {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 12px 0 0;
+}
+
+.ten-flow {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  display: flex;
+  gap: 4px;
+  margin: 0 0 18px;
+  overflow-x: auto;
+  padding: 5px;
+}
+
+.ten-step {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  flex: 1 0 auto;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 10px 14px;
+}
+
+.ten-step.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.ten-panel {
+  display: none;
+}
+
+.ten-panel.is-active {
+  display: block;
+}
+
+.ten-grid,
+.ten-practice-layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ten-card {
+  padding: 24px;
+}
+
+.ten-card h3 {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.12;
+  margin: 0 0 12px;
+}
+
+.ten-card p {
+  color: var(--ink-soft);
+}
+
+.ten-choice-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.ten-choice {
+  appearance: none;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  font: inherit;
+  padding: 14px;
+  text-align: left;
+}
+
+.ten-choice strong {
+  font-size: 15px;
+}
+
+.ten-choice span {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.ten-choice.is-selected {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.ten-route-card {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 0.65fr) minmax(320px, 1fr);
+  margin-top: 16px;
+}
+
+.ten-route,
+.ten-plan,
+.ten-checklist {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.ten-route li,
+.ten-plan li,
+.ten-checklist li {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  list-style: none;
+  padding: 12px 14px;
+}
+
+.ten-route li {
+  align-items: center;
+  color: var(--ink);
+  display: flex;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.ten-route span {
+  align-items: center;
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--accent);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 12px;
+  height: 26px;
+  justify-content: center;
+  width: 26px;
+}
+
+.ten-tags,
+.ten-mode-row,
+.ten-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ten-tags span {
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
+.ten-facts {
+  display: grid;
+  gap: 10px;
+}
+
+.ten-facts div {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+}
+
+.ten-facts strong {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ten-facts span,
+.ten-note {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.ten-practice-head,
+.ten-feedback-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.ten-select,
+.ten-source-form input,
+.ten-source-form textarea,
+.ten-answer {
+  appearance: none;
+  background: var(--bg);
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+  padding: 12px 14px;
+  width: 100%;
+}
+
+.ten-select {
+  max-width: 260px;
+}
+
+.ten-answer {
+  line-height: 1.55;
+  margin: 14px 0;
+  resize: vertical;
+}
+
+.ten-question {
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 14px;
+}
+
+.ten-feedback-head span {
+  background: var(--accent);
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 900;
+  padding: 8px 12px;
+}
+
+.ten-feedback-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ten-feedback-grid article,
+.ten-model {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.ten-feedback-grid h4,
+.ten-model h4 {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.ten-feedback-grid p,
+.ten-model p {
+  margin: 0;
+}
+
+.ten-model {
+  margin-top: 14px;
+}
+
+.ten-bars {
+  display: grid;
+  gap: 14px;
+}
+
+.ten-bar div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.ten-bar span {
+  color: var(--ink-soft);
+  font-weight: 800;
+}
+
+.ten-bar meter {
+  height: 12px;
+  width: 100%;
+}
+
+.ten-source-form {
+  display: grid;
+  gap: 10px;
+}
+
+.ten-sources {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.ten-sources article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+}
+
+.ten-sources span {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.ten-sources em {
+  color: var(--accent);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  margin-right: 8px;
+}
+
+@media (max-width: 900px) {
+  .ten-hero,
+  .ten-grid,
+  .ten-practice-layout,
+  .ten-route-card,
+  .ten-feedback-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ten-scorecard {
+    max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .ten-card,
+  .ten-scorecard {
+    padding: 20px;
+  }
+
+  .ten-practice-head,
+  .ten-feedback-head {
+    flex-direction: column;
+  }
+
+  .ten-select {
+    max-width: none;
+  }
+}
+
 /* ============ Leerroute ============ */
 
 .route-page {

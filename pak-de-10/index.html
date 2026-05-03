@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Pak de 10 — toetsgerichte trainingsmachine voor logopedische kindcasuïstiek." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Pak de 10 &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=8" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; 3 mei</div>
+  <main class="studio ten-app">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Pak de 10</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <header class="ten-hero">
+      <div>
+        <p class="eyebrow">Weten -> oefenen -> feedback -> bewijs</p>
+        <h2>Leg elke kindcasus uit met logopedisch vakjargon.</h2>
+        <p>
+          Kies een casus, train het criterium dat punten oplevert en verbeter je antwoord
+          tot het toetsklaar is. Geen bibliotheek. Wel een route naar je MDO, verslag en mondeling.
+        </p>
+      </div>
+      <aside class="ten-scorecard" aria-label="Toetsklaar score">
+        <span id="ready-label">Toetsklaar</span>
+        <strong id="ready-score">0%</strong>
+        <p id="ready-hint">Start met een casus en lever bewijs per criterium.</p>
+      </aside>
+    </header>
+
+    <section class="ten-flow" aria-label="Trainingsflow">
+      <button class="ten-step is-active" type="button" data-panel="start">1. Start</button>
+      <button class="ten-step" type="button" data-panel="knowledge">2. Kennischeck</button>
+      <button class="ten-step" type="button" data-panel="practice">3. Oefenen</button>
+      <button class="ten-step" type="button" data-panel="feedback">4. Feedback</button>
+      <button class="ten-step" type="button" data-panel="dashboard">5. Bewijs</button>
+    </section>
+
+    <section class="ten-panel is-active" id="panel-start">
+      <div class="ten-grid">
+        <article class="ten-card">
+          <p class="ten-card__label">Stap 1</p>
+          <h3>Kies je toetsroute</h3>
+          <div class="ten-choice-grid" id="exam-list"></div>
+        </article>
+        <article class="ten-card">
+          <p class="ten-card__label">Stap 2</p>
+          <h3>Kies je casus</h3>
+          <div class="ten-choice-grid" id="case-list"></div>
+        </article>
+      </div>
+
+      <article class="ten-card ten-route-card">
+        <div>
+          <p class="ten-card__label">Vandaag</p>
+          <h3 id="route-title">Diagnostiekroute</h3>
+          <p id="route-summary"></p>
+        </div>
+        <ol class="ten-route" id="route-list"></ol>
+      </article>
+    </section>
+
+    <section class="ten-panel" id="panel-knowledge">
+      <div class="ten-grid">
+        <article class="ten-card">
+          <p class="ten-card__label">Snapkaart</p>
+          <h3 id="snap-title"></h3>
+          <p id="snap-copy"></p>
+          <div class="ten-tags" id="snap-tags"></div>
+        </article>
+        <article class="ten-card">
+          <p class="ten-card__label">Uit je hoofd</p>
+          <h3>Dit moet je kunnen reproduceren</h3>
+          <ul class="ten-checklist" id="memory-list"></ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="ten-panel" id="panel-practice">
+      <div class="ten-practice-layout">
+        <article class="ten-card ten-case-card">
+          <p class="ten-card__label">Casuskaart</p>
+          <h3 id="case-title"></h3>
+          <div class="ten-facts" id="case-facts"></div>
+          <p class="ten-note" id="case-warning"></p>
+        </article>
+
+        <article class="ten-card">
+          <div class="ten-practice-head">
+            <div>
+              <p class="ten-card__label">Oefenvraag</p>
+              <h3 id="question-title"></h3>
+            </div>
+            <select id="criterion-select" class="ten-select" aria-label="Kies criterium"></select>
+          </div>
+          <p class="ten-question" id="question-text"></p>
+          <div class="ten-mode-row">
+            <button class="mode-btn" type="button" data-answer-mode="written" aria-selected="true">Schriftelijk</button>
+            <button class="mode-btn" type="button" data-answer-mode="oral" aria-selected="false">Mondeling 60 sec</button>
+            <button class="mode-btn" type="button" id="new-question">Nieuwe vraag</button>
+          </div>
+          <label class="sr-only" for="answer-input">Jouw antwoord</label>
+          <textarea id="answer-input" class="ten-answer" rows="7" placeholder="Schrijf of dicteer je antwoord alsof je in het MDO zit."></textarea>
+          <div class="ten-actions">
+            <button class="btn btn--primary" type="button" id="check-answer">Geef strenge feedback</button>
+            <button class="btn btn--ghost" type="button" id="record-answer">Neem op</button>
+            <button class="btn btn--ghost" type="button" id="clear-answer">Wis</button>
+          </div>
+          <p class="ten-note" id="speech-note"></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="ten-panel" id="panel-feedback">
+      <article class="ten-card">
+        <p class="ten-card__label">Strenge feedback</p>
+        <div class="ten-feedback-head">
+          <h3 id="feedback-title">Nog geen antwoord nagekeken</h3>
+          <span id="feedback-score">0/5</span>
+        </div>
+        <div class="ten-feedback-grid" id="feedback-grid"></div>
+        <div class="ten-model">
+          <h4>Zo klinkt 10-niveau</h4>
+          <p id="model-answer"></p>
+        </div>
+      </article>
+    </section>
+
+    <section class="ten-panel" id="panel-dashboard">
+      <div class="ten-grid">
+        <article class="ten-card">
+          <p class="ten-card__label">10-dashboard</p>
+          <h3>Bewijs dat je klaar bent</h3>
+          <div class="ten-bars" id="dashboard-bars"></div>
+        </article>
+        <article class="ten-card">
+          <p class="ten-card__label">Herhaalplanning</p>
+          <h3>Wat doe je nu?</h3>
+          <ol class="ten-plan" id="repeat-plan"></ol>
+        </article>
+      </div>
+
+      <article class="ten-card">
+        <p class="ten-card__label">Transcriptiebrein</p>
+        <h3>Voeg eigen lesmateriaal toe</h3>
+        <form class="ten-source-form" id="source-form">
+          <input id="source-title" type="text" placeholder="Titel les/flitscollege" />
+          <input id="source-outcome" type="text" placeholder="Leeruitkomst of criterium" />
+          <textarea id="source-text" rows="4" placeholder="Plak hier je eigen transcriptie, docentaccenten of begrippenlijst. Dit blijft lokaal in je browser."></textarea>
+          <button class="btn btn--primary" type="submit">Maak trainingsbron</button>
+        </form>
+        <div class="ten-sources" id="source-list"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
