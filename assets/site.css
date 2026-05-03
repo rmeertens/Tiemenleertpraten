@@ -631,6 +631,316 @@ a { color: inherit; }
   margin-right: 8px;
 }
 
+/* ============ Mondeling 10 ============ */
+
+.oral-app {
+  max-width: 1120px;
+}
+
+.oral-hero {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  margin: 36px 0 20px;
+}
+
+.oral-hero h2 {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 6vw, 70px);
+  font-weight: 500;
+  line-height: 1.02;
+  margin: 0 0 18px;
+}
+
+.oral-hero p {
+  color: var(--ink-soft);
+  margin: 0;
+  max-width: 760px;
+}
+
+.oral-clock,
+.oral-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+}
+
+.oral-clock {
+  display: grid;
+  gap: 12px;
+  padding: 22px;
+}
+
+.oral-clock span,
+.oral-label {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.oral-clock strong {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.oral-tabs {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  display: flex;
+  gap: 4px;
+  margin-bottom: 18px;
+  overflow-x: auto;
+  padding: 5px;
+}
+
+.oral-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  flex: 1 0 auto;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 10px 14px;
+}
+
+.oral-tab.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.oral-view {
+  display: none;
+}
+
+.oral-view.is-active {
+  display: block;
+}
+
+.oral-grid,
+.oral-sim {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.oral-card {
+  padding: 24px;
+}
+
+.oral-card h3 {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.12;
+  margin: 0 0 12px;
+}
+
+.oral-card p {
+  color: var(--ink-soft);
+}
+
+.oral-prompt,
+.oral-case div,
+.oral-feedback-grid article,
+.oral-model {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.oral-prompt {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.oral-prompt strong,
+.oral-case strong {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.oral-prompt p,
+.oral-prompt span {
+  margin: 0;
+}
+
+.oral-prompt span,
+.oral-note {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.oral-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.oral-checks {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.oral-checks label {
+  align-items: flex-start;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  padding: 11px 12px;
+}
+
+.oral-checks input {
+  margin-top: 4px;
+}
+
+.oral-checks span {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.oral-case {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 18px;
+}
+
+.oral-case div {
+  display: grid;
+  gap: 5px;
+}
+
+.oral-case span {
+  color: var(--ink-soft);
+}
+
+.oral-answer {
+  appearance: none;
+  background: var(--bg);
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.55;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  resize: vertical;
+  width: 100%;
+}
+
+.oral-feedback {
+  margin-top: 16px;
+}
+
+.oral-feedback__head {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.oral-feedback__head strong {
+  background: var(--accent);
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 900;
+  padding: 8px 12px;
+}
+
+.oral-feedback-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.oral-feedback-grid h4,
+.oral-model h4 {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.oral-feedback-grid p,
+.oral-model p {
+  margin: 0;
+}
+
+.oral-model {
+  margin-top: 14px;
+}
+
+.oral-bars,
+.oral-plan {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.oral-bar div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.oral-bar span {
+  color: var(--ink-soft);
+  font-weight: 800;
+}
+
+.oral-bar meter {
+  height: 12px;
+  width: 100%;
+}
+
+.oral-plan li {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  list-style: none;
+  padding: 12px 14px;
+}
+
+@media (max-width: 900px) {
+  .oral-hero,
+  .oral-grid,
+  .oral-sim,
+  .oral-feedback-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .oral-card,
+  .oral-clock {
+    padding: 20px;
+  }
+
+  .oral-feedback__head {
+    flex-direction: column;
+  }
+}
+
 @media (max-width: 900px) {
   .ten-hero,
   .ten-grid,

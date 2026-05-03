@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Mondeling 10 — train de mondelinge Spraak-Taal performance assessment op rubricniveau." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Mondeling 10 &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=9" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; 3 mei</div>
+  <main class="studio oral-app">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Mondeling 10</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <header class="oral-hero">
+      <div>
+        <p class="eyebrow">Performance assessment Spraak-Taal</p>
+        <h2>Train alsof de docent meekijkt.</h2>
+        <p>
+          Oefen de live Schlichting-afname, je foutverantwoording en het therapiegesprek.
+          De tool stuurt op de criteria die punten opleveren.
+        </p>
+      </div>
+      <aside class="oral-clock">
+        <span>Toetsritme</span>
+        <strong id="oral-timer">15:00</strong>
+        <button class="btn btn--primary" type="button" id="timer-toggle">Start</button>
+      </aside>
+    </header>
+
+    <section class="oral-tabs" aria-label="Mondelinge trainingsonderdelen">
+      <button class="oral-tab is-active" type="button" data-view="diagnostics">Diagnostiek</button>
+      <button class="oral-tab" type="button" data-view="therapy">Therapie</button>
+      <button class="oral-tab" type="button" data-view="simulation">Simulatie</button>
+      <button class="oral-tab" type="button" data-view="dashboard">Dashboard</button>
+    </section>
+
+    <section class="oral-view is-active" id="view-diagnostics">
+      <div class="oral-grid">
+        <article class="oral-card">
+          <p class="oral-label">Onderdeel A</p>
+          <h3>Schlichting live afnemen</h3>
+          <p>
+            Je wordt beoordeeld op testsituatie, aanbod, scoring, startsectie,
+            afbreekregels en je professionele verantwoording.
+          </p>
+          <div class="oral-prompt" id="diagnostic-prompt"></div>
+          <div class="oral-actions">
+            <button class="btn btn--primary" type="button" data-new="diagnostics">Nieuwe opdracht</button>
+            <button class="btn btn--ghost" type="button" data-record="diagnostics">Neem uitleg op</button>
+          </div>
+        </article>
+
+        <article class="oral-card">
+          <p class="oral-label">Zelfcheck</p>
+          <h3>Vink je bewijs aan</h3>
+          <div class="oral-checks" id="diagnostic-checks"></div>
+          <button class="btn btn--primary" type="button" data-score="diagnostics">Bereken score</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="oral-view" id="view-therapy">
+      <div class="oral-grid">
+        <article class="oral-card">
+          <p class="oral-label">Onderdeel B</p>
+          <h3>Therapiegesprek verdedigen</h3>
+          <p>
+            Je formuleert vervolgstappen, doelen, methode, therapievorm, duur,
+            samenwerking en prognose. Alles moet passen bij casus en beginsituatie.
+          </p>
+          <div class="oral-prompt" id="therapy-prompt"></div>
+          <div class="oral-actions">
+            <button class="btn btn--primary" type="button" data-new="therapy">Nieuwe opdracht</button>
+            <button class="btn btn--ghost" type="button" data-record="therapy">Neem uitleg op</button>
+          </div>
+        </article>
+
+        <article class="oral-card">
+          <p class="oral-label">Zelfcheck</p>
+          <h3>Vink je bewijs aan</h3>
+          <div class="oral-checks" id="therapy-checks"></div>
+          <button class="btn btn--primary" type="button" data-score="therapy">Bereken score</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="oral-view" id="view-simulation">
+      <div class="oral-sim">
+        <article class="oral-card">
+          <p class="oral-label">15 minuten voorbereiding</p>
+          <h3 id="sim-title">Trek een toetskaart</h3>
+          <div class="oral-case" id="sim-case"></div>
+          <button class="btn btn--primary" type="button" id="draw-card">Nieuwe toetskaart</button>
+        </article>
+
+        <article class="oral-card">
+          <p class="oral-label">Jouw antwoord</p>
+          <textarea id="oral-answer" class="oral-answer" rows="9" placeholder="Dicteer of schrijf je 60-seconden antwoord. Gebruik vaktaal, volgorde en verantwoording."></textarea>
+          <div class="oral-actions">
+            <button class="btn btn--primary" type="button" id="strict-feedback">Strenge feedback</button>
+            <button class="btn btn--ghost" type="button" id="record-main">Neem op</button>
+            <button class="btn btn--ghost" type="button" id="clear-main">Wis</button>
+          </div>
+          <p class="oral-note" id="oral-note"></p>
+        </article>
+      </div>
+
+      <article class="oral-card oral-feedback" id="oral-feedback" hidden>
+        <div class="oral-feedback__head">
+          <div>
+            <p class="oral-label">Feedback</p>
+            <h3 id="feedback-heading">Nog niet nagekeken</h3>
+          </div>
+          <strong id="feedback-points">0/4</strong>
+        </div>
+        <div class="oral-feedback-grid" id="feedback-body"></div>
+        <div class="oral-model">
+          <h4>Zeg het zo op 10-niveau</h4>
+          <p id="feedback-model"></p>
+        </div>
+      </article>
+    </section>
+
+    <section class="oral-view" id="view-dashboard">
+      <div class="oral-grid">
+        <article class="oral-card">
+          <p class="oral-label">Score naar cijfer</p>
+          <h3>Rubricmeter</h3>
+          <div class="oral-bars" id="oral-bars"></div>
+        </article>
+        <article class="oral-card">
+          <p class="oral-label">Dagplan</p>
+          <h3>Wat moet je vandaag kunnen?</h3>
+          <ol class="oral-plan" id="oral-plan"></ol>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
