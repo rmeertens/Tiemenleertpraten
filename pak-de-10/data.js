@@ -254,6 +254,40 @@ window.PAK_DE_10_DATA = {
         prognosis: 'Voorzichtig maar betekenisvol: winst zit in functionaliteit, zelfstandigheid en minder frustratie.'
       }
     ],
+    skillCoach: {
+      workflow: [
+        ['Stap 1: probleemmechanisme', 'Schrijf niet meteen een doel. Bepaal eerst: is het probleem fonologisch, fonetisch, spraakmotorisch, taalstructureel, semantisch, pragmatisch of contextueel? Noteer het bewijs uit de casus.'],
+        ['Stap 2: ICF-brug', 'Vertaal functiestoornis naar activiteit en participatie. Vraag: wat lukt het kind daardoor thuis, in de klas of in contact met anderen niet goed?'],
+        ['Stap 3: LT-doel', 'Formuleer eerst participatie: wie doet wat, in welke dagelijkse context, met welke steun, binnen welke termijn?'],
+        ['Stap 4: KT-doel', 'Maak daarna een klein meetbaar bouwblok: gedrag + materiaal/context + criterium + cue-niveau + termijn.'],
+        ['Stap 5: methodebewijs', 'Kies de methode pas nadat je hebt bewezen dat het mechanisme erbij past. Noem ook waarom een andere methode minder logisch is.'],
+        ['Stap 6: transferplan', 'Bepaal wie buiten de therapiekamer moet meedoen: ouders, leerkracht, IB, audiologie, fysio/ergo of psycholoog. Maak hun taak concreet.'],
+        ['Stap 7: evaluatie en prognose', 'Leg vast wanneer je meet, wat je meet op functieniveau en participatieniveau, en wat de prognose gunstig of voorzichtig maakt.']
+      ],
+      lookup: [
+        ['Handboek TOS', 'Zoek op: TOS kenmerken, interventie, ouderbegeleiding, leerkrachtbegeleiding, morfosyntaxis, woordenschat, pragmatiek, generalisatie, prognose. Noteer per onderwerp de beste pagina.'],
+        ['ICF-handreiking', 'Zoek op: functies, activiteiten, participatie, externe factoren, persoonlijke factoren. Gebruik dit om LT-doelen niet te stoornisgericht te maken.'],
+        ['Casusdocument', 'Zoek bewijs: leeftijd, hulpvraag, testscore, observatie, dagelijks functioneren, schoolcontext, ouders, ontbrekende gegevens. Zonder casusbewijs geen ZG.'],
+        ['Beoordelingsformulier', 'Zoek criteria 11 t/m 20. Vertaal elk criterium naar een checklistvraag: heb ik doel, methode, vorm, duur, samenwerking en prognose verdedigd?'],
+        ['Schlichting/diagnostiekinfo', 'Alleen gebruiken voor wat het testresultaat betekent. Behandeling volgt daarna uit interpretatie, ICF en hulpvraag.']
+      ],
+      goalTemplate: [
+        'ICF-niveau: functie / activiteit / participatie',
+        'Gedrag: wat doet het kind observeerbaar?',
+        'Context: therapie, thuis, klas, kring, spel, gesprek',
+        'Norm: percentage, aantal keren of mate van hulp',
+        'Steun: zonder cue, met visuele cue, met model, met ouder/leerkracht',
+        'Termijn: binnen hoeveel weken of maanden',
+        'Waarom: welke participatiebeperking wordt kleiner?'
+      ],
+      methodQuestions: [
+        'Past de methode bij het probleemmechanisme of alleen bij het symptoom?',
+        'Welke casusgegevens bewijzen dat deze methode nodig is?',
+        'Welke cognitieve, motorische of sociaal-emotionele factor maakt aanpassing nodig?',
+        'Hoe bouw je hulp af zodat het kind zelfstandiger wordt?',
+        'Waar vindt generalisatie plaats en wie bewaakt dat?'
+      ]
+    },
     goals: [
       ['Verstaanbaarheid', 'Zwak: het kind is beter verstaanbaar.', 'ZG: het kind is aan het einde van de behandelperiode in 80-85% van bekende klassituaties verstaanbaar voor vertrouwde gesprekspartners.'],
       ['Fonologisch contrast', 'Zwak: het kind kan /s/ en /t/.', 'ZG: het kind onderscheidt en produceert het contrast /s/-/t/ in 8 van de 10 minimale paren op woordniveau.'],

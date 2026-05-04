@@ -47,6 +47,8 @@ const treatmentRouteSelect = document.getElementById('treatment-route-select');
 const treatmentRouteDetail = document.getElementById('treatment-route-detail');
 const treatmentCaseTitle = document.getElementById('treatment-case-title');
 const treatmentCaseCoach = document.getElementById('treatment-case-coach');
+const treatmentWorkflow = document.getElementById('treatment-workflow');
+const treatmentLookup = document.getElementById('treatment-lookup');
 const treatmentGoals = document.getElementById('treatment-goals');
 const treatmentMethods = document.getElementById('treatment-methods');
 const treatmentScript = document.getElementById('treatment-script');
@@ -230,6 +232,7 @@ function renderTreatment() {
   treatmentCaseTitle.textContent = coach.title;
   treatmentCaseCoach.innerHTML = `
     <p>${escapeHtml(coach.pitch)}</p>
+    ${treatmentMiniList('Zelf uitzoeken', buildCaseResearchTasks(coach))}
     ${treatmentMiniList('Prioriteiten', coach.priorities)}
     ${treatmentMiniList('Doelen', coach.goals)}
     ${treatmentMiniList('Methoden', coach.methods)}
@@ -238,9 +241,30 @@ function renderTreatment() {
     <div class="ten-treatment-warning is-prognosis"><strong>Prognose</strong><span>${escapeHtml(coach.prognosis)}</span></div>
   `;
 
+  treatmentWorkflow.innerHTML = `
+    ${data.treatmentMachine.skillCoach.workflow.map(([title, text]) => `
+      <article>
+        <strong>${escapeHtml(title)}</strong>
+        <span>${escapeHtml(text)}</span>
+      </article>
+    `).join('')}
+    <article>
+      <strong>Doelformule-check</strong>
+      <span>${escapeHtml(data.treatmentMachine.skillCoach.goalTemplate.join(' -> '))}</span>
+    </article>
+  `;
+
+  treatmentLookup.innerHTML = data.treatmentMachine.skillCoach.lookup.map(([source, task]) => `
+    <article>
+      <strong>${escapeHtml(source)}</strong>
+      <span>${escapeHtml(task)}</span>
+    </article>
+  `).join('');
+
   treatmentGoals.innerHTML = data.treatmentMachine.goals.map(([label, weak, strong]) => `
     <article>
       <strong>${escapeHtml(label)}</strong>
+      <span>${escapeHtml('Opdracht: maak eerst zelf een LT-doel en KT-doel met gedrag, context, norm, steun en termijn. Vergelijk pas daarna met het voorbeeld.')}</span>
       <span>${escapeHtml(weak)}</span>
       <p>${escapeHtml(strong)}</p>
     </article>
@@ -249,6 +273,7 @@ function renderTreatment() {
   treatmentMethods.innerHTML = data.treatmentMachine.methods.map(([name, indication, contra, script]) => `
     <article>
       <strong>${escapeHtml(name)}</strong>
+      <span>${escapeHtml(data.treatmentMachine.skillCoach.methodQuestions[0])}</span>
       <span>${escapeHtml(indication)}</span>
       <span>${escapeHtml(contra)}</span>
       <p>${escapeHtml(script)}</p>
@@ -298,6 +323,16 @@ function treatmentMiniList(title, items) {
       <ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
     </div>
   `;
+}
+
+function buildCaseResearchTasks(coach) {
+  return [
+    `Zoek in de casus het bewijs voor: ${coach.priorities.slice(0, 3).join(', ')}.`,
+    'Markeer welke gegevens functie, activiteit, participatie en omgeving zijn.',
+    'Schrijf eerst zelf een LT-doel en KT-doel; gebruik het voorbeeld alleen als controle.',
+    'Zoek in je bronindex de pagina die je methodekeuze ondersteunt.',
+    'Bedenk welke informatie nog ontbreekt voordat je prognose durft te formuleren.'
+  ];
 }
 
 function checkAnswer() {
