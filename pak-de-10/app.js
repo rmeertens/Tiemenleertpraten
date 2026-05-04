@@ -7,6 +7,9 @@ const state = {
   criterion: data.criteria[0],
   question: data.questions[0],
   answerMode: 'written',
+  treatmentRoute: data.treatmentMachine.routes[0],
+  treatmentScript: data.treatmentMachine.scripts[0],
+  treatmentDrill: data.treatmentMachine.drills[0],
   scores: JSON.parse(localStorage.getItem('pak10_scores') || '{}'),
   sources: JSON.parse(localStorage.getItem('pak10_sources') || '[]'),
 };
@@ -40,6 +43,16 @@ const repeatPlan = document.getElementById('repeat-plan');
 const speechNote = document.getElementById('speech-note');
 const sourceForm = document.getElementById('source-form');
 const sourceList = document.getElementById('source-list');
+const treatmentRouteSelect = document.getElementById('treatment-route-select');
+const treatmentRouteDetail = document.getElementById('treatment-route-detail');
+const treatmentCaseTitle = document.getElementById('treatment-case-title');
+const treatmentCaseCoach = document.getElementById('treatment-case-coach');
+const treatmentGoals = document.getElementById('treatment-goals');
+const treatmentMethods = document.getElementById('treatment-methods');
+const treatmentScript = document.getElementById('treatment-script');
+const treatmentDrill = document.getElementById('treatment-drill');
+const treatmentCollab = document.getElementById('treatment-collab');
+const treatmentRedflags = document.getElementById('treatment-redflags');
 
 let recognition = null;
 let recording = false;
@@ -49,6 +62,7 @@ boot();
 function boot() {
   renderChoices();
   renderCriterionOptions();
+  renderTreatmentOptions();
   bindEvents();
   renderAll();
 }
@@ -62,6 +76,21 @@ function bindEvents() {
     state.criterion = data.criteria.find(item => item.id === criterionSelect.value);
     state.question = questionForCriterion();
     renderAll();
+  });
+
+  treatmentRouteSelect.addEventListener('change', () => {
+    state.treatmentRoute = data.treatmentMachine.routes.find(item => item.id === treatmentRouteSelect.value);
+    renderTreatment();
+  });
+
+  document.getElementById('new-treatment-script').addEventListener('click', () => {
+    state.treatmentScript = randomItem(data.treatmentMachine.scripts);
+    renderTreatment();
+  });
+
+  document.getElementById('new-treatment-drill').addEventListener('click', () => {
+    state.treatmentDrill = randomItem(data.treatmentMachine.drills);
+    renderTreatment();
   });
 
   document.getElementById('new-question').addEventListener('click', () => {
@@ -127,10 +156,18 @@ function renderCriterionOptions() {
   `).join('');
 }
 
+function renderTreatmentOptions() {
+  treatmentRouteSelect.innerHTML = data.treatmentMachine.routes.map(item => `
+    <option value="${item.id}">${item.title}</option>
+  `).join('');
+}
+
 function renderAll() {
   renderChoices();
   renderStart();
   renderKnowledge();
+  syncTreatmentRouteWithCase();
+  renderTreatment();
   renderPractice();
   renderDashboard();
 }
@@ -163,6 +200,106 @@ function renderPractice() {
   questionText.textContent = state.question;
 }
 
+function syncTreatmentRouteWithCase() {
+  const coach = data.caseTreatment[state.case.id];
+  if (!coach) return;
+  const route = data.treatmentMachine.routes.find(item => item.id === coach.route);
+  if (route) state.treatmentRoute = route;
+}
+
+function renderTreatment() {
+  const route = state.treatmentRoute;
+  const coach = data.caseTreatment[state.case.id];
+  treatmentRouteSelect.value = route.id;
+  treatmentRouteDetail.innerHTML = `
+    <article class="ten-treatment-route">
+      <h4>${escapeHtml(route.title)}</h4>
+      <p>${escapeHtml(route.problem)}</p>
+    </article>
+    <div class="ten-treatment-facts">
+      ${treatmentFact('LT-doel', route.lt)}
+      ${treatmentFact('KT-doel', route.kt)}
+      ${treatmentFact('Methode', route.method)}
+      ${treatmentFact('Waarom', route.why)}
+      ${treatmentFact('Vorm', route.form)}
+      ${treatmentFact('Duur/evaluatie', route.duration)}
+      ${treatmentFact('Prognose', route.prognosis)}
+    </div>
+  `;
+
+  treatmentCaseTitle.textContent = coach.title;
+  treatmentCaseCoach.innerHTML = `
+    <p>${escapeHtml(coach.pitch)}</p>
+    ${treatmentMiniList('Prioriteiten', coach.priorities)}
+    ${treatmentMiniList('Doelen', coach.goals)}
+    ${treatmentMiniList('Methoden', coach.methods)}
+    ${treatmentMiniList('Powerzinnen', coach.scripts)}
+    <div class="ten-treatment-warning"><strong>Let op</strong><span>${escapeHtml(coach.warning)}</span></div>
+    <div class="ten-treatment-warning is-prognosis"><strong>Prognose</strong><span>${escapeHtml(coach.prognosis)}</span></div>
+  `;
+
+  treatmentGoals.innerHTML = data.treatmentMachine.goals.map(([label, weak, strong]) => `
+    <article>
+      <strong>${escapeHtml(label)}</strong>
+      <span>${escapeHtml(weak)}</span>
+      <p>${escapeHtml(strong)}</p>
+    </article>
+  `).join('');
+
+  treatmentMethods.innerHTML = data.treatmentMachine.methods.map(([name, indication, contra, script]) => `
+    <article>
+      <strong>${escapeHtml(name)}</strong>
+      <span>${escapeHtml(indication)}</span>
+      <span>${escapeHtml(contra)}</span>
+      <p>${escapeHtml(script)}</p>
+    </article>
+  `).join('');
+
+  treatmentScript.innerHTML = `
+    <strong>${escapeHtml(state.treatmentScript[0])}</strong>
+    <p>${escapeHtml(state.treatmentScript[1])}</p>
+  `;
+
+  treatmentDrill.innerHTML = `
+    <strong>${escapeHtml(state.treatmentDrill[0])}</strong>
+    <p>${escapeHtml(state.treatmentDrill[1])}</p>
+    <span>${escapeHtml(state.treatmentDrill[2])}</span>
+  `;
+
+  treatmentCollab.innerHTML = `
+    ${data.treatmentMachine.collaboration.map(([role, text]) => `
+      <article>
+        <strong>${escapeHtml(role)}</strong>
+        <span>${escapeHtml(text)}</span>
+      </article>
+    `).join('')}
+    <article>
+      <strong>Prognoseformules</strong>
+      <span>${escapeHtml(data.treatmentMachine.prognosis.map(([label, text]) => `${label}: ${text}`).join(' '))}</span>
+    </article>
+  `;
+
+  treatmentRedflags.innerHTML = data.treatmentMachine.redFlags.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+}
+
+function treatmentFact(label, text) {
+  return `
+    <div>
+      <strong>${escapeHtml(label)}</strong>
+      <span>${escapeHtml(text)}</span>
+    </div>
+  `;
+}
+
+function treatmentMiniList(title, items) {
+  return `
+    <div>
+      <strong>${escapeHtml(title)}</strong>
+      <ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+    </div>
+  `;
+}
+
 function checkAnswer() {
   const answer = answerInput.value.trim();
   if (!answer) {
@@ -192,7 +329,7 @@ function scoreAnswer(answer) {
   const clean = normalize(answer);
   const criterionHits = state.criterion.checks.filter(check => clean.includes(normalize(check)));
   const caseHits = [...state.case.focus, ...state.case.risks].filter(check => clean.includes(normalize(check.split(' ')[0])));
-  const structureHits = ['omdat', 'daarom', 'functie', 'activiteit', 'participatie', 'advies', 'conclusie'].filter(word => clean.includes(word));
+  const structureHits = ['omdat', 'daarom', 'functie', 'activiteit', 'participatie', 'advies', 'conclusie', 'methode', 'prognose', 'evaluatie'].filter(word => clean.includes(word));
   const lengthPoint = answer.split(/\s+/).length >= 45 ? 1 : 0;
   const raw = criterionHits.length + Math.min(2, caseHits.length) + Math.min(2, structureHits.length) + lengthPoint;
   const score = Math.min(5, Math.max(0, Math.round(raw / 3)));
@@ -237,8 +374,8 @@ function renderDashboard() {
   const groups = [
     ['Kennis', ['logodiagnostiek', 'diagnose']],
     ['Toepassing', ['logodiagnostiek', 'mdo', 'advies']],
-    ['Vaktaal', ['diagnose', 'icf']],
-    ['Mondeling', ['mdo', 'advies']],
+    ['Vaktaal', ['diagnose', 'icf', 'behandeling']],
+    ['Mondeling', ['mdo', 'advies', 'behandeling']],
     ['Toetsklaar', data.criteria.map(item => item.id)]
   ];
 
@@ -358,6 +495,7 @@ function questionForCriterion() {
     diagnose: 'Formuleer een diagnose en sluit minstens één alternatief uit.',
     icf: 'Maak de ICF-brug voor deze casus in vier stappen.',
     advies: 'Geef een advies met argumentatie voor ouders, school en logopedie.',
+    behandeling: 'Verdedig behandeling: LT-doel, KT-doel, methode, vorm, duur, samenwerking en prognose.',
   };
   return byCriterion[state.criterion.id] || randomItem(data.questions);
 }

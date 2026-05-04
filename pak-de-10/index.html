@@ -38,9 +38,10 @@
     <section class="ten-flow" aria-label="Trainingsflow">
       <button class="ten-step is-active" type="button" data-panel="start">1. Start</button>
       <button class="ten-step" type="button" data-panel="knowledge">2. Kennischeck</button>
-      <button class="ten-step" type="button" data-panel="practice">3. Oefenen</button>
-      <button class="ten-step" type="button" data-panel="feedback">4. Feedback</button>
-      <button class="ten-step" type="button" data-panel="dashboard">5. Bewijs</button>
+      <button class="ten-step" type="button" data-panel="treatment">3. Behandeling</button>
+      <button class="ten-step" type="button" data-panel="practice">4. Oefenen</button>
+      <button class="ten-step" type="button" data-panel="feedback">5. Feedback</button>
+      <button class="ten-step" type="button" data-panel="dashboard">6. Bewijs</button>
     </section>
 
     <section class="ten-panel is-active" id="panel-start">
@@ -79,6 +80,76 @@
           <p class="ten-card__label">Uit je hoofd</p>
           <h3>Dit moet je kunnen reproduceren</h3>
           <ul class="ten-checklist" id="memory-list"></ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="ten-panel" id="panel-treatment">
+      <div class="ten-grid">
+        <article class="ten-card">
+          <div class="ten-section-head">
+            <div>
+              <p class="ten-card__label">Behandelcoach</p>
+              <h3>Van diagnose naar 10-waardig behandelplan</h3>
+            </div>
+            <select id="treatment-route-select" class="ten-select" aria-label="Kies behandelroute"></select>
+          </div>
+          <div class="ten-treatment-detail" id="treatment-route-detail"></div>
+        </article>
+
+        <article class="ten-card">
+          <p class="ten-card__label">Casuscoach</p>
+          <h3 id="treatment-case-title"></h3>
+          <div class="ten-treatment-coach" id="treatment-case-coach"></div>
+        </article>
+      </div>
+
+      <div class="ten-treatment-grid">
+        <article class="ten-card">
+          <p class="ten-card__label">Doelenbank</p>
+          <h3>Formuleer SMART, niet vaag</h3>
+          <div class="ten-treatment-list" id="treatment-goals"></div>
+        </article>
+        <article class="ten-card">
+          <p class="ten-card__label">Methodematrix</p>
+          <h3>Kies methode met reden</h3>
+          <div class="ten-treatment-list" id="treatment-methods"></div>
+        </article>
+      </div>
+
+      <div class="ten-grid">
+        <article class="ten-card">
+          <div class="ten-section-head">
+            <div>
+              <p class="ten-card__label">Mondeling script</p>
+              <h3>Zeg het op 10-niveau</h3>
+            </div>
+            <button class="btn btn--ghost" type="button" id="new-treatment-script">Nieuw script</button>
+          </div>
+          <div class="ten-treatment-drill" id="treatment-script"></div>
+        </article>
+        <article class="ten-card">
+          <div class="ten-section-head">
+            <div>
+              <p class="ten-card__label">Docentvraag</p>
+              <h3>Verdedig je keuze</h3>
+            </div>
+            <button class="btn btn--ghost" type="button" id="new-treatment-drill">Nieuwe vraag</button>
+          </div>
+          <div class="ten-treatment-drill" id="treatment-drill"></div>
+        </article>
+      </div>
+
+      <div class="ten-treatment-grid">
+        <article class="ten-card">
+          <p class="ten-card__label">Samenwerking & prognose</p>
+          <h3>Maak de transfer toetsbaar</h3>
+          <div class="ten-treatment-list" id="treatment-collab"></div>
+        </article>
+        <article class="ten-card">
+          <p class="ten-card__label">Rode vlaggen</p>
+          <h3>Dit kost direct punten</h3>
+          <ul class="ten-treatment-redflags" id="treatment-redflags"></ul>
         </article>
       </div>
     </section>

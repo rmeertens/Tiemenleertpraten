@@ -577,6 +577,133 @@ a { color: inherit; }
   margin-top: 14px;
 }
 
+.ten-section-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.ten-treatment-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.ten-treatment-detail,
+.ten-treatment-coach,
+.ten-treatment-list,
+.ten-treatment-drill {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.ten-treatment-route,
+.ten-treatment-facts div,
+.ten-treatment-list article,
+.ten-treatment-drill,
+.ten-treatment-warning,
+.ten-treatment-coach > div {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.ten-treatment-route h4 {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.ten-treatment-route p,
+.ten-treatment-list p,
+.ten-treatment-drill p,
+.ten-treatment-coach p {
+  margin: 0;
+}
+
+.ten-treatment-facts {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ten-treatment-facts div,
+.ten-treatment-list article,
+.ten-treatment-coach > div {
+  display: grid;
+  gap: 6px;
+}
+
+.ten-treatment-facts strong,
+.ten-treatment-list strong,
+.ten-treatment-coach strong,
+.ten-treatment-warning strong {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ten-treatment-facts span,
+.ten-treatment-list span,
+.ten-treatment-list p,
+.ten-treatment-coach li,
+.ten-treatment-coach span,
+.ten-treatment-drill p,
+.ten-treatment-drill span {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.ten-treatment-list {
+  max-height: 520px;
+  overflow: auto;
+}
+
+.ten-treatment-list p,
+.ten-treatment-drill strong {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.ten-treatment-coach ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ten-treatment-warning {
+  border-color: rgba(192, 57, 43, 0.2);
+}
+
+.ten-treatment-warning.is-prognosis {
+  border-color: rgba(45, 108, 223, 0.25);
+}
+
+.ten-treatment-redflags {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+}
+
+.ten-treatment-redflags li {
+  background: rgba(192, 57, 43, 0.08);
+  border: 1px solid rgba(192, 57, 43, 0.2);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  font-size: 14px;
+  list-style: none;
+  padding: 10px 12px;
+}
+
 .ten-bars {
   display: grid;
   gap: 14px;
@@ -1241,7 +1368,9 @@ a { color: inherit; }
   .ten-grid,
   .ten-practice-layout,
   .ten-route-card,
-  .ten-feedback-grid {
+  .ten-feedback-grid,
+  .ten-treatment-grid,
+  .ten-treatment-facts {
     grid-template-columns: 1fr;
   }
 
@@ -1257,7 +1386,8 @@ a { color: inherit; }
   }
 
   .ten-practice-head,
-  .ten-feedback-head {
+  .ten-feedback-head,
+  .ten-section-head {
     flex-direction: column;
   }
 

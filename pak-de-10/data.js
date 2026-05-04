@@ -71,6 +71,16 @@ window.PAK_DE_10_DATA = {
       memory: ['advies koppelen aan diagnose', 'schoolkeuze argumenteren', 'ouder- en leerkrachtadvies geven', 'doelen concreet formuleren', 'samenwerking benoemen'],
       checks: ['advies', 'diagnose', 'school', 'ouders', 'leerkracht', 'doel', 'interventie', 'argument'],
       model: 'Mijn advies volgt uit de combinatie van stoornis, activiteit en participatie. Ik adviseer gerichte logopedische behandeling, afstemming met school en ouders, en een schoolsetting die past bij de ondersteuningsbehoefte. Ik onderbouw dit met de casusgegevens.'
+    },
+    {
+      id: 'behandeling',
+      title: 'Behandeling criteria 11-20',
+      domain: 'ZG-coach',
+      tags: ['LT-doel', 'KT-doel', 'methode', 'vorm', 'duur', 'samenwerking', 'prognose'],
+      snap: 'Een 10-waardig behandelantwoord is geen methode noemen, maar klinisch regisseren: diagnose -> ICF -> LT-doel -> KT-doel -> methode -> vorm/frequentie -> samenwerking -> prognose.',
+      memory: ['hoofdprobleem en behandelprioriteit bepalen', 'LT-doel op participatie formuleren', 'KT-doel SMART op functieniveau formuleren', 'methode kiezen met indicatie en contra-indicatie', 'vorm, frequentie en evaluatie noemen', 'ouders/school/MDO koppelen aan transfer', 'prognose voorzichtig en onderbouwd formuleren'],
+      checks: ['behandeling', 'LT', 'KT', 'SMART', 'methode', 'therapievorm', 'frequentie', 'evaluatie', 'samenwerking', 'prognose', 'participatie'],
+      model: 'Mijn behandelplan start bij de participatiebeperking en werkt terug naar haalbare functiedoelen. Ik formuleer een LT-doel op meedoen, een SMART KT-doel op spraak of taal, kies een methode die past bij het probleemmechanisme, benoem vorm/frequentie/evaluatie en borg transfer via ouders, school en MDO. De prognose is concreet, voorzichtig en gekoppeld aan leerbaarheid.'
     }
   ],
   cases: [
@@ -154,6 +164,208 @@ window.PAK_DE_10_DATA = {
     'Formuleer een logopedische conclusie in toetswaardige taal.',
     'Vul de ICF-brug: functie -> activiteit -> participatie -> omgeving.',
     'Beargumenteer schoolkeuze of ondersteuningsbehoefte.',
-    'Formuleer een advies dat logisch volgt uit diagnose en ICF.'
-  ]
+    'Formuleer een advies dat logisch volgt uit diagnose en ICF.',
+    'Verdedig behandeling: LT-doel, KT-doel, methode, vorm, duur, samenwerking en prognose.'
+  ],
+  treatmentMachine: {
+    routes: [
+      {
+        id: 'fonologie',
+        title: 'Fonologische stoornis',
+        problem: 'Het kind heeft een klanksysteemprobleem: klankcontrasten zijn onvoldoende georganiseerd.',
+        lt: 'Het kind is in klas- en thuissituaties beter verstaanbaar en neemt actiever deel aan gesprek en spel.',
+        kt: 'Het kind onderscheidt en produceert het gekozen contrast in 80-90% van gestructureerde woord- of zinscontexten.',
+        method: 'Minimale paren, Metaphon of Hodson & Paden bij meerdere processen.',
+        why: 'Kies contrastief of cyclisch werken omdat het probleem in het fonologische systeem zit, niet alleen in losse klankmotoriek.',
+        form: 'Direct individueel, gecombineerd met ouder- en leerkrachtinstructie.',
+        duration: 'Wekelijks of intensiever bij ernstige onverstaanbaarheid; evaluatie na 8-12 sessies.',
+        prognosis: 'Gunstig bij goede auditieve verwerking, stimulabiliteit en consequente oefening.'
+      },
+      {
+        id: 'vod',
+        title: 'Verbale ontwikkelingsdyspraxie',
+        problem: 'Het kind heeft moeite met planning en programmering van spraakbewegingen; fouten zijn vaak wisselend en zoekend.',
+        lt: 'Het kind produceert verstaanbare woorden en korte uitingen in dagelijkse situaties.',
+        kt: 'Het kind programmeert gekozen klank- of syllabesequenties accuraat met multisensorische cues.',
+        method: 'Motorisch-planningsgerichte aanpak met veel herhaling, ritme, visuele en tactiel-kinesthetische cueing.',
+        why: 'VOD vraagt om herhaald inslijpen van motorische sequenties, niet om alleen klankcontrastbewustzijn.',
+        form: 'Individueel en intensief, met kort dagelijks thuisprogramma.',
+        duration: 'Langduriger traject; hogere frequentie en regelmatige evaluatie op generalisatie.',
+        prognosis: 'Voorzichtig: vooruitgang is mogelijk, maar automatisatie kost veel tijd.'
+      },
+      {
+        id: 'morfosyntax',
+        title: 'Taalproductie / morfosyntaxis',
+        problem: 'Het kind gebruikt korte of grammaticaal zwakke zinnen, laat functiewoorden weg of past vervoegingen onvoldoende toe.',
+        lt: 'Het kind formuleert begrijpelijke, grammaticaal rijkere uitingen in spel, klas en gesprek.',
+        kt: 'Het kind produceert de gekozen zinsstructuur in 8 van de 10 uitingen binnen gestructureerde interactie.',
+        method: 'Modeling, recasting, expansie en scaffolding binnen de zone van naaste ontwikkeling.',
+        why: 'Het kind oefent net boven het huidige taalniveau met steun die je geleidelijk afbouwt.',
+        form: 'Directe therapie plus ouder- en leerkrachtcoaching in natuurlijke routines.',
+        duration: 'Evaluatie na 8-12 weken op spontane taal en klascontext.',
+        prognosis: 'Afhankelijk van ernst, leerbaarheid, cognitie en taalaanbod.'
+      },
+      {
+        id: 'semantiek',
+        title: 'Woordenschat / semantiek',
+        problem: 'Het kind heeft een kleine actieve of passieve woordenschat en slaat woorden onvoldoende rijk op.',
+        lt: 'Het kind gebruikt relevante school- en thuistaalwoorden functioneel in uitleg, spel en gesprek.',
+        kt: 'Het kind leert en gebruikt wekelijks een beperkte set themawoorden met vorm, betekenis, categorie en context.',
+        method: 'Semantische netwerken, herhaald aanbod, expliciete woordleerstrategie en functionele toepassing.',
+        why: 'Losse woordherhaling is te zwak; vorm, betekenis en gebruik moeten gekoppeld worden.',
+        form: 'Directe instructie met klassikale en thuissituatie-transfer.',
+        duration: 'Cyclisch per thema; evaluatie op begrip, actieve productie en generalisatie.',
+        prognosis: 'Gunstiger bij veel kwalitatieve input; voorzichtiger bij brede TOS of beperkte leerbaarheid.'
+      },
+      {
+        id: 'pragmatiek',
+        title: 'Pragmatiek / narratief',
+        problem: 'Het kind heeft moeite met beurtwisseling, perspectief nemen, gesprekssamenhang of verhaalstructuur.',
+        lt: 'Het kind neemt begrijpelijk en passend deel aan gesprekken en spel met leeftijdsgenoten.',
+        kt: 'Het kind gebruikt in een gestructureerde taak begin-midden-einde, beurtgedrag of contextinformatie volgens het gekozen doel.',
+        method: 'Narratieve interventie, scripts, visuele ondersteuning, rollenspel en naturalistische pragmatiektherapie.',
+        why: 'Het probleem wordt zichtbaar in communicatie met anderen; daarom moet therapie functioneel en contextgericht zijn.',
+        form: 'Individueel starten, daarna groep of klassituatie voor generalisatie.',
+        duration: 'Evaluatie na 8-10 weken op gesprek, spel of verhaal in natuurlijke context.',
+        prognosis: 'Afhankelijk van sociaal-cognitieve ontwikkeling, voorspelbaarheid en omgevingssteun.'
+      },
+      {
+        id: 'meertalig',
+        title: 'Meertaligheid / NT2 / TOS',
+        problem: 'Er is uitval in het Nederlands en mogelijk ook in de thuistaal; differentiaaldiagnose is cruciaal.',
+        lt: 'Het kind communiceert functioneler in relevante talen en contexten en kan beter onderwijs volgen.',
+        kt: 'Het kind breidt gekozen taalstructuren of woordenschat uit met ondersteuning in Nederlands en waar mogelijk thuistaal.',
+        method: 'Taalgerichte interventie met thuistaalbetrokkenheid, visuele steun en schoolgerichte strategieen.',
+        why: 'Lage Nederlandse scores alleen bewijzen geen TOS; uitval in beide talen en leerbaarheid sturen je keuze.',
+        form: 'Direct en indirect, met ouders/tolk en school.',
+        duration: 'Evaluatie op groei en leerbaarheid, niet alleen op eentalige normscore.',
+        prognosis: 'Positiever bij rijk taalaanbod en groei; voorzichtiger bij uitval in beide talen.'
+      },
+      {
+        id: 'cluster3',
+        title: 'Syndroom / verstandelijke beperking / ASS',
+        problem: 'Communicatieontwikkeling is verweven met cognitie, prikkelverwerking, gedrag en onderwijscontext.',
+        lt: 'Het kind communiceert functioneler in dagelijkse routines en participeert beter thuis en op school.',
+        kt: 'Het kind gebruikt gekozen woorden, gebaren, pictogrammen of zinsvormen in een afgebakende routine.',
+        method: 'Totale communicatie, ondersteunde communicatie, Hanen-principes, routines en sterke visuele ondersteuning.',
+        why: 'Spreken is niet de enige route naar participatie; communicatie moet haalbaar zijn binnen het ontwikkelingsniveau.',
+        form: 'Indirect en contextgericht, naast korte directe sessies waar belastbaarheid dat toelaat.',
+        duration: 'Kleine stappen, korte cycli, evaluatie op functionele communicatie.',
+        prognosis: 'Voorzichtig maar betekenisvol: winst zit in functionaliteit, zelfstandigheid en minder frustratie.'
+      }
+    ],
+    goals: [
+      ['Verstaanbaarheid', 'Zwak: het kind is beter verstaanbaar.', 'ZG: het kind is aan het einde van de behandelperiode in 80-85% van bekende klassituaties verstaanbaar voor vertrouwde gesprekspartners.'],
+      ['Fonologisch contrast', 'Zwak: het kind kan /s/ en /t/.', 'ZG: het kind onderscheidt en produceert het contrast /s/-/t/ in 8 van de 10 minimale paren op woordniveau.'],
+      ['Morfosyntaxis', 'Zwak: het kind maakt langere zinnen.', 'ZG: het kind produceert in 8 van de 10 uitingen een vierwoordzin met correcte woordvolgorde binnen gestructureerd spel.'],
+      ['Taalbegrip', 'Zwak: het kind begrijpt instructies.', 'ZG: het kind voert tweestapsinstructies in de klas in 4 van de 5 situaties uit met visuele steun.'],
+      ['Woordenschat', 'Zwak: het kind leert nieuwe woorden.', 'ZG: het kind gebruikt vijf themawoorden actief in spel en kringactiviteit binnen twee weken.'],
+      ['Ondersteunde communicatie', 'Zwak: het kind gebruikt gebaren.', 'ZG: het kind gebruikt in drie dagelijkse routines een gebaar of pictogram om een behoefte of keuze duidelijk te maken.']
+    ],
+    methods: [
+      ['Minimale paren', 'Indicatie: fonologisch contrastprobleem.', 'Niet kiezen bij puur motorisch onvermogen.', 'Script: ik kies minimale paren omdat betekenisverschil laat ervaren dat klankcontrast functioneel is.'],
+      ['Hodson & Paden', 'Indicatie: ernstige onverstaanbaarheid met meerdere processen.', 'Minder passend bij een enkel fonetisch probleem.', 'Script: ik kies cyclisch werken omdat meerdere processen tegelijk de verstaanbaarheid beperken.'],
+      ['Motorische articulatie', 'Indicatie: fonetische klankvorming.', 'Niet als hoofdroute bij systeemfout.', 'Script: ik kies motorisch werken omdat de productiebeweging zelf onvoldoende lukt.'],
+      ['PROMPT/DTTC-principes', 'Indicatie: VOD of motorische planning.', 'Niet inzetten als het probleem uitsluitend fonologisch is.', 'Script: ik kies multisensorische cueing omdat planning en sequenties centraal staan.'],
+      ['Scaffolding/recasting', 'Indicatie: morfosyntaxis of TOS.', 'Te vaag zonder concrete doelstructuur.', 'Script: ik kies recasting en scaffolding om doelstructuren net boven huidig niveau uit te lokken.'],
+      ['Ondersteunde communicatie/NmG', 'Indicatie: beperkte spraak of verstandelijke beperking.', 'Niet stoppen zodra eerste woorden komen.', 'Script: ik kies multimodaal omdat functionele communicatie belangrijker is dan alleen spreken.']
+    ],
+    scripts: [
+      ['Fonologische route', 'Ik kies een spelenderwijze contrastieve aanpak omdat de verstaanbaarheid wordt beperkt door een fonologisch systeemprobleem. Door minimale paren, Metaphon of Hodson & Paden te koppelen aan klaswoorden verbind ik functieniveau aan participatie.'],
+      ['VOD-route', 'Ik kies een motorisch-planningsgerichte aanpak met veel herhaling en multisensorische cues. Bij VOD is niet alleen het contrast kwetsbaar, maar vooral de planning van klanksequenties.'],
+      ['TOS/morfosyntaxis', 'Ik kies scaffolding en recasting binnen de zone van naaste ontwikkeling. Het KT-doel richt zich op een concrete zinsstructuur en het LT-doel op begrijpelijker communiceren in de klas.'],
+      ['Meertalige route', 'Ik behandel voorzichtig en verzamel informatie over beide talen. Als de uitval in beide talen zichtbaar is, past dat meer bij TOS dan bij alleen blootstellingsachterstand.'],
+      ['Cluster 3 / ondersteunde communicatie', 'Ik kies ondersteunde communicatie en korte functionele routines. De behandeling moet aansluiten bij belastbaarheid en ontwikkelingsniveau, met ouders en school als vaste partners.']
+    ],
+    collaboration: [
+      ['Ouders', 'Draagkracht, hulpvraag en oefenkansen; dagelijkse korte routines voor generalisatie.'],
+      ['Leerkracht/IB', 'Functioneren in de groep; visuele steun, recasting en doelwoorden in de klas.'],
+      ['Psycholoog/orthopedagoog', 'Cognitie, ASS, aandacht en sociaal-emotionele factoren; voorkom overvraging.'],
+      ['Audioloog/KNO', 'Gehoorstatus en middenoorproblematiek; auditieve toegang is randvoorwaarde.'],
+      ['Fysio/ergo', 'Motoriek, prikkelverwerking en planning; relevant bij VOD of bredere motorische problemen.'],
+      ['Ambulant begeleider', 'Onderwijsbehoefte en clusterondersteuning; doelen opnemen in handelingsplan.']
+    ],
+    prognosis: [
+      ['Fonologie', 'Gunstig bij goede auditieve verwerking, stimulabiliteit en consequente generalisatie.'],
+      ['VOD', 'Voorzichtig; motorisch leren vraagt hoge intensiteit, veel herhaling en langdurige monitoring.'],
+      ['TOS', 'Langdurige ondersteuning is waarschijnlijk; doelen richten op functioneren en compensatie naast groei.'],
+      ['Meertaligheid', 'Positief als er leerbaarheid en rijk taalaanbod is; voorzichtig bij uitval in beide talen.'],
+      ['Syndroom/verstandelijke beperking', 'Voorzichtig maar betekenisvol: winst zit in communicatie, participatie en minder frustratie.']
+    ],
+    redFlags: [
+      'Een methode noemen zonder diagnosekoppeling.',
+      'LT-doel en KT-doel als los zand formuleren.',
+      'Een doel niet meetbaar of niet observeerbaar maken.',
+      'Alleen kindgerichte therapie noemen terwijl generalisatie via ouders of school nodig is.',
+      'Geen duur, frequentie of evaluatiemoment noemen.',
+      'Samenwerking of prognose vergeten.',
+      'Fonologisch, fonetisch en VOD door elkaar halen.',
+      'Zeggen "taal stimuleren" zonder concreet behandelmechanisme.'
+    ],
+    drills: [
+      ['Waarom kies je 2x per week?', 'Bij ernstige of hardnekkige problemen is intensiteit nodig voor inslijpen, herhaling en generalisatie.', 'Criterium 18'],
+      ['Wat is het verschil tussen fonetisch en fonologisch werken?', 'Fonetisch is motorische uitvoering; fonologisch is organisatie van betekenisvolle klankcontrasten.', 'Criterium 14/15'],
+      ['Wanneer kies je oudercoaching?', 'Als dagelijkse interactie en generalisatie de grootste hefboom zijn, vooral bij jonge kinderen.', 'Criterium 16/17/19'],
+      ['Hoe formuleer je prognose bij VOD?', 'Voorzichtig: vooruitgang kan, maar automatisatie vraagt intensiteit en tijd.', 'Criterium 20'],
+      ['Hoe behandel je meertalige uitval?', 'Ik weeg beide talen en leerbaarheid; lage Nederlandse scores alleen zijn onvoldoende bewijs voor TOS.', 'Criterium 11/19'],
+      ['Wanneer zet je ondersteunde communicatie in?', 'Als spreken nog onvoldoende functioneel is en het kind toch communicatief moet kunnen participeren.', 'Criterium 11/16']
+    ]
+  },
+  caseTreatment: {
+    wietze: {
+      route: 'vod',
+      title: 'Wietze: ZG-behandelverdediging',
+      pitch: 'Wietze is 7;0 jaar met TIQ 62, zwakke verstaanbaarheid, VOD-kenmerken, fonologische processen en zeer zwakke morfosyntaxis. De prioriteit is functionele communicatie in de klas: spraakmotorische planning en verstaanbaarheid verbeteren, terwijl zinsbouw en woordenschat klein, visueel en contextgebonden worden aangeboden.',
+      priorities: ['functionele verstaanbaarheid', 'communicatieve veiligheid', 'een zinsstructuur per keer', 'transfer naar klas en thuis', 'afstemming logopedisch werkplan en handelingsplan'],
+      goals: ['LT: Wietze neemt binnen 6 maanden met visuele steun actief deel aan dagelijkse klassituaties.', 'KT spraak: gekozen functionele CVC-woorden met afbouwende visuele/tactiele cue in 80% van de pogingen.', 'KT taal: een vaste SVO-structuur bij actiekaarten met visuele zinssteun en maximaal een verbale cue.'],
+      methods: ['motorisch-planningsgericht oefenen met korte herhalingen', 'cyclische/contrastieve fonologie concreet en visueel', 'scaffolding en recasting voor morfosyntaxis', 'leerkrachtcoaching voor transfer'],
+      scripts: ['Ik behandel Wietze niet als een puur fonologisch kind, omdat wisselende fouten en zoekgedrag wijzen op VOD-kenmerken.', 'Ik kies korte, frequente en visueel ondersteunde oefening, omdat TIQ 62 beperkte belastbaarheid en trage automatisering betekent.', 'Ik train niet alle klanken tegelijk, maar functionele woorden uit de klas zodat spraakdoelen direct bijdragen aan participatie.'],
+      warning: 'Mondgewoonten, open beet of OMFT alleen noemen als observatie of casus dit bevestigt; niet als vast Wietze-feit presenteren.',
+      prognosis: 'Voorzichtig maar functioneel positief: geen snelle normalisatie, wel groei in verstaanbaarheid, korte functionele uitingen en participatie bij intensieve, klein-stappige en school/thuis-geborgde behandeling.'
+    },
+    aaron: {
+      route: 'pragmatiek',
+      title: 'Aaron: structuur, verstaanbaarheid en ASS-context',
+      pitch: 'Bij Aaron combineer je verstaanbaarheid en fonologisch bewustzijn met voorspelbare communicatie en visuele steun. Zijn ASS-context betekent dat generalisatie via vaste routines en schoolstrategie essentieel is.',
+      priorities: ['fonologisch bewustzijn', 'verstaanbaarheid', 'visuele ondersteuning', 'voorspelbaarheid', 'schoolstrategie'],
+      goals: ['LT: Aaron vertelt begrijpelijker in bekende routines met visuele steun.', 'KT: hij gebruikt doelklanken of verhaalstappen in 8 van de 10 gestructureerde pogingen.'],
+      methods: ['fonologische contrasten of cyclisch werken', 'narratieve scripts', 'visuele planning', 'leerkrachtcoaching'],
+      scripts: ['Ik kies geen losse klanktraining, maar een voorspelbare aanpak waarin verstaanbaarheid, verhaalopbouw en ASS-structuur samenkomen.'],
+      warning: 'Verklaar spraakproblemen niet alleen mondmotorisch; koppel altijd aan fonologie, taal en prikkelverwerking.',
+      prognosis: 'Redelijk gunstig bij consequente routines, visuele steun en transfer naar school.'
+    },
+    erik: {
+      route: 'morfosyntax',
+      title: 'Erik: TOS-profiel met gehoor als randvoorwaarde',
+      pitch: 'Bij Erik moet behandeling taalproductie, verstaanbaarheid en auditieve randvoorwaarden combineren. Geleidingsverlies maakt audiologische afstemming een voorwaarde voor betrouwbaar behandelen.',
+      priorities: ['gehoorstatus checken', 'morfosyntaxis', 'fonologie', 'cluster-2 onderbouwing', 'faalervaring voorkomen'],
+      goals: ['LT: Erik communiceert met langere, begrijpelijke uitingen in klas en thuis.', 'KT: hij produceert een gekozen tweewoord- of driewoordstructuur in 8 van de 10 spelmomenten.'],
+      methods: ['scaffolding en recasting', 'woordenschat in routines', 'fonologische behandeling waar passend', 'audiologie/KNO afstemming'],
+      scripts: ['Ik behandel niet door alsof gehoor bijzaak is; stabiele auditieve input is een randvoorwaarde voor taal en fonologie.'],
+      warning: 'Onderschat gehoorverlies niet en interpreteer scores altijd samen met taalontwikkelingsniveau.',
+      prognosis: 'Voorzichtig positief als gehoor, intensiteit en schoolondersteuning goed geborgd zijn.'
+    },
+    isa: {
+      route: 'cluster3',
+      title: 'Isa: totale communicatie en functionele winst',
+      pitch: 'Bij Isa is spreken belangrijk, maar functionele communicatie is leidend. Gebaren, pictogrammen en routines zijn geen noodoplossing maar de brug naar participatie.',
+      priorities: ['totale communicatie', 'voorzichtige testinterpretatie', 'gebaren/NmG', 'minder frustratie', 'cluster 3 context'],
+      goals: ['LT: Isa maakt behoeften duidelijker in dagelijkse routines.', 'KT: ze gebruikt een woord, gebaar of pictogram in drie vaste routines.'],
+      methods: ['ondersteunde communicatie', 'Hanen-principes', 'korte directe oefening', 'ouder- en leerkrachtcoaching'],
+      scripts: ['Ik kies multimodaal omdat communicatie meer is dan spreken; participatie en minder frustratie zijn hier de kernuitkomst.'],
+      warning: 'Stop gebaren niet zodra spraak opkomt; ondersteunende communicatie blijft taalontwikkeling dragen.',
+      prognosis: 'Voorzichtig maar betekenisvol: winst zit in zelfstandigheid, begrijpelijkheid en participatie.'
+    },
+    tarik: {
+      route: 'meertalig',
+      title: 'Tarik: meertaligheid, leerbaarheid en schoolkeuze',
+      pitch: 'Bij Tarik is de behandelvraag niet alleen Nederlands verbeteren. Je moet thuistaal, leerbaarheid, auditieve vaardigheden en schoolcontext wegen voordat je TOS of schoolkeuze verdedigt.',
+      priorities: ['thuistaalinformatie', 'leerbaarheid', 'Nederlandse normscore voorzichtig gebruiken', 'auditieve vaardigheden', 'ouder- en schoolvragen'],
+      goals: ['LT: Tarik volgt onderwijs beter met taalsteun in relevante contexten.', 'KT: hij leert en gebruikt themawoorden of zinsstructuren met visuele steun en transfer naar de klas.'],
+      methods: ['meertalige anamnese', 'woordenschat in schoolthema’s', 'visuele steun', 'ouder/school/tolk betrekken'],
+      scripts: ['Ik baseer behandeling niet op Nederlandse normscore alleen; groei, leerbaarheid en thuistaalinformatie bepalen de klinische route.'],
+      warning: 'Verwar NT2, beperkte blootstelling en TOS niet te snel.',
+      prognosis: 'Positiever bij rijk taalaanbod en aantoonbare leerbaarheid; voorzichtiger bij uitval in beide talen.'
+    }
+  }
 };
