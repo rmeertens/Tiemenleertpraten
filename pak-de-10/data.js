@@ -288,6 +288,56 @@ window.PAK_DE_10_DATA = {
         'Waar vindt generalisatie plaats en wie bewaakt dat?'
       ]
     },
+    sourceIndex: {
+      sources: [
+        ['Ontwikkelingspsychologie deel 2: De baby', 'Handboek', 'Fysieke, motorische, cognitieve groei; hersenplasticiteit en informatieverwerking.', 'Diagnostiek en behandelverantwoording', 'H5 fysieke groei, H6 cognitie/informatieverwerking'],
+        ['Ontwikkelingspsychologie deel 3: Peuter/kleuter', 'Handboek', 'Taalontwikkeling, TOS, Piaget, Vygotsky, ZPD, scaffolding en omgeving.', 'Diagnostiek en behandeling', 'H9 taal, 9.2.4 TOS, onderwijs/opvang, modeling'],
+        ['Mondmotoriek & OMFT', 'Samenvatting', 'Anatomie, articulatie, occlusie en afwijkende mondgewoonten.', 'Alleen gebruiken als casusgegevens dit ondersteunen', 'Open beet, afwijkende gewoonten, myofunctionele voorwaarden'],
+        ['ICF-handreiking', 'Model/handreiking', 'Functies, activiteiten, participatie, externe en persoonlijke factoren.', 'Doelen, advies, samenwerking en prognose', 'Gebruik als brug van stoornis naar functioneren']
+      ],
+      themes: [
+        ['TOS', 'taalontwikkelingsstoornis', 'Neurocognitieve stoornis waarbij taalverwerking minder goed verloopt.', 'D/B', 'Differentieren tussen TOS, taalachterstand en SES-effect.', 'D3 p. 292'],
+        ['Scaffolding', 'steunsteiger', 'Tijdelijke ondersteuning bij een taak net boven het eigen niveau.', 'B', 'Onderbouwen hoe je hulp doseert en afbouwt.', 'D3 p. 286'],
+        ['ZPD', 'zone van naaste ontwikkeling', 'Niveau waarop een kind met hulp een taak kan volbrengen.', 'B', 'Instapniveau en moeilijkheidsgraad van doelen bepalen.', 'D3 p. 285'],
+        ['Morfosyntaxis', 'grammatica, syntaxis', 'Regels voor woordvormen, woordcombinaties en zinsbouw.', 'D/B', 'Grammaticale fouten analyseren en zinsdoelen formuleren.', 'D3 p. 288-289'],
+        ['Pragmatiek', 'sociaal taalgebruik', 'Taal gebruiken in interactie en sociale context.', 'D/B', 'Communicatieve redzaamheid en participatie beoordelen.', 'D3 p. 290'],
+        ['Informatieverwerking', 'coderen, opslaan, ophalen', 'Hoe informatie wordt verwerkt, opgeslagen en teruggehaald.', 'D/B', 'Trage reacties, instructieproblemen en belasting verklaren.', 'D2 p. 187, D3 p. 281'],
+        ['Fast mapping', 'snelle woord-betekenis koppeling', 'Nieuwe woorden snel aan betekenis koppelen.', 'D/B', 'Woordenschatverwerving en woordenschatinterventie onderbouwen.', 'D3 p. 288'],
+        ['Centratie', 'Piaget', 'Focussen op een aspect tegelijk.', 'D/B', 'Complexe instructies vereenvoudigen en visueel maken.', 'D3 p. 276'],
+        ['Modeling', 'sociaal leren, voorbeeldtaal', 'Correct taalmodel aanbieden zonder expliciete correctie.', 'B', 'Indirecte stimulatie en frustratiearme behandeling verdedigen.', 'D3 p. 325'],
+        ['Geleide participatie', 'guided participation', 'Leren door deelname met steun van een competenter persoon.', 'B', 'Ouders en leerkracht als behandelpartners onderbouwen.', 'D3 p. 284']
+      ],
+      oralLinks: [
+        ['Ik pas scaffolding toe binnen de ZPD.', 'Vygotsky/ZPD/scaffolding', 'D3 p. 285-286', 'Door steun af te stemmen op wat het kind met hulp kan, verlaag ik cognitieve belasting en bouw ik autonomie stapsgewijs op.'],
+        ['De taalproblemen wijzen op TOS.', 'Neurocognitieve taalverwerking', 'D3 p. 292', 'Hardnekkige morfosyntactische en semantische problemen ondanks aanbod vragen om specifieke logopedische interventie.'],
+        ['Ik ben voorzichtig bij meertaligheid.', 'SES, taalaanbod, blootstelling', 'D3 p. 290-291', 'Een lage Nederlandse score kan door blootstelling komen; ik weeg thuistaal, leerbaarheid en context voordat ik TOS concludeer.'],
+        ['Ik betrek ouders en leerkracht.', 'Geleide participatie en modeling', 'D3 p. 284, 325', 'Generalisatie ontstaat niet alleen in de behandelkamer; de omgeving moet dezelfde steun en taalmodellen bieden.'],
+        ['Ik formuleer LT-doelen op participatie.', 'ICF', 'ICF-handreiking', 'Het einddoel is niet een losse klank of zinsvorm, maar beter functioneren thuis, op school en in interactie.'],
+        ['Ik hak instructies op en visualiseer.', 'Informatieverwerking', 'D2 p. 187', 'Bij beperkte codering of opslag maak ik input kleiner en zichtbaarder zodat het kind de taak kan verwerken.'],
+        ['Ik gebruik modeling in plaats van directe correctie.', 'Modeling/sociaal leren', 'D3 p. 325', 'Zo krijgt het kind correcte taalvormen aangeboden zonder faaldruk, waardoor oefenen functioneler en veiliger wordt.'],
+        ['Ik noem OMFT alleen als het past bij de casus.', 'Mondmotoriek/occlusie', 'OMFT summary', 'Afwijkende mondgewoonten kunnen articulatievoorwaarden beinvloeden, maar mogen niet zonder casusbewijs als verklaring worden gepresenteerd.']
+      ],
+      wietze: [
+        ['Beperkte informatieverwerking', 'coderen, opslaan, ophalen', 'D2 p. 187', 'Instructies opknippen, visualiseren en herhalen.', 'Wietze heeft minder auditieve belasting nodig zodat de boodschap beter verwerkt wordt.'],
+        ['Zwakke zinsbouw', 'morfosyntaxis', 'D3 p. 288-289', 'Een zinsstructuur per keer met modeling en visuele steun.', 'Ik train niet vaag taal, maar een observeerbare zinsstructuur binnen zijn ZPD.'],
+        ['Terugtrekken in de klas', 'pragmatiek/participatie', 'D3 p. 290 + ICF', 'Doelen koppelen aan hulpvragen, kringmomenten en succeservaringen.', 'De behandeling is pas zinvol als Wietze beter kan meedoen in de klas.'],
+        ['Vermoeden TOS-profiel', 'neurocognitieve taalverwerking', 'D3 p. 292', 'Langdurige, specifieke ondersteuning en voorzichtig positieve prognose.', 'Ik verwacht functionele groei, geen snelle normalisatie.'],
+        ['School en ouders nodig', 'geleide participatie/modeling', 'D3 p. 284, 325', 'Leerkracht en ouders gebruiken dezelfde cues en voorbeeldzinnen.', 'Transfer is een behandelvoorwaarde, niet een extraatje.'],
+        ['Mondmotoriek/OMFT-vraag', 'anatomie en mondgewoonten', 'OMFT summary', 'Alleen navragen of observeren als casus daar aanleiding toe geeft.', 'Ik presenteer open beet of duimzuigen niet als feit zonder casusbewijs.']
+      ],
+      toplists: [
+        ['Diagnostiek', 'D2 p. 158', 'Normen en gemiddelden', 'Gebruik scores nooit blind; koppel normscore aan observatie en context.'],
+        ['Diagnostiek', 'D2 p. 187', 'Informatieverwerking', 'Verklaar instructieproblemen via codering, opslag en ophalen.'],
+        ['Diagnostiek', 'D3 p. 288-289', 'Morfosyntaxis en Wugs', 'Onderbouw grammaticale analyse en regeltoepassing.'],
+        ['Diagnostiek', 'D3 p. 290-292', 'Pragmatiek, SES, TOS', 'Differentieer sociale communicatie, blootstelling en neurocognitieve TOS.'],
+        ['Behandeling', 'D2 p. 148/173', 'Plasticiteit', 'Verdedig vroege en intensieve stimulatie in gevoelige perioden.'],
+        ['Behandeling', 'D3 p. 284-286', 'Geleide participatie, ZPD, scaffolding', 'Verdedig hulp doseren en afbouwen.'],
+        ['Behandeling', 'D3 p. 293-295', 'VVE, opvang, voorlezen', 'Onderbouw school- en ouderadvies.'],
+        ['Behandeling', 'D3 p. 325', 'Modeling', 'Verdedig indirecte taalstimulering boven directe correctie.'],
+        ['Wietze', 'D2 p. 187 + D3 p. 288-292', 'Informatieverwerking, morfosyntaxis, TOS', 'Gebruik deze pagina’s voor de kern van Wietze’s behandelredenering.'],
+        ['Mondeling', 'ICF-handreiking', 'Participatie', 'Breng ieder antwoord terug naar functioneren en omgeving.']
+      ]
+    },
     goals: [
       ['Verstaanbaarheid', 'Zwak: het kind is beter verstaanbaar.', 'ZG: het kind is aan het einde van de behandelperiode in 80-85% van bekende klassituaties verstaanbaar voor vertrouwde gesprekspartners.'],
       ['Fonologisch contrast', 'Zwak: het kind kan /s/ en /t/.', 'ZG: het kind onderscheidt en produceert het contrast /s/-/t/ in 8 van de 10 minimale paren op woordniveau.'],

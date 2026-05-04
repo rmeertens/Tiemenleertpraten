@@ -49,6 +49,8 @@ const treatmentCaseTitle = document.getElementById('treatment-case-title');
 const treatmentCaseCoach = document.getElementById('treatment-case-coach');
 const treatmentWorkflow = document.getElementById('treatment-workflow');
 const treatmentLookup = document.getElementById('treatment-lookup');
+const treatmentSourceIndex = document.getElementById('treatment-source-index');
+const treatmentPageToplist = document.getElementById('treatment-page-toplist');
 const treatmentGoals = document.getElementById('treatment-goals');
 const treatmentMethods = document.getElementById('treatment-methods');
 const treatmentScript = document.getElementById('treatment-script');
@@ -227,6 +229,7 @@ function renderTreatment() {
       ${treatmentFact('Duur/evaluatie', route.duration)}
       ${treatmentFact('Prognose', route.prognosis)}
     </div>
+    ${sourceAnchor(bestAnchorForRoute(route.id), 'Beste verdieping bij deze route')}
   `;
 
   treatmentCaseTitle.textContent = coach.title;
@@ -237,6 +240,7 @@ function renderTreatment() {
     ${treatmentMiniList('Doelen', coach.goals)}
     ${treatmentMiniList('Methoden', coach.methods)}
     ${treatmentMiniList('Powerzinnen', coach.scripts)}
+    ${sourceAnchor(bestAnchorForCase(coach), 'Beste verdieping bij deze casus')}
     <div class="ten-treatment-warning"><strong>Let op</strong><span>${escapeHtml(coach.warning)}</span></div>
     <div class="ten-treatment-warning is-prognosis"><strong>Prognose</strong><span>${escapeHtml(coach.prognosis)}</span></div>
   `;
@@ -260,6 +264,9 @@ function renderTreatment() {
       <span>${escapeHtml(task)}</span>
     </article>
   `).join('');
+
+  treatmentSourceIndex.innerHTML = renderSourceIndex(coach);
+  treatmentPageToplist.innerHTML = renderPageToplist();
 
   treatmentGoals.innerHTML = data.treatmentMachine.goals.map(([label, weak, strong]) => `
     <article>
@@ -325,12 +332,123 @@ function treatmentMiniList(title, items) {
   `;
 }
 
+function renderSourceIndex(coach) {
+  const index = data.treatmentMachine.sourceIndex;
+  const keyThemes = ['TOS', 'Scaffolding', 'Morfosyntaxis', 'Informatieverwerking', 'Modeling'];
+  const highlighted = index.themes.filter(([topic]) => keyThemes.includes(topic));
+  return `
+    <article>
+      <strong>Belangrijkste bronankers</strong>
+      <span>${highlighted.map(([topic, synonyms, meaning, relevance, use, pages]) => `${topic}: ${pages}. ${use}`).join(' ')}</span>
+    </article>
+    <details class="ten-treatment-details">
+      <summary>Open volledige bronnen-index</summary>
+      <div>
+        ${index.sources.map(([title, type, theme, use, section]) => `
+          <article>
+            <strong>${escapeHtml(title)}</strong>
+            <span>${escapeHtml(`${type}. ${theme} Toepassing: ${use}. Secties: ${section}.`)}</span>
+          </article>
+        `).join('')}
+        ${index.themes.map(([topic, synonyms, meaning, relevance, use, pages]) => `
+          <article id="source-theme-${slugify(topic)}">
+            <strong>${escapeHtml(topic)} · ${escapeHtml(pages)}</strong>
+            <span>${escapeHtml(`${meaning} Zoekwoorden: ${synonyms}. Toepassing: ${use}.`)}</span>
+          </article>
+        `).join('')}
+        ${index.oralLinks.map(([claim, concept, pages, script]) => `
+          <article id="source-claim-${slugify(concept)}">
+            <strong>${escapeHtml(pages)} · ${escapeHtml(concept)}</strong>
+            <span>${escapeHtml(`${claim} ${script}`)}</span>
+          </article>
+        `).join('')}
+        ${index.wietze.map(([problem, concept, pages, consequence, script]) => `
+          <article id="source-wietze-${slugify(problem)}">
+            <strong>${escapeHtml(problem)} · ${escapeHtml(pages)}</strong>
+            <span>${escapeHtml(`${consequence} ${script}`)}</span>
+          </article>
+        `).join('')}
+      </div>
+    </details>
+  `;
+}
+
+function renderPageToplist() {
+  const items = data.treatmentMachine.sourceIndex.toplists;
+  const highlighted = items.filter(([area]) => ['Behandeling', 'Wietze', 'Mondeling'].includes(area)).slice(0, 5);
+  return `
+    ${highlighted.map(([area, page, topic, argument]) => `
+      <article>
+        <strong>${escapeHtml(area)} · ${escapeHtml(page)}</strong>
+        <span>${escapeHtml(topic)}</span>
+        <p>${escapeHtml(argument)}</p>
+      </article>
+    `).join('')}
+    <details class="ten-treatment-details">
+      <summary>Open volledige pagina-toplijst</summary>
+      <div>
+        ${items.map(([area, page, topic, argument]) => `
+          <article>
+            <strong>${escapeHtml(area)} · ${escapeHtml(page)}</strong>
+            <span>${escapeHtml(topic)}</span>
+            <p>${escapeHtml(argument)}</p>
+          </article>
+        `).join('')}
+      </div>
+    </details>
+  `;
+}
+
+function sourceAnchor(anchor, label) {
+  if (!anchor) return '';
+  return `
+    <a class="ten-source-anchor" href="${escapeHtml(anchor.href)}">
+      <strong>${escapeHtml(label)}</strong>
+      <span>${escapeHtml(anchor.text)}</span>
+    </a>
+  `;
+}
+
+function bestAnchorForRoute(routeId) {
+  const anchors = {
+    fonologie: ['#treatment-source-index', 'D3 p. 288-289 · check taalvorm en klanksysteem; koppel contrasten aan functioneren.'],
+    vod: ['#treatment-source-index', 'D2 p. 187 · gebruik informatieverwerking om cueing, herhaling en beperkte belasting te onderbouwen.'],
+    morfosyntax: ['#treatment-source-index', 'D3 p. 288-289 · beste plek voor zinsbouw, grammatica en doelstructuren.'],
+    semantiek: ['#treatment-source-index', 'D3 p. 288 · beste plek voor woordleren en fast mapping.'],
+    pragmatiek: ['#treatment-source-index', 'D3 p. 290 · beste plek voor sociaal taalgebruik en redzaamheid.'],
+    meertalig: ['#treatment-source-index', 'D3 p. 290-291 · beste plek om meertaligheid, SES en blootstelling te nuanceren.'],
+    cluster3: ['#treatment-source-index', 'D3 p. 284 en 325 · beste plek voor omgeving, modeling en geleide participatie.']
+  };
+  const selected = anchors[routeId];
+  return selected ? { href: selected[0], text: selected[1] } : null;
+}
+
+function bestAnchorForCase(coach) {
+  if (coach.title.includes('Wietze')) {
+    return { href: '#treatment-source-index', text: 'D2 p. 187 + D3 p. 288-292 · kernanker voor Wietze: informatieverwerking, morfosyntaxis en TOS.' };
+  }
+  if (coach.title.includes('Erik')) {
+    return { href: '#treatment-source-index', text: 'D2 p. 187 · combineer taalprofiel met auditieve randvoorwaarden en belastbaarheid.' };
+  }
+  if (coach.title.includes('Isa')) {
+    return { href: '#treatment-source-index', text: 'D3 p. 284 en 325 · beste anker voor totale communicatie, routines en omgeving.' };
+  }
+  if (coach.title.includes('Tarik')) {
+    return { href: '#treatment-source-index', text: 'D3 p. 290-291 · beste anker voor meertaligheid, blootstelling en voorzichtig diagnosticeren.' };
+  }
+  return { href: '#treatment-source-index', text: 'D3 p. 290 · beste anker voor communicatie in interactie en schoolcontext.' };
+}
+
+function slugify(value) {
+  return normalize(value).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
 function buildCaseResearchTasks(coach) {
   return [
     `Zoek in de casus het bewijs voor: ${coach.priorities.slice(0, 3).join(', ')}.`,
     'Markeer welke gegevens functie, activiteit, participatie en omgeving zijn.',
     'Schrijf eerst zelf een LT-doel en KT-doel; gebruik het voorbeeld alleen als controle.',
-    'Zoek in je bronindex de pagina die je methodekeuze ondersteunt.',
+    'Gebruik maar een bronanker als primaire onderbouwing; kies pas extra bron als je antwoord anders onvoldoende bewijs heeft.',
     'Bedenk welke informatie nog ontbreekt voordat je prognose durft te formuleren.'
   ];
 }

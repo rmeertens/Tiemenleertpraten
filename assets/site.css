@@ -687,6 +687,56 @@ a { color: inherit; }
   border-color: rgba(45, 108, 223, 0.25);
 }
 
+.ten-source-anchor {
+  background: rgba(45, 108, 223, 0.08);
+  border: 1px solid rgba(45, 108, 223, 0.22);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  text-decoration: none;
+}
+
+.ten-source-anchor strong {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ten-source-anchor span {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.ten-treatment-details {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.ten-treatment-details summary {
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ten-treatment-details div {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.ten-treatment-details article {
+  background: var(--surface);
+}
+
 .ten-treatment-redflags {
   display: grid;
   gap: 8px;
