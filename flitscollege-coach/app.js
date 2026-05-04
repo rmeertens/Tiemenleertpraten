@@ -249,12 +249,27 @@ function explainTerm(term) {
     school: 'school (wat de leerkracht in de klas concreet doet).',
     samenwerking: 'samenwerking (met wie je afstemt en waarom).',
     prognose: 'prognose (wat je verwacht en welke factoren helpen of remmen).',
+    richtlijn: 'richtlijn (professionele aanbeveling: zo onderbouw je je keuzes volgens de beroepsstandaard).',
+    behandelplan: 'behandelplan (doelen, methode, vorm, frequentie, samenwerking en evaluatie samen).',
     omft: 'OMFT (behandeling van mondgewoonten en spierbalans).',
+    structuuronderzoek: 'structuuronderzoek (wat je ziet aan lippen, tong, gehemelte, kaak en gebit).',
+    functieonderzoek: 'functieonderzoek (wat mond, tong en lippen doen bij rust, slikken, ademen en spreken).',
+    rustpositie: 'rustpositie (waar tong, lippen en kaak zijn als het kind niet spreekt of slikt).',
+    lipsluiting: 'lipsluiting (of de lippen in rust goed sluiten).',
+    tandheelkunde: 'tandheelkunde (gebit, kaakstand en wisseling die logopedie kunnen beïnvloeden).',
+    occlusie: 'occlusie (hoe boven- en ondergebit op elkaar sluiten).',
+    wisselgebit: 'wisselgebit (fase waarin melktanden wisselen; dit kan articulatie tijdelijk beïnvloeden).',
     'open beet': 'open beet (voortanden sluiten niet; dit kan spraak beïnvloeden).',
     tong: 'tongpositie (waar de tong ligt in rust, slikken of spreken).',
     slikken: 'slikpatroon (of slikken de mondfunctie beïnvloedt).',
     mondgewoonte: 'mondgewoonte (duimen, mondademen of tongpersen die eerst aangepakt moet worden).',
-    orthodontist: 'orthodontist (samenwerking bij gebit/kaakstand).'
+    orthodontist: 'orthodontist (samenwerking bij gebit/kaakstand).',
+    plagiaat: 'plagiaat (tekst of idee overnemen zonder eigen verwerking en bron).',
+    apa: 'APA (vaste manier van bronverwijzen in tekst en literatuurlijst).',
+    bronvermelding: 'bronvermelding (laten zien waar je informatie vandaan komt).',
+    parafraseren: 'parafraseren (in eigen woorden uitleggen met bron erbij).',
+    toepassing: 'toepassing (wat de theorie betekent voor dit kind, deze casus of deze behandeling).',
+    casus: 'casus (het concrete kind of de concrete situatie waarop je je uitleg toepast).'
   };
   return explanations[normalize(term)] || `${term} (leg dit uit met één voorbeeld uit het kind).`;
 }
