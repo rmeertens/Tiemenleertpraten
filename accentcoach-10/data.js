@@ -10,11 +10,11 @@ window.ACCENT_DATA = {
   ],
   route: [
     'Start met doel en werkwijze in cliënttaal: minder belasting, meer efficiënte adem-stemkoppeling.',
-    'Demonstreer Largo rustig: tempo, beweging, zachte inzet, zachte offset, ruime kaak.',
-    'Laat Bernard imiteren en geef non-verbaal mee: handen, knieën, pols, kaak.',
+    'Demonstreer de gevraagde oefening: Largo zelf kiezen, daarna Andante, Allegro of tekst als de docent die kiest.',
+    'Laat Bernard imiteren en geef korte non-verbale cues: beweging, adem, kaak, inzet en afsluiting.',
     'Vraag door: wat voelde je, waar zat spanning, wat ging makkelijker?',
-    'Geef één specifieke verbetercue en één concreet compliment.',
-    'Sluit af met huiswerk: materiaal, frequentie, aandachtspunten en transfer naar drukkerij/koor.'
+    'Geef één concreet compliment, één verbetercue en laat direct opnieuw proberen.',
+    'Geef huiswerk alleen bij de afronding: materiaal, frequentie, aandachtspunten en transfer naar drukkerij/koor.'
   ],
   powerLines: [
     'We oefenen economisch stemgebruik: je stem mag draagkracht krijgen zonder extra druk op je stemplooien.',
@@ -99,7 +99,7 @@ window.ACCENT_DATA = {
       title: '10. Huiswerk en aandachtspunten',
       must: ['Concreet materiaal meegeven.', 'Frequentie en duur noemen.', 'Aandachtspunten samenvatten.', 'Transfer naar drukkerij/koor benoemen.'],
       fix: ['Noem wat hij meekrijgt: audio/trommel/kaart/tekst.', 'Maak aandachtspunten specifiek: kaak, zachte offset, spiegel, ritme.'],
-      model: 'U oefent thuis drie keer per dag tien minuten met de audio of trommel, voor de spiegel. Let vooral op losse knieën, ruime kaak, zachte inzet en zachte afsluiting.'
+      model: 'U oefent thuis drie keer per dag vijf minuten met de audio of trommel, voor de spiegel. Let vooral op losse knieën, ruime kaak, zachte inzet en zachte afsluiting.'
     }
   ],
   rhythms: [
@@ -173,17 +173,17 @@ window.ACCENT_DATA = {
   simulations: [
     ['Start Largo', 'Leg Bernard in cliënttaal doel en werkwijze uit en start Largo met /f/.'],
     ['Corrigeer beweging', 'Bernard staat op slot en beweegt nauwelijks vanuit de knieën. Geef non-verbale en verbale cue.'],
-    ['Feedback na poging', 'Bernard doet Largo redelijk, maar sluit de vocaal hard af. Geef specifieke feedback en laat opnieuw proberen.'],
-    ['Allegro gekozen door docent', 'De docent kiest Allegro. Leg kort uit, demonstreer opmaat en voorkom jachtig tempo.'],
     ['Zelfreflectie', 'Vraag Bernard hoe het ging en vraag daarna door op adem, keel, kaak en gemak.'],
-    ['Huiswerk afsluiten', 'Geef concreet huiswerk inclusief materiaal, frequentie, aandachtspunten en transfer naar drukkerij/koor.'],
-    ['Tekstniveau', 'De docent kiest tekstniveau. Leg uit hoe je ritme, klinkerspraak en ontspannen articulatie bewaakt.'],
+    ['Feedback na poging', 'Bernard doet Largo redelijk, maar sluit de vocaal hard af. Geef specifieke feedback en laat opnieuw proberen.'],
     ['Weerstand Bernard', 'Bernard zegt: “Ik wilde een truc om weer te zingen, waarom moet ik zo raar bewegen?” Reageer non-directief en motiverend.'],
-    ['Andante gekozen door docent', 'De docent kiest Andante. Demonstreer 1/8 inademing, onbeklemtoonde inzet, drie accenten, draaiing en onderarmbeweging.']
+    ['Andante gekozen door docent', 'De docent kiest Andante. Demonstreer 1/8 inademing, onbeklemtoonde inzet, drie accenten, draaiing en onderarmbeweging.'],
+    ['Allegro gekozen door docent', 'De docent kiest Allegro. Leg kort uit, demonstreer opmaat en voorkom jachtig tempo.'],
+    ['Tekstniveau', 'De docent kiest tekstniveau. Leg uit hoe je ritme, klinkerspraak en ontspannen articulatie bewaakt.'],
+    ['Huiswerk afsluiten', 'Geef concreet huiswerk inclusief materiaal, frequentie, aandachtspunten en transfer naar drukkerij/koor.']
   ],
   homework: [
     ['Materiaal', 'Audio-opname of ritmische gids/trommel, korte huiswerkkaart en eventueel tekstmateriaal.'],
-    ['Frequentie', '3x per dag 10 minuten, liever kort en precies dan lang en slordig.'],
+    ['Frequentie', '3x per dag 5 minuten, liever kort en precies dan lang en slordig. In jouw toets oefen je per onderdeel ook compact: ongeveer 5 minuten.'],
     ['Aandachtspunten', 'Losse knieën/polsen, ruime kaak, zachte inzet, zachte offset, adem en stem samen.'],
     ['Zelfcheck', 'Voel ik buikrecoil? Duw ik in mijn keel? Dooft de klank zacht uit? Blijft de kaak los?'],
     ['Transfer', 'Voor drukkerij: eerst ademruimte en draagkracht zonder persen. Voor koor: niet compenseren met keeldruk.']

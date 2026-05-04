@@ -504,12 +504,33 @@ a { color: inherit; }
   width: 100%;
 }
 
+.accent-simulation-picker {
+  margin: 4px 0 12px;
+}
+
 .accent-prompt {
   background: var(--accent-soft);
   border-radius: var(--radius);
   color: var(--ink);
   font-weight: 800;
   padding: 14px;
+}
+
+.accent-micro-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.accent-micro-list span {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 7px 10px;
 }
 
 .accent-answer {

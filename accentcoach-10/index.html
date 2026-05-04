@@ -8,10 +8,10 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Accentcoach 10 &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=11" />
+  <link rel="stylesheet" href="/assets/site.css?v=13" />
 </head>
 <body>
-  <div class="version-stamp">v10 &middot; Accentcoach</div>
+  <div class="version-stamp">v13 &middot; Accentcoach</div>
   <main class="studio accent-app">
     <nav class="studio__nav">
       <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
@@ -148,9 +148,14 @@
             <p class="accent-label">Toetssimulatie</p>
             <h3 id="simulation-title"></h3>
           </div>
-          <button class="btn btn--ghost" type="button" id="new-simulation">Nieuwe prompt</button>
+          <button class="btn btn--ghost" type="button" id="next-simulation">Volgende stap</button>
+        </div>
+        <div class="accent-toolbar accent-simulation-picker">
+          <label class="sr-only" for="simulation-select">Kies toetsmoment</label>
+          <select id="simulation-select" class="accent-select" aria-label="Kies toetsmoment"></select>
         </div>
         <p id="simulation-prompt" class="accent-prompt"></p>
+        <div id="simulation-focus" class="accent-micro-list"></div>
         <textarea id="simulation-answer" class="accent-answer" rows="8" placeholder="Schrijf of dicteer precies wat je tegen Bernard zegt en wat je doet."></textarea>
         <div class="accent-actions">
           <button class="btn btn--primary" type="button" id="check-simulation">Strenge feedback</button>

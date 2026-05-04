@@ -12,6 +12,7 @@ const views = document.querySelectorAll('.accent-view');
 const tabs = document.querySelectorAll('.accent-tab');
 const criterionSelect = document.getElementById('criterion-select');
 const rhythmSelect = document.getElementById('rhythm-select');
+const simulationSelect = document.getElementById('simulation-select');
 const simulationAnswer = document.getElementById('simulation-answer');
 const simulationFeedback = document.getElementById('simulation-feedback');
 const speechNote = document.getElementById('speech-note');
@@ -46,6 +47,11 @@ function bindEvents() {
     renderRhythm();
   });
 
+  simulationSelect.addEventListener('change', () => {
+    state.simulation = data.simulations[Number(simulationSelect.value)] || data.simulations[0];
+    renderSimulation();
+  });
+
   document.getElementById('mark-criterion').addEventListener('click', () => {
     state.scores[`criterion:${state.criterion.id}`] = 4;
     saveScores();
@@ -58,8 +64,9 @@ function bindEvents() {
     renderEvidence();
   });
 
-  document.getElementById('new-simulation').addEventListener('click', () => {
-    state.simulation = randomItem(data.simulations);
+  document.getElementById('next-simulation').addEventListener('click', () => {
+    const currentIndex = simulationIndex();
+    state.simulation = data.simulations[(currentIndex + 1) % data.simulations.length];
     renderSimulation();
   });
 
@@ -79,6 +86,7 @@ function bindEvents() {
 function renderOptions() {
   criterionSelect.innerHTML = data.criteria.map(item => `<option value="${item.id}">${item.title}</option>`).join('');
   rhythmSelect.innerHTML = data.rhythms.map(item => `<option value="${item.id}">${item.title}</option>`).join('');
+  simulationSelect.innerHTML = data.simulations.map((item, index) => `<option value="${index}">${index + 1}. ${item[0]}</option>`).join('');
 }
 
 function renderAll() {
@@ -121,8 +129,11 @@ function renderRhythm() {
 }
 
 function renderSimulation() {
+  simulationSelect.value = String(simulationIndex());
   document.getElementById('simulation-title').textContent = state.simulation[0];
   document.getElementById('simulation-prompt').textContent = state.simulation[1];
+  const profile = simulationProfile(state.simulation[0]);
+  document.getElementById('simulation-focus').innerHTML = profile.focus.map(item => `<span>${escapeHtml(item)}</span>`).join('');
   simulationFeedback.innerHTML = '<p class="accent-note">Nog geen simulatie nagekeken.</p>';
 }
 
@@ -163,33 +174,33 @@ function checkSimulation() {
 
 function scoreAnswer(answer) {
   const clean = normalize(answer);
-  const hits = [
-    ['doel', ['doel', 'minder belast', 'draagkracht', 'drukkerij', 'koor']],
-    ['uitvoering', ['adem', 'stem', 'ritme', 'beweging', 'knie', 'kaak']],
-    ['accentmethode', ['largo', 'allegro', 'andante', 'opmaat', 'zachte', 'offset', 'borstregister', 'vielluft']],
-    ['client', ['wat merkte', 'hoe voelde', 'waar voelde', 'zelf', 'oogcontact']],
-    ['feedback', ['let op', 'volgende', 'verbeter', 'compliment']],
-    ['huiswerk', ['thuis', 'spiegel', 'audio', 'trommel', '3x', '10 minuten']],
-    ['boekproof', ['onbeklemtoond', 'beklemtoond', 'buikwand', 'gedachteconcentratie', 'klinkerspraak']]
-  ].filter(([, words]) => words.some(word => clean.includes(normalize(word))));
-  const lengthPoint = answer.split(/\s+/).length >= 55 ? 1 : 0;
-  const score = Math.min(4, Math.max(1, Math.round((hits.length + lengthPoint) / 1.8)));
+  const profile = simulationProfile(state.simulation[0]);
+  const passed = profile.checks.filter(check => hasAny(clean, check.words));
+  const missing = profile.checks.filter(check => !hasAny(clean, check.words));
+  const warnings = profile.warnings.filter(warning => warning.test(clean));
+  const wordCount = answer.split(/\s+/).filter(Boolean).length;
+
+  let score = scoreFromRatio(passed.length / profile.checks.length);
+  if (warnings.length) score = Math.min(score, 2);
+  if (wordCount < profile.minimumWords) score = Math.min(score, 2);
 
   return {
     score,
-    label: score >= 4 ? 'Toetswaardig sterk' : score >= 3 ? 'Voldoende, nog scherper' : 'Nog te vaag',
-    good: hits.length ? `Je raakt deze toetsdelen: ${hits.map(([label]) => label).join(', ')}.` : 'Je tekst heeft nog te weinig herkenbare toetsdelen.',
-    missing: missingFor(clean),
-    zgSteps: zgStepsFor(clean, score),
-    next: score >= 4 ? 'Herhaal nu zonder tekst en met zichtbare beweging.' : 'Maak je antwoord concreter: wat zeg je, wat doe je, wat ziet Bernard, wat krijgt hij mee?'
+    label: labelForScore(score),
+    good: passed.length ? `Je raakt: ${passed.map(check => check.label).join(', ')}.` : 'Je antwoord is nog te algemeen voor deze simulatie.',
+    missing: missingForSimulation(missing, warnings, wordCount, profile.minimumWords),
+    zgSteps: zgStepsForSimulation(profile, missing, warnings, score),
+    next: score >= 4 ? profile.nextStrong : profile.next
   };
 }
 
 function zgCoachBlock(result) {
-  const title = result.score >= 3 ? 'Zo maak je hiervan ZG' : 'Eerst naar voldoende';
-  const intro = result.score >= 3
-    ? 'Je basis is voldoende. Met deze aanpassingen klinkt het als therapeutisch handelen op hoog niveau:'
-    : 'Voordat dit ZG kan worden, moet eerst de uitvoering concreet en toetsbaar worden:';
+  const title = result.score >= 4 ? 'Score 4/4 vasthouden' : result.score >= 3 ? 'Van score 3/4 naar 4/4' : 'Eerst naar voldoende';
+  const intro = result.score >= 4
+    ? 'Sterk. Nu alleen nog uitvoeren zonder spiektekst en met zichtbare beweging.'
+    : result.score >= 3
+      ? 'Je basis is voldoende. Voeg dit kort toe voor ZG:'
+      : 'Maak eerst deze basis concreet:';
 
   return `
     <article class="accent-zg-coach">
@@ -202,42 +213,208 @@ function zgCoachBlock(result) {
   `;
 }
 
-function zgStepsFor(clean, score) {
-  const steps = [];
-  if (!clean.includes('bernard') && !clean.includes('drukkerij') && !clean.includes('koor')) {
-    steps.push('Koppel je uitleg expliciet aan Bernard: drukkerij, koor, stemvermoeidheid en zwelling.');
-  }
-  if (!clean.includes('non-verbaal') && !clean.includes('oogcontact') && !clean.includes('voordoen')) {
-    steps.push('Maak zichtbaar hoe je non-verbaal coacht: voordoen, oogcontact, hand/arm/kniecue of kaakcue.');
-  }
-  if (!clean.includes('zacht') && !clean.includes('weke') && !clean.includes('offset')) {
-    steps.push('Benoem zachte inzet én zachte afsluiting; dit was een belangrijk verbeterpunt.');
-  }
-  if (!clean.includes('wat merkte') && !clean.includes('hoe voelde') && !clean.includes('waar voelde')) {
-    steps.push('Laat Bernard zelf reflecteren en vraag door op keel, adem, kaak en gemak.');
-  }
-  if (!clean.includes('volgende') && !clean.includes('opnieuw') && !clean.includes('nog een keer')) {
-    steps.push('Sluit je feedback af met een nieuwe poging: één concrete cue en direct opnieuw oefenen.');
-  }
-  if (!clean.includes('thuis') && !clean.includes('huiswerk') && !clean.includes('audio') && !clean.includes('trommel')) {
-    steps.push('Maak huiswerk concreet: materiaal, frequentie, duur, aandachtspunten en transfer.');
-  }
-  if (score >= 3 && steps.length < 3) {
-    steps.push('Zeg minder theorie en meer therapie: wat doe jij, wat doet Bernard, wat observeer je, wat stuur je bij?');
-  }
-  return steps.slice(0, score >= 3 ? 4 : 3);
+function scoreFromRatio(ratio) {
+  if (ratio >= 0.86) return 4;
+  if (ratio >= 0.62) return 3;
+  if (ratio >= 0.38) return 2;
+  return 1;
 }
 
-function missingFor(clean) {
-  const missing = [];
-  if (!clean.includes('kaak')) missing.push('kaakdaling');
-  if (!clean.includes('zacht')) missing.push('zachte inzet/offset');
-  if (!clean.includes('oogcontact')) missing.push('oogcontact');
-  if (!clean.includes('buik')) missing.push('buikwand/recoil');
-  if (!clean.includes('huiswerk') && !clean.includes('thuis')) missing.push('huiswerk');
-  if (!clean.includes('wat merkte') && !clean.includes('hoe voelde')) missing.push('doorvragen bij cliënt');
-  if (!clean.includes('knie') && !clean.includes('beweging')) missing.push('zichtbare beweging/non-verbaal');
-  return missing.length ? `Voeg toe: ${missing.join(', ')}.` : 'Geen grote gaten; let nu vooral op timing en demonstratiekwaliteit.';
+function labelForScore(score) {
+  if (score >= 4) return 'Score 4/4 · ZG-klaar';
+  if (score === 3) return 'Score 3/4 · voldoende';
+  if (score === 2) return 'Score 2/4 · nog niet toetsvast';
+  return 'Score 1/4 · te vaag';
+}
+
+function missingForSimulation(missing, warnings, wordCount, minimumWords) {
+  const parts = [];
+  warnings.forEach(warning => parts.push(warning.message));
+  if (wordCount < minimumWords) parts.push(`Te kort: zeg concreet wat jij doet en wat Bernard doet. Richting: minimaal ${minimumWords} woorden.`);
+  if (missing.length) parts.push(`Nog toevoegen: ${missing.slice(0, 4).map(check => check.missing).join('; ')}.`);
+  return parts.length ? parts.join(' ') : 'Geen grote inhoudelijke gaten; train nu vooral timing, stemkwaliteit en zichtbare beweging.';
+}
+
+function zgStepsForSimulation(profile, missing, warnings, score) {
+  if (warnings.length) return warnings.map(warning => warning.fix).slice(0, 3);
+  const steps = missing.map(check => check.zg || check.missing);
+  if (score >= 3) steps.push(profile.upgrade);
+  if (score >= 4) steps.push('Laat dit nu door iemand live afvinken op beweging, tempo, kaak, inzet en afsluiting.');
+  return unique(steps).filter(Boolean).slice(0, score >= 3 ? 3 : 4);
+}
+
+function simulationProfile(title) {
+  const profiles = {
+    'Start Largo': {
+      focus: ['Geen huiswerk hier', 'Doel in cliënttaal', 'Largo 3/4 starten', 'Zachte inzet + beweging'],
+      minimumWords: 35,
+      checks: [
+        check('Bernard-context', ['bernard', 'drukkerij', 'koor', 'zwelling', 'stemvermoeid'], 'koppel aan Bernard', 'Noem Bernard zijn werk/koor en waarom minder druk nodig is.'),
+        check('Cliënttaal doel', ['minder belast', 'draagkracht', 'minder druk', 'economisch', 'stem beter samenwerken'], 'zeg het doel in gewone taal', 'Maak het simpel: minder drukken, toch draagkracht.'),
+        check('Voordoen/imiteren', ['ik doe', 'doe mij', 'meedoen', 'imiteren', 'voordoen'], 'vertel dat jij voordoet en Bernard imiteert', 'Laat zien dat je non-directief werkt: voordoen en laten meedoen.'),
+        check('Largo-beweging', ['largo', '3/4', 'voor', 'achter', 'drie tellen', 'voor-achter'], 'benoem Largo als 3/4 met voor-achterbeweging', 'Zeg: voorwaarts in, achterwaarts uit met klank.'),
+        check('Zachte stemstart', ['zacht', 'weke', 'rustig', 'geen tik', 'offset', 'afsluiting'], 'bewaken van zachte inzet/afsluiting', 'Noem zachte inzet en zacht laten uitdoven.'),
+        check('Eerste klank', ['/f', 'f-klank', 'stemloos', 'uitademing hoorbaar'], 'start met /f/ of stemloze uitademing', 'Start met /f/ zodat adem en beweging eerst veilig koppelen.')
+      ],
+      warnings: [],
+      upgrade: 'Hou het bij starten: geen huiswerk, geen lange theorie, wel voordoen en direct laten imiteren.',
+      next: 'Korter en praktischer: doelzin, voordoen, Largo starten met /f/, één cue.',
+      nextStrong: 'Herhaal Start Largo staand: 30 seconden uitleg, daarna direct voordoen.'
+    },
+    'Corrigeer beweging': {
+      focus: ['Beweging losmaken', 'Non-verbaal groot genoeg', 'Geen lang college', 'Direct opnieuw'],
+      minimumWords: 30,
+      checks: [
+        check('Probleem benoemen', ['op slot', 'statisch', 'knie', 'vast', 'beweging'], 'benoem wat je ziet', 'Benoem kort dat de beweging nog vast/statisch is.'),
+        check('Non-verbale cue', ['voordoen', 'non-verbaal', 'laat zien', 'knie', 'hand', 'arm'], 'geef zichtbare non-verbale cue', 'Laat met je eigen knieën/arm zien wat losser moet.'),
+        check('Adem-stemkoppeling', ['adem', 'uitadem', 'stem', 'klank', 'samen'], 'koppel beweging aan adem/stem', 'Zeg dat de klank pas meegaat met de uitademende beweging.'),
+        check('Nieuwe poging', ['opnieuw', 'nog een keer', 'volgende poging', 'probeer'], 'laat direct opnieuw proberen', 'Sluit af met: we doen hem meteen nog een keer.')
+      ],
+      warnings: [],
+      upgrade: 'Maak je cue therapeutisch: één observatie, één beweging voordoen, direct herhalen.',
+      next: 'Zeg precies welke beweging je corrigeert en laat Bernard meteen opnieuw doen.',
+      nextStrong: 'Train dit live: iemand staat op slot en jij corrigeert met zo min mogelijk woorden.'
+    },
+    'Feedback na poging': {
+      focus: ['Specifiek compliment', 'Harde offset corrigeren', 'Zachte afsluiting', 'Nieuwe poging'],
+      minimumWords: 30,
+      checks: [
+        check('Concreet compliment', ['goed', 'sterk', 'mooi', 'rustiger', 'beter'], 'geef één concreet compliment', 'Benoem specifiek wat beter ging, bijvoorbeeld tempo of beweging.'),
+        check('Harde offset', ['offset', 'afsluiting', 'tik', 'hard', 'dichtzetten', 'uitdoven'], 'benoem harde afsluiting/offset', 'Zeg dat het einde zachter moet uitdoven.'),
+        check('Waarom', ['druk', 'keel', 'stemband', 'zwelling', 'minder belast'], 'koppel feedback aan minder stemdruk', 'Leg kort uit dat dit de keel minder laat dichtzetten.'),
+        check('Nieuwe poging', ['opnieuw', 'nog een keer', 'volgende poging', 'probeer'], 'laat direct opnieuw proberen', 'Feedback is pas toetswaardig als je daarna opnieuw laat oefenen.')
+      ],
+      warnings: [],
+      upgrade: 'Maak de feedback in één formule: concreet sterk punt, één correctie, waarom, opnieuw.',
+      next: 'Voeg harde offset en direct opnieuw proberen toe.',
+      nextStrong: 'Oefen met één zin feedback: kort, streng en direct uitvoerbaar.'
+    },
+    'Allegro gekozen door docent': fourFourProfile({
+      focus: ['4/4, geen Largo', '1/8 opmaat', '5 accenten', 'Verende knieën + losse pols'],
+      checks: [
+        check('Allegro/4-4', ['allegro', '4/4', 'vierkwarts', 'galop'], 'noem Allegro als 4/4', 'Zeg expliciet: dit is Allegro in 4/4, niet Largo.'),
+        check('Opmaat', ['opmaat', '1/8', 'achtste', 'korte inademing'], 'benoem 1/8 opmaat/inademing', 'Maak de opmaat hoorbaar/zichtbaar: kort in, dan inzet.'),
+        check('Accentpatroon', ['vijf', '5', 'zes', '6', 'accent'], 'benoem opmaat plus accenten', 'Gebruik: één onbeklemtoonde opmaat + vijf accenten.'),
+        check('Beweging', ['knie', 'verend', 'pols', 'hand', 'gebogen armen'], 'toon verende knieën en losse pols', 'Vervang voor-achter door knievering en polsbeweging.'),
+        check('Tempo bewaken', ['niet jachtig', 'rustig', 'tempo laag', 'niet te snel'], 'voorkom jachtig tempo', 'Zeg dat het dynamisch is, maar niet gehaast.'),
+        check('Klank/stem', ['zacht', 'kaak', 'borstregister', 'stem', 'open klinker'], 'bewaak stemkwaliteit en kaak', 'Ook snel blijft de stem licht, ruim en zonder drukken.')
+      ],
+      upgrade: 'Zeg hardop: “4/4: kort in, onbeklemtoonde opmaat, vijf accenten; knieën veren, pols los.”',
+      next: 'Je zit nog te veel in Largo. Noem 4/4, opmaat, vijf accenten en pols/knieën.',
+      nextStrong: 'Herhaal met metronoomgevoel: langzaam Allegro, niet versnellen.'
+    }),
+    'Andante gekozen door docent': fourFourProfile({
+      focus: ['4/4, geen Largo', '1/8 adem + 1/8 inzet', '3 gelijke accenten', 'Draaiing + onderarm'],
+      checks: [
+        check('Andante/4-4', ['andante', '4/4', 'vierkwarts'], 'noem Andante als 4/4', 'Zeg expliciet: Andante is 4/4, niet Largo.'),
+        check('1/8 adem', ['1/8', 'achtste', 'korte inademing', 'opmaat'], 'benoem 1/8 inademing/opmaat', 'Start met korte adem, niet drie tellen in.'),
+        check('Onbeklemtoonde inzet', ['onbeklemtoond', 'inzet', 'opmaat'], 'benoem onbeklemtoonde inzet', 'Na de 1/8 adem komt de onbeklemtoonde inzet.'),
+        check('Drie accenten', ['drie accenten', '3 accenten', 'drie beklemtoonde', 'even sterk'], 'benoem drie gelijke accenten', 'Daarna volgen drie even sterke accenten.'),
+        check('Beweging', ['draai', 'lichaamsas', 'onderarm', 'elleboog'], 'toon draaiing om lichaamsas en onderarm', 'Vervang voor-achter door draaiing en losse onderarm.'),
+        check('Buikwand', ['buikwand', 'terugveren', 'recoil', 'loslaten'], 'check directe buikwandrecoil', 'Bewaak dat de buikwand direct terugveert na de klank.')
+      ],
+      upgrade: 'Zeg hardop: “4/4: 1/8 in, 1/8 zachte inzet, drie accenten; draaiing en onderarm.”',
+      next: 'Maak het echt Andante: geen drie tellen, maar 1/8 adem, 1/8 inzet en drie accenten.',
+      nextStrong: 'Oefen Andante met alleen /f/ en daarna /v/, zonder uitlegdrang.'
+    }),
+    'Tekstniveau': {
+      focus: ['Accentgroepen', 'Klinkerspraak', 'Natuurlijke zin', 'Weinig uitleg'],
+      minimumWords: 35,
+      checks: [
+        check('Accentgroepen', ['accentgroep', 'logische eenheid', 'accenten', 'beluisteren'], 'start met accentgroepen beluisteren', 'Laat Bernard eerst luisteren naar de accenten.'),
+        check('Klinkerspraak', ['klinkerspraak', 'klinkers', 'zonder woorden'], 'gebruik klinkerspraak vóór tekst', 'Doe de zin eerst voor in klinkerspraak.'),
+        check('Natuurlijke zin', ['natuurlijk', 'echte zin', 'overbrengen', 'spontane spraak'], 'ga daarna naar natuurlijke zin', 'Laat daarna dezelfde zin natuurlijk spreken.'),
+        check('Gedachte/oogcontact', ['gedachteconcentratie', 'oogcontact', 'luisteraar'], 'bewaak gedachteconcentratie en oogcontact', 'Eerst denken, oogcontact, inademing, spreken.'),
+        check('Weinig uitleg', ['weinig uitleg', 'voordoen', 'imiteren', 'oefenen'], 'niet praten maar oefenen', 'De toets wil zien dat je voordoet en bewaakt.')
+      ],
+      warnings: [],
+      upgrade: 'Maak één korte voorbeeldzin concreet en laat exact horen hoe je van klinkerspraak naar zin gaat.',
+      next: 'Noem accentgroepen, klinkerspraak en natuurlijke zin in die volgorde.',
+      nextStrong: 'Pak “we gaan naar huis” en voer de drie stappen hardop uit.'
+    },
+    'Zelfreflectie': {
+      focus: ['Open vraag', 'Doorvragen', 'Antwoord gebruiken', 'Niet zelf invullen'],
+      minimumWords: 25,
+      checks: [
+        check('Open vraag', ['wat merkte', 'hoe ging', 'hoe voelde', 'wat voelde'], 'start met open vraag', 'Vraag wat Bernard zelf merkte.'),
+        check('Doorvragen keel/adem', ['keel', 'adem', 'kaak', 'spanning', 'gemak'], 'vraag door op keel, adem, kaak of spanning', 'Eén vraag is te weinig; vraag gericht door.'),
+        check('Gebruik antwoord', ['daarom', 'dan', 'volgende', 'cue', 'opnieuw'], 'gebruik zijn antwoord voor je volgende cue', 'Laat zien dat reflectie je behandeling stuurt.')
+      ],
+      warnings: [],
+      upgrade: 'Maak het therapeutisch: vraag, luister, kies één cue, probeer opnieuw.',
+      next: 'Voeg doorvragen en een vervolgcue toe.',
+      nextStrong: 'Train dit met iemand die expres vaag antwoordt.'
+    },
+    'Huiswerk afsluiten': {
+      focus: ['Materiaal', '3x 5 minuten', 'Aandachtspunten', 'Transfer'],
+      minimumWords: 35,
+      checks: [
+        check('Materiaal', ['audio', 'trommel', 'kaart', 'tekst', 'opname'], 'noem concreet materiaal', 'Zeg wat Bernard meekrijgt.'),
+        check('Frequentie/duur', ['3x', 'drie keer', '5 minuten', 'vijf minuten', '10 minuten', 'tien minuten'], 'noem frequentie en duur', 'Maak het meetbaar: 3x per dag 5 minuten.'),
+        check('Aandachtspunten', ['kaak', 'zacht', 'offset', 'knie', 'pols', 'spiegel'], 'geef specifieke aandachtspunten', 'Noem maximaal drie punten: kaak, zachte afsluiting, beweging.'),
+        check('Transfer', ['drukkerij', 'koor', 'zingen', 'werk'], 'koppel aan drukkerij/koor', 'Leg uit waar hij het buiten de therapie gaat gebruiken.'),
+        check('Zelfcheck', ['voel', 'merkte', 'keel', 'duw', 'zelfcheck'], 'geef zelfcheckvraag', 'Laat Bernard thuis controleren of hij niet duwt.')
+      ],
+      warnings: [],
+      upgrade: 'Zeg het als afsluitinstructie aan Bernard, niet als losse notitie over huiswerk.',
+      next: 'Maak huiswerk concreet: materiaal, 3x5 minuten, drie aandachtspunten, transfer.',
+      nextStrong: 'Oefen de afsluiting in 25 seconden.'
+    },
+    'Weerstand Bernard': {
+      focus: ['Erkennen', 'Non-directief', 'Koppelen aan zang/werk', 'Kort laten ervaren'],
+      minimumWords: 35,
+      checks: [
+        check('Erkennen', ['begrijp', 'logisch', 'raar', 'snap', 'voorstellen'], 'erken zijn weerstand', 'Begin niet verdedigend; erken dat het vreemd kan voelen.'),
+        check('Motiveren via hulpvraag', ['zingen', 'koor', 'drukkerij', 'draagkracht', 'truc'], 'koppel aan zijn doel', 'Verbind de beweging aan weer kunnen zingen/werken zonder druk.'),
+        check('Non-directief', ['probeer', 'ervaren', 'doet mee', 'ik doe voor', 'meedoen'], 'nodig uit om te ervaren', 'Laat hem het verschil voelen in plaats van overtuigen met theorie.'),
+        check('Kort houden', ['kort', 'even', 'één keer', 'daarna'], 'maak de drempel laag', 'Vraag om één korte poging.')
+      ],
+      warnings: [],
+      upgrade: 'Vervang uitleg door ervaring: erken, doel koppelen, één korte poging laten voelen.',
+      next: 'Reageer minder theoretisch en meer motiverend.',
+      nextStrong: 'Speel dit met een kritische cliënt en blijf rustig/non-directief.'
+    }
+  };
+
+  return profiles[title] || {
+    focus: ['Doel', 'Uitvoering', 'Feedback'],
+    minimumWords: 30,
+    checks: [
+      check('Concreet handelen', ['ik doe', 'ik laat', 'ik vraag', 'ik geef'], 'zeg wat jij doet'),
+      check('Cliëntactie', ['bernard', 'u doet', 'u voelt', 'probeer'], 'zeg wat Bernard doet'),
+      check('Volgende stap', ['opnieuw', 'volgende', 'feedback'], 'noem de volgende stap')
+    ],
+    warnings: [],
+    upgrade: 'Maak het concreet: therapeutzin, cliëntactie, observatie en vervolg.',
+    next: 'Vul aan wat je precies zegt en doet.',
+    nextStrong: 'Herhaal zonder tekst.'
+  };
+}
+
+function fourFourProfile(profile) {
+  return {
+    minimumWords: 35,
+    warnings: [
+      {
+        test: clean => hasAny(clean, ['3/4', 'drie kwart', 'largo', 'voor-achter', 'voor achter', '3 tellen', 'drie tellen']),
+        message: 'Let op: je beschrijft nu 3/4/Largo. De docent vraagt hier 4/4.',
+        fix: profile.upgrade
+      }
+    ],
+    ...profile
+  };
+}
+
+function check(label, words, missing, zg = missing) {
+  return { label, words, missing, zg };
+}
+
+function hasAny(clean, words) {
+  return words.some(word => clean.includes(normalize(word)));
+}
+
+function unique(items) {
+  return [...new Set(items)];
 }
 
 function answerAccentCoachQuestion() {
@@ -259,6 +436,22 @@ function answerAccentCoachQuestion() {
 function buildAccentCoachAnswer(question) {
   const clean = normalize(question);
 
+  if ((hasAny(clean, ['andante', 'allegro', 'ritme 2']) && hasAny(clean, ['3/4', 'drie kwart', 'largo', 'voor-achter', 'drie tellen'])) || (hasAny(clean, ['4/4', 'vierkwarts']) && hasAny(clean, ['ritme', 'andante', 'allegro']))) {
+    return {
+      title: 'Van Largo-denken naar 4/4',
+      body: 'Schrap de Largo-taal: geen 3 tellen, geen voor-achterbeweging. Zeg bij Andante: 1/8 inademing, 1/8 onbeklemtoonde inzet, drie accenten, draaiing en onderarm. Zeg bij Allegro: opmaat, vijf accenten, verende knieën en losse pols.',
+      action: 'Actie: open Simulatie en oefen Andante of Allegro met alleen deze 4/4-zin.',
+      view: 'simulatie'
+    };
+  }
+  if (hasAny(clean, ['3/4', '3 van 4', 'voldoende']) && hasAny(clean, ['4/4', '4 van 4', 'zg', 'score', 'punten'])) {
+    return {
+      title: 'Van 3/4-score naar 4/4-score',
+      body: 'Voeg niet méér theorie toe. Voeg één zichtbaar therapeutisch bewijs toe: concrete Bernard-koppeling, non-verbale cue, cliëntreflectie of direct opnieuw proberen. De simulatiefeedback kiest er maximaal drie.',
+      action: 'Actie: plak je antwoord in Simulatie en kijk alleen naar het blok “Van score 3/4 naar 4/4”.',
+      view: 'simulatie'
+    };
+  }
   if (matches(clean, ['largo', 'ritme 1', '3/4', 'drie kwart'])) {
     return {
       title: 'Largo: eerst beweging, dan klank',
@@ -310,7 +503,7 @@ function buildAccentCoachAnswer(question) {
   if (matches(clean, ['huiswerk', 'thuis', 'oefenen', 'meegeven', 'transfer'])) {
     return {
       title: 'Huiswerk moet concreet zijn',
-      body: 'Noem materiaal, frequentie, duur, aandachtspunten en transfer. Dus niet “oefen dit thuis”, maar: audio/trommel, 3x per dag 10 minuten, spiegel, zachte inzet/offset, kaakruimte en toepassing bij drukkerij/koor.',
+      body: 'Noem materiaal, frequentie, duur, aandachtspunten en transfer. Dus niet “oefen dit thuis”, maar: audio/trommel, 3x per dag 5 minuten, spiegel, zachte inzet/offset, kaakruimte en toepassing bij drukkerij/koor.',
       action: 'Actie: open Huiswerk en spreek de afsluiting alsof Bernard nu vertrekt.',
       view: 'huiswerk'
     };
@@ -458,6 +651,10 @@ function saveScores() {
   localStorage.setItem('accent_scores', JSON.stringify(state.scores));
 }
 
+function simulationIndex() {
+  return Math.max(0, data.simulations.findIndex(item => item[0] === state.simulation[0]));
+}
+
 function block(label, text) {
   return `
     <article>
@@ -478,8 +675,4 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-function randomItem(items) {
-  return items[Math.floor(Math.random() * items.length)];
 }
