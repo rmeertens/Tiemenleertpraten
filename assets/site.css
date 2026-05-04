@@ -816,6 +816,167 @@ a { color: inherit; }
   font-size: 14px;
 }
 
+.oral-therapy-machine {
+  margin-top: 16px;
+}
+
+.oral-wietze {
+  margin-top: 16px;
+}
+
+.oral-wietze-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.oral-wietze-grid article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.oral-wietze-grid h4 {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.oral-wietze-grid p,
+.oral-wietze-grid li {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0;
+}
+
+.oral-wietze-grid ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.oral-wietze-grid div {
+  display: grid;
+  gap: 7px;
+}
+
+.oral-wietze-grid article:first-child,
+.oral-wietze-grid article:nth-child(11) {
+  grid-column: 1 / -1;
+}
+
+.oral-section-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.oral-select {
+  appearance: none;
+  background: var(--bg);
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+  max-width: 320px;
+  padding: 12px 14px;
+  width: 100%;
+}
+
+.oral-route-detail {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.oral-route-main,
+.oral-route-grid div,
+.oral-goals article,
+.oral-methods article,
+.oral-collab-list article,
+.oral-prognosis-list {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.oral-route-main h4 {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.oral-route-main p {
+  margin: 0;
+}
+
+.oral-route-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.oral-route-grid div,
+.oral-goals article,
+.oral-methods article,
+.oral-collab-list article {
+  display: grid;
+  gap: 5px;
+}
+
+.oral-route-grid strong,
+.oral-goals strong,
+.oral-methods strong,
+.oral-collab-list strong {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.oral-route-grid span,
+.oral-goals span,
+.oral-methods span,
+.oral-collab-list span,
+.oral-collab-list p,
+.oral-prognosis-list p {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0;
+}
+
+.oral-goals,
+.oral-methods,
+.oral-collab-list,
+.oral-prognosis-list {
+  display: grid;
+  gap: 10px;
+  max-height: 540px;
+  overflow: auto;
+}
+
+.oral-goals p,
+.oral-methods p {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.oral-collab {
+  display: grid;
+  gap: 12px;
+}
+
 .oral-guide {
   margin-top: 16px;
 }
@@ -1049,7 +1210,9 @@ a { color: inherit; }
   .oral-hero,
   .oral-grid,
   .oral-sim,
-  .oral-feedback-grid {
+  .oral-feedback-grid,
+  .oral-route-grid,
+  .oral-wietze-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -1062,6 +1225,14 @@ a { color: inherit; }
 
   .oral-feedback__head {
     flex-direction: column;
+  }
+
+  .oral-section-head {
+    flex-direction: column;
+  }
+
+  .oral-select {
+    max-width: none;
   }
 }
 

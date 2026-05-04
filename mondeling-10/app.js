@@ -15,6 +15,15 @@ const diagnosticPrompt = document.getElementById('diagnostic-prompt');
 const therapyPrompt = document.getElementById('therapy-prompt');
 const diagnosticChecks = document.getElementById('diagnostic-checks');
 const therapyChecks = document.getElementById('therapy-checks');
+const therapyRouteSelect = document.getElementById('therapy-route-select');
+const therapyRouteDetail = document.getElementById('therapy-route-detail');
+const therapyGoals = document.getElementById('therapy-goals');
+const therapyMethods = document.getElementById('therapy-methods');
+const therapyScript = document.getElementById('therapy-script');
+const therapyDrill = document.getElementById('therapy-drill');
+const therapyCollab = document.getElementById('therapy-collab');
+const therapyRedflags = document.getElementById('therapy-redflags');
+const wietzePrep = document.getElementById('wietze-prep');
 const guideGrid = document.getElementById('guide-grid');
 const oralDrill = document.getElementById('oral-drill');
 const redFlags = document.getElementById('red-flags');
@@ -36,12 +45,18 @@ let timerId = null;
 let recognition = null;
 let recording = false;
 let activeDrill = data.drills[0];
+let activeTherapyRoute = data.therapyMachine.routes[0];
+let activeTherapyScript = data.therapyMachine.scripts[0];
+let activeTherapyDrill = data.therapyMachine.drills[0];
+let activeWietzeQuestion = data.wietzePrep.questions[0];
 
 boot();
 
 function boot() {
   renderPrompts();
   renderChecks();
+  renderTherapyMachine();
+  renderWietzePrep();
   renderGuide();
   renderDrill();
   renderRedFlags();
@@ -69,6 +84,11 @@ function bindEvents() {
     btn.addEventListener('click', () => scoreChecklist(btn.dataset.score));
   });
 
+  therapyRouteSelect.addEventListener('change', () => {
+    activeTherapyRoute = data.therapyMachine.routes.find(route => route.id === therapyRouteSelect.value) || data.therapyMachine.routes[0];
+    renderTherapyRoute();
+  });
+
   document.querySelectorAll('[data-record]').forEach(btn => {
     btn.addEventListener('click', () => toggleRecording(`${btn.dataset.record}-prompt`));
   });
@@ -81,6 +101,21 @@ function bindEvents() {
   document.getElementById('new-drill').addEventListener('click', () => {
     activeDrill = randomItem(data.drills);
     renderDrill();
+  });
+
+  document.getElementById('new-therapy-script').addEventListener('click', () => {
+    activeTherapyScript = randomItem(data.therapyMachine.scripts);
+    renderTherapyScript();
+  });
+
+  document.getElementById('new-therapy-drill').addEventListener('click', () => {
+    activeTherapyDrill = randomItem(data.therapyMachine.drills);
+    renderTherapyDrill();
+  });
+
+  document.getElementById('wietze-question').addEventListener('click', () => {
+    activeWietzeQuestion = randomItem(data.wietzePrep.questions);
+    renderWietzePrep();
   });
 
   document.getElementById('strict-feedback').addEventListener('click', strictFeedback);
@@ -109,6 +144,134 @@ function promptHtml(prompt, model) {
 function renderChecks() {
   diagnosticChecks.innerHTML = checksHtml('diagnostics', data.diagnostics.criteria);
   therapyChecks.innerHTML = checksHtml('therapy', data.therapy.criteria);
+}
+
+function renderTherapyMachine() {
+  therapyRouteSelect.innerHTML = data.therapyMachine.routes.map(route => `
+    <option value="${route.id}">${escapeHtml(route.title)}</option>
+  `).join('');
+  renderTherapyRoute();
+  renderTherapyGoals();
+  renderTherapyMethods();
+  renderTherapyScript();
+  renderTherapyDrill();
+  renderTherapyCollab();
+  therapyRedflags.innerHTML = data.therapyMachine.redFlags.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+}
+
+function renderTherapyRoute() {
+  therapyRouteSelect.value = activeTherapyRoute.id;
+  therapyRouteDetail.innerHTML = `
+    <div class="oral-route-main">
+      <h4>${escapeHtml(activeTherapyRoute.title)}</h4>
+      <p>${escapeHtml(activeTherapyRoute.problem)}</p>
+    </div>
+    <div class="oral-route-grid">
+      ${routeFact('LT-doel', activeTherapyRoute.lt)}
+      ${routeFact('KT-doel', activeTherapyRoute.kt)}
+      ${routeFact('Methode', activeTherapyRoute.method)}
+      ${routeFact('Waarom', activeTherapyRoute.why)}
+      ${routeFact('Vorm', activeTherapyRoute.form)}
+      ${routeFact('Duur', activeTherapyRoute.duration)}
+      ${routeFact('Samenwerking', activeTherapyRoute.collaboration)}
+      ${routeFact('Prognose', activeTherapyRoute.prognosis)}
+    </div>
+  `;
+}
+
+function renderTherapyGoals() {
+  therapyGoals.innerHTML = data.therapyMachine.goals.map(([domain, weak, strong]) => `
+    <article>
+      <strong>${escapeHtml(domain)}</strong>
+      <span>${escapeHtml(weak)}</span>
+      <p>${escapeHtml(strong)}</p>
+    </article>
+  `).join('');
+}
+
+function renderTherapyMethods() {
+  therapyMethods.innerHTML = data.therapyMachine.methods.map(([method, indication, pitfall, script]) => `
+    <article>
+      <strong>${escapeHtml(method)}</strong>
+      <span><b>Indicatie:</b> ${escapeHtml(indication)}</span>
+      <span><b>Valkuil:</b> ${escapeHtml(pitfall)}</span>
+      <p>${escapeHtml(script)}</p>
+    </article>
+  `).join('');
+}
+
+function renderTherapyScript() {
+  const [scenario, script] = activeTherapyScript;
+  therapyScript.innerHTML = `
+    <strong>${escapeHtml(scenario)}</strong>
+    <p>${escapeHtml(script)}</p>
+    <span>Criterium 15 en 17</span>
+  `;
+}
+
+function renderTherapyDrill() {
+  const [question, answer, criterion] = activeTherapyDrill;
+  therapyDrill.innerHTML = `
+    <strong>${escapeHtml(question)}</strong>
+    <p>${escapeHtml(answer)}</p>
+    <span>${escapeHtml(criterion)}</span>
+  `;
+}
+
+function renderTherapyCollab() {
+  therapyCollab.innerHTML = `
+    <div class="oral-collab-list">
+      ${data.therapyMachine.collaboration.map(([discipline, ask, agree, why]) => `
+        <article>
+          <strong>${escapeHtml(discipline)}</strong>
+          <span><b>Weten:</b> ${escapeHtml(ask)}</span>
+          <span><b>Afspreken:</b> ${escapeHtml(agree)}</span>
+          <p>${escapeHtml(why)}</p>
+        </article>
+      `).join('')}
+    </div>
+    <div class="oral-prognosis-list">
+      ${data.therapyMachine.prognosis.map(([profile, text]) => `
+        <p><strong>${escapeHtml(profile)}:</strong> ${escapeHtml(text)}</p>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderWietzePrep() {
+  const w = data.wietzePrep;
+  const [question, answer] = activeWietzeQuestion;
+  wietzePrep.innerHTML = `
+    ${wietzeBlock('30 seconden pitch', `<p>${escapeHtml(w.pitch)}</p>`)}
+    ${wietzeBlock('Differentiaal redeneren', listHtml(w.differential))}
+    ${wietzeBlock('ICF-brug', factListHtml(w.icf))}
+    ${wietzeBlock('12-weken plan', factListHtml(w.plan))}
+    ${wietzeBlock('LT/KT-doelen', factListHtml(w.goals))}
+    ${wietzeBlock('Methodekeuze', factListHtml(w.methods))}
+    ${wietzeBlock('ZG-scripts', listHtml(w.scripts))}
+    ${wietzeBlock('Samenwerking', factListHtml(w.collaboration))}
+    ${wietzeBlock('Prognose', `<p>${escapeHtml(w.prognosis)}</p>`)}
+    ${wietzeBlock('Docentvraag', `<strong>${escapeHtml(question)}</strong><p>${escapeHtml(answer)}</p>`)}
+    ${wietzeBlock('ZG-spiekkaart', listHtml(w.cheat))}
+  `;
+}
+
+function wietzeBlock(title, body) {
+  return `<article><h4>${escapeHtml(title)}</h4>${body}</article>`;
+}
+
+function listHtml(items) {
+  return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+}
+
+function factListHtml(items) {
+  return `<div>${items.map(([label, text]) => `
+    <p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(text)}</p>
+  `).join('')}</div>`;
+}
+
+function routeFact(label, value) {
+  return `<div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`;
 }
 
 function renderGuide() {
@@ -197,7 +360,11 @@ function strictFeedback() {
     'beginsituatie', 'doel', 'methode', 'verantwoord', 'advies', 'samenwerking',
     'prognose', 'score', 'afbreekregel', 'start', 'intonatie', 'neutraal',
     'handleiding', 'fout', 'betrouwbaar', 'testsituatie', 'tempo', 'prosodie',
-    'morfosyntaxis', 'terugkeerregel', 'respons', 'taalbegrip', 'zinsontwikkeling'
+    'morfosyntaxis', 'terugkeerregel', 'respons', 'taalbegrip', 'zinsontwikkeling',
+    'lt', 'kt', 'frequentie', 'evaluatie', 'ouders', 'leerkracht', 'icf',
+    'participatie', 'generalisatie', 'fonologisch', 'fonetisch', 'vod', 'tos',
+    'scaffolding', 'recasting', 'metaphon', 'minimale paren', 'wietze',
+    'tiq', 'visuele steun', 'jaarhandelingsplan'
   ];
   const hits = rubricWords.filter(word => clean.includes(word));
   const structure = ['omdat', 'dus', 'daarom', 'passend', 'concreet'].filter(word => clean.includes(word));

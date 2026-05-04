@@ -111,6 +111,69 @@
           <button class="btn btn--primary" type="button" data-score="therapy">Bereken score</button>
         </article>
       </div>
+
+      <article class="oral-card oral-therapy-machine">
+        <div class="oral-section-head">
+          <div>
+            <p class="oral-label">Behandelbeslisboom</p>
+            <h3>Kies hoofdprobleem, verdedig je koers</h3>
+          </div>
+          <select class="oral-select" id="therapy-route-select" aria-label="Kies behandelroute"></select>
+        </div>
+        <div class="oral-route-detail" id="therapy-route-detail"></div>
+      </article>
+
+      <article class="oral-card oral-wietze">
+        <div class="oral-section-head">
+          <div>
+            <p class="oral-label">Casus Wietze</p>
+            <h3>ZG-voorbereiding behandeling</h3>
+          </div>
+          <button class="btn btn--primary" type="button" id="wietze-question">Nieuwe docentvraag</button>
+        </div>
+        <div class="oral-wietze-grid" id="wietze-prep"></div>
+      </article>
+
+      <div class="oral-grid oral-extra-grid">
+        <article class="oral-card">
+          <p class="oral-label">Doelenbank</p>
+          <h3>Slecht doel → 10-doel</h3>
+          <div class="oral-goals" id="therapy-goals"></div>
+        </article>
+        <article class="oral-card">
+          <p class="oral-label">Methodematrix</p>
+          <h3>Wanneer kies je wat?</h3>
+          <div class="oral-methods" id="therapy-methods"></div>
+        </article>
+      </div>
+
+      <div class="oral-grid oral-extra-grid">
+        <article class="oral-card">
+          <p class="oral-label">Mondeling script</p>
+          <h3>Verdedig methode en vorm</h3>
+          <div class="oral-drill" id="therapy-script"></div>
+          <button class="btn btn--primary" type="button" id="new-therapy-script">Nieuw script</button>
+        </article>
+        <article class="oral-card">
+          <p class="oral-label">Therapie einddrill</p>
+          <h3>Docentvraag</h3>
+          <div class="oral-drill" id="therapy-drill"></div>
+          <button class="btn btn--primary" type="button" id="new-therapy-drill">Nieuwe vraag</button>
+        </article>
+      </div>
+
+      <div class="oral-grid oral-extra-grid">
+        <article class="oral-card">
+          <p class="oral-label">Samenwerking en prognose</p>
+          <h3>Maak het multidisciplinair</h3>
+          <div class="oral-collab" id="therapy-collab"></div>
+        </article>
+        <article class="oral-card">
+          <p class="oral-label">Rode vlaggen therapie</p>
+          <h3>Dit kost punten</h3>
+          <ul class="oral-redflags" id="therapy-redflags"></ul>
+        </article>
+      </div>
     </section>
 
     <section class="oral-view" id="view-simulation">
