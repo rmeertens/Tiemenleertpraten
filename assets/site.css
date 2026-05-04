@@ -247,6 +247,239 @@ a { color: inherit; }
 
 /* ============ Pak de 10 ============ */
 
+.accent-app {
+  max-width: 1180px;
+}
+
+.accent-hero {
+  align-items: stretch;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  margin: 36px 0 22px;
+}
+
+.accent-hero h2 {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 74px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+  margin: 0 0 18px;
+}
+
+.accent-hero p {
+  color: var(--ink-soft);
+  font-size: 18px;
+  margin: 0;
+  max-width: 68ch;
+}
+
+.accent-score,
+.accent-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.accent-score {
+  align-content: center;
+  display: grid;
+}
+
+.accent-score span,
+.accent-label {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.accent-score strong {
+  font-family: var(--font-display);
+  font-size: 54px;
+  line-height: 1;
+}
+
+.accent-score p,
+.accent-card p {
+  color: var(--ink-soft);
+}
+
+.accent-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.accent-tab {
+  appearance: none;
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 10px 14px;
+}
+
+.accent-tab.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.accent-view {
+  display: none;
+}
+
+.accent-view.is-active {
+  display: grid;
+  gap: 16px;
+}
+
+.accent-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.accent-card h3 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0 0 14px;
+}
+
+.accent-list,
+.accent-power,
+.accent-bars {
+  display: grid;
+  gap: 10px;
+}
+
+.accent-list article,
+.accent-power p,
+.accent-feedback article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 12px 14px;
+}
+
+.accent-list strong,
+.accent-feedback strong {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.accent-list span,
+.accent-list p,
+.accent-feedback p,
+.accent-note {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0;
+}
+
+.accent-route,
+.accent-checklist {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.accent-route li,
+.accent-checklist li {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  list-style: none;
+  padding: 11px 13px;
+}
+
+.accent-toolbar,
+.accent-actions,
+.accent-section-head,
+.accent-feedback-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.accent-select,
+.accent-answer {
+  appearance: none;
+  background: var(--bg);
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+  padding: 12px 14px;
+}
+
+.accent-select {
+  max-width: 520px;
+  width: 100%;
+}
+
+.accent-prompt {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-weight: 800;
+  padding: 14px;
+}
+
+.accent-answer {
+  line-height: 1.55;
+  margin-bottom: 12px;
+  resize: vertical;
+  width: 100%;
+}
+
+.accent-feedback:empty {
+  display: none;
+}
+
+.accent-feedback-head strong {
+  background: var(--accent);
+  border-radius: 999px;
+  color: white;
+  padding: 8px 12px;
+}
+
+.accent-bar div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.accent-bar span {
+  color: var(--ink-soft);
+  font-weight: 800;
+}
+
+.accent-bar meter {
+  height: 12px;
+  width: 100%;
+}
+
 .ten-app {
   max-width: 1180px;
 }
@@ -1551,6 +1784,8 @@ a { color: inherit; }
 }
 
 @media (max-width: 900px) {
+  .accent-hero,
+  .accent-grid,
   .ten-hero,
   .ten-grid,
   .ten-practice-layout,
@@ -1569,11 +1804,17 @@ a { color: inherit; }
 }
 
 @media (max-width: 560px) {
+  .accent-card,
+  .accent-score,
   .ten-card,
   .ten-scorecard {
     padding: 20px;
   }
 
+  .accent-toolbar,
+  .accent-actions,
+  .accent-section-head,
+  .accent-feedback-head,
   .ten-practice-head,
   .ten-feedback-head,
   .ten-section-head {

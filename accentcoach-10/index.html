@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Accentcoach 10 — herkansingstrainer Accentmethode casus Bernard." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Accentcoach 10 &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=10" />
+</head>
+<body>
+  <div class="version-stamp">v10 &middot; Accentcoach</div>
+  <main class="studio accent-app">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Accentcoach 10</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <header class="accent-hero">
+      <div>
+        <p class="eyebrow">Herkansing Accentmethode &middot; casus Bernard</p>
+        <h2>Oefen alsof de docent naast je zit.</h2>
+        <p>
+          Train doeluitleg, ritmes, beweging, stemkwaliteit, cliënttaal, feedback en huiswerk.
+          De tool is gebouwd op jouw beoordelingsformulier en verbeterpunten.
+        </p>
+      </div>
+      <aside class="accent-score">
+        <span>Herkansingsklaar</span>
+        <strong id="accent-ready">0%</strong>
+        <p id="accent-hint">Scoor bewijs per criterium.</p>
+      </aside>
+    </header>
+
+    <section class="accent-tabs" aria-label="Accentcoach onderdelen">
+      <button class="accent-tab is-active" type="button" data-view="route">Route</button>
+      <button class="accent-tab" type="button" data-view="bron">Bron</button>
+      <button class="accent-tab" type="button" data-view="criteria">Criteria</button>
+      <button class="accent-tab" type="button" data-view="ritmes">Ritmes</button>
+      <button class="accent-tab" type="button" data-view="simulatie">Simulatie</button>
+      <button class="accent-tab" type="button" data-view="huiswerk">Huiswerk</button>
+      <button class="accent-tab" type="button" data-view="bewijs">Bewijs</button>
+    </section>
+
+    <section class="accent-view is-active" id="view-route">
+      <div class="accent-grid">
+        <article class="accent-card">
+          <p class="accent-label">Casus Bernard</p>
+          <h3>Waarom Accentmethode?</h3>
+          <div id="case-profile" class="accent-list"></div>
+        </article>
+        <article class="accent-card">
+          <p class="accent-label">Vandaag oefenen</p>
+          <h3>5 minuten per oefening</h3>
+          <ol id="daily-route" class="accent-route"></ol>
+        </article>
+      </div>
+      <article class="accent-card">
+        <p class="accent-label">Spiekposter zonder afleiding</p>
+        <h3>3 zinnen die je altijd moet kunnen</h3>
+        <div id="power-lines" class="accent-power"></div>
+      </article>
+    </section>
+
+    <section class="accent-view" id="view-bron">
+      <div class="accent-grid">
+        <article class="accent-card">
+          <p class="accent-label">Boektekst geordend</p>
+          <h3>Theorie die je kort moet kunnen verantwoorden</h3>
+          <div id="theory-list" class="accent-list"></div>
+        </article>
+        <article class="accent-card">
+          <p class="accent-label">Observatielijsten</p>
+          <h3>De toets kijkt hiernaar</h3>
+          <div id="checklist-list" class="accent-list"></div>
+        </article>
+      </div>
+      <article class="accent-card">
+        <p class="accent-label">Tekstniveau</p>
+        <h3>Voorbeeldzinnen en teksten</h3>
+        <div id="text-examples" class="accent-list"></div>
+      </article>
+    </section>
+
+    <section class="accent-view" id="view-criteria">
+      <div class="accent-toolbar">
+        <select id="criterion-select" class="accent-select" aria-label="Kies criterium"></select>
+        <button class="btn btn--ghost" type="button" id="mark-criterion">Markeer geoefend</button>
+      </div>
+      <div class="accent-grid">
+        <article class="accent-card">
+          <p class="accent-label">Rubric</p>
+          <h3 id="criterion-title"></h3>
+          <div id="criterion-detail" class="accent-list"></div>
+        </article>
+        <article class="accent-card">
+          <p class="accent-label">Verbeterpunt vorige poging</p>
+          <h3>Hier win je punten</h3>
+          <div id="criterion-fix" class="accent-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="accent-view" id="view-ritmes">
+      <div class="accent-toolbar">
+        <select id="rhythm-select" class="accent-select" aria-label="Kies ritme"></select>
+        <button class="btn btn--ghost" type="button" id="mark-rhythm">Markeer geoefend</button>
+      </div>
+      <div class="accent-grid">
+        <article class="accent-card">
+          <p class="accent-label">Ritmekaart</p>
+          <h3 id="rhythm-title"></h3>
+          <div id="rhythm-detail" class="accent-list"></div>
+        </article>
+        <article class="accent-card">
+          <p class="accent-label">Foutendetector</p>
+          <h3>Waar zakte je vorige keer op?</h3>
+          <ul id="rhythm-errors" class="accent-checklist"></ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="accent-view" id="view-simulatie">
+      <article class="accent-card">
+        <div class="accent-section-head">
+          <div>
+            <p class="accent-label">Toetssimulatie</p>
+            <h3 id="simulation-title"></h3>
+          </div>
+          <button class="btn btn--ghost" type="button" id="new-simulation">Nieuwe prompt</button>
+        </div>
+        <p id="simulation-prompt" class="accent-prompt"></p>
+        <textarea id="simulation-answer" class="accent-answer" rows="8" placeholder="Schrijf of dicteer precies wat je tegen Bernard zegt en wat je doet."></textarea>
+        <div class="accent-actions">
+          <button class="btn btn--primary" type="button" id="check-simulation">Strenge feedback</button>
+          <button class="btn btn--ghost" type="button" id="record-simulation">Neem op</button>
+          <button class="btn btn--ghost" type="button" id="clear-simulation">Wis</button>
+        </div>
+        <p class="accent-note" id="speech-note"></p>
+      </article>
+      <article class="accent-card accent-feedback" id="simulation-feedback"></article>
+    </section>
+
+    <section class="accent-view" id="view-huiswerk">
+      <div class="accent-grid">
+        <article class="accent-card">
+          <p class="accent-label">Huiswerkkaart Bernard</p>
+          <h3>Concreet materiaal + aandachtspunten</h3>
+          <div id="homework-card" class="accent-list"></div>
+        </article>
+        <article class="accent-card">
+          <p class="accent-label">Feedbacktrainer</p>
+          <h3>Van compliment naar verbetercue</h3>
+          <div id="feedback-trainer" class="accent-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="accent-view" id="view-bewijs">
+      <div class="accent-grid">
+        <article class="accent-card">
+          <p class="accent-label">Scorebewijs</p>
+          <h3>Welke criteria zijn veilig?</h3>
+          <div id="score-bars" class="accent-bars"></div>
+        </article>
+        <article class="accent-card">
+          <p class="accent-label">Laatste checklist</p>
+          <h3>Voor je herkansing</h3>
+          <ul id="final-checklist" class="accent-checklist"></ul>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
