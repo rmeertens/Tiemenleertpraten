@@ -8,7 +8,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Mondeling 10 &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=9" />
+  <link rel="stylesheet" href="/assets/site.css?v=10" />
 </head>
 <body>
   <div class="version-stamp">v1 &middot; 3 mei</div>
@@ -21,12 +21,11 @@
 
     <header class="oral-hero">
       <div>
-        <p class="eyebrow">Performance assessment Spraak-Taal</p>
-        <h2>Train alsof de docent meekijkt.</h2>
+        <p class="eyebrow">Criteria 1-20 &middot; ZG-coach</p>
+        <h2>Eén toets. Twee delen. Geen ruis.</h2>
         <p>
-          Oefen Taalbegrip-3 volledig, Taalproductie-3 alleen Zinsontwikkeling,
-          je foutverantwoording en het therapiegesprek. De tool stuurt op de criteria
-          die punten opleveren.
+          Deel 1 traint Schlichting-afname en verantwoording. Deel 2 traint behandeling.
+          De coach laat eerst zien wat je moet kunnen, daarna pas de verdieping.
         </p>
       </div>
       <aside class="oral-clock">
@@ -37,13 +36,18 @@
     </header>
 
     <section class="oral-tabs" aria-label="Mondelinge trainingsonderdelen">
-      <button class="oral-tab is-active" type="button" data-view="diagnostics">Diagnostiek</button>
-      <button class="oral-tab" type="button" data-view="therapy">Therapie</button>
-      <button class="oral-tab" type="button" data-view="simulation">Simulatie</button>
-      <button class="oral-tab" type="button" data-view="dashboard">Dashboard</button>
+      <button class="oral-tab is-active" type="button" data-view="diagnostics">Deel 1 · Schlichting 1-10</button>
+      <button class="oral-tab" type="button" data-view="therapy">Deel 2 · Behandeling 11-20</button>
+      <button class="oral-tab" type="button" data-view="simulation">Toetssimulatie</button>
+      <button class="oral-tab" type="button" data-view="dashboard">Bewijs</button>
     </section>
 
     <section class="oral-view is-active" id="view-diagnostics">
+      <article class="oral-card oral-focus">
+        <p class="oral-label">Kerndoel deel 1</p>
+        <h3>Laat zien dat je betrouwbaar kunt afnemen.</h3>
+        <p>Focus op: testsituatie, exacte instructie, scoring, start-/terugkeer-/afbreekregels en professionele foutverantwoording.</p>
+      </article>
       <div class="oral-grid">
         <article class="oral-card">
           <p class="oral-label">Onderdeel A</p>
@@ -67,28 +71,36 @@
         </article>
       </div>
 
-      <article class="oral-card oral-guide">
-        <p class="oral-label">Handleidingcheck</p>
-        <h3>Wat moet automatisch uit je mond komen?</h3>
-        <div class="oral-guide-grid" id="guide-grid"></div>
-      </article>
+      <details class="oral-coach-accordion">
+        <summary>Verdieping Schlichting: regels, docentvragen en rode vlaggen</summary>
+        <article class="oral-card oral-guide">
+          <p class="oral-label">Handleidingcheck</p>
+          <h3>Wat moet automatisch uit je mond komen?</h3>
+          <div class="oral-guide-grid" id="guide-grid"></div>
+        </article>
 
-      <div class="oral-grid oral-extra-grid">
-        <article class="oral-card">
-          <p class="oral-label">Overhoorstand</p>
-          <h3>Docentvraag</h3>
-          <div class="oral-drill" id="oral-drill"></div>
-          <button class="btn btn--primary" type="button" id="new-drill">Nieuwe vraag</button>
-        </article>
-        <article class="oral-card">
-          <p class="oral-label">Rode vlaggen</p>
-          <h3>Dit kost punten</h3>
-          <ul class="oral-redflags" id="red-flags"></ul>
-        </article>
-      </div>
+        <div class="oral-grid oral-extra-grid">
+          <article class="oral-card">
+            <p class="oral-label">Overhoorstand</p>
+            <h3>Docentvraag</h3>
+            <div class="oral-drill" id="oral-drill"></div>
+            <button class="btn btn--primary" type="button" id="new-drill">Nieuwe vraag</button>
+          </article>
+          <article class="oral-card">
+            <p class="oral-label">Rode vlaggen</p>
+            <h3>Dit kost punten</h3>
+            <ul class="oral-redflags" id="red-flags"></ul>
+          </article>
+        </div>
+      </details>
     </section>
 
     <section class="oral-view" id="view-therapy">
+      <article class="oral-card oral-focus">
+        <p class="oral-label">Kerndoel deel 2</p>
+        <h3>Laat zien dat je klinisch kunt behandelen.</h3>
+        <p>Focus op: vervolgstap, LT-doel, KT-doel, methode, therapievorm, duur/evaluatie, samenwerking en prognose.</p>
+      </article>
       <div class="oral-grid">
         <article class="oral-card">
           <p class="oral-label">Onderdeel B</p>
@@ -134,46 +146,49 @@
         <div class="oral-wietze-grid" id="wietze-prep"></div>
       </article>
 
-      <div class="oral-grid oral-extra-grid">
-        <article class="oral-card">
-          <p class="oral-label">Doelenbank</p>
-          <h3>Slecht doel → 10-doel</h3>
-          <div class="oral-goals" id="therapy-goals"></div>
-        </article>
-        <article class="oral-card">
-          <p class="oral-label">Methodematrix</p>
-          <h3>Wanneer kies je wat?</h3>
-          <div class="oral-methods" id="therapy-methods"></div>
-        </article>
-      </div>
+      <details class="oral-coach-accordion">
+        <summary>Verdieping behandeling: doelenbank, methode, scripts en rode vlaggen</summary>
+        <div class="oral-grid oral-extra-grid">
+          <article class="oral-card">
+            <p class="oral-label">Doelenbank</p>
+            <h3>Slecht doel → 10-doel</h3>
+            <div class="oral-goals" id="therapy-goals"></div>
+          </article>
+          <article class="oral-card">
+            <p class="oral-label">Methodematrix</p>
+            <h3>Wanneer kies je wat?</h3>
+            <div class="oral-methods" id="therapy-methods"></div>
+          </article>
+        </div>
 
-      <div class="oral-grid oral-extra-grid">
-        <article class="oral-card">
-          <p class="oral-label">Mondeling script</p>
-          <h3>Verdedig methode en vorm</h3>
-          <div class="oral-drill" id="therapy-script"></div>
-          <button class="btn btn--primary" type="button" id="new-therapy-script">Nieuw script</button>
-        </article>
-        <article class="oral-card">
-          <p class="oral-label">Therapie einddrill</p>
-          <h3>Docentvraag</h3>
-          <div class="oral-drill" id="therapy-drill"></div>
-          <button class="btn btn--primary" type="button" id="new-therapy-drill">Nieuwe vraag</button>
-        </article>
-      </div>
+        <div class="oral-grid oral-extra-grid">
+          <article class="oral-card">
+            <p class="oral-label">Mondeling script</p>
+            <h3>Verdedig methode en vorm</h3>
+            <div class="oral-drill" id="therapy-script"></div>
+            <button class="btn btn--primary" type="button" id="new-therapy-script">Nieuw script</button>
+          </article>
+          <article class="oral-card">
+            <p class="oral-label">Therapie einddrill</p>
+            <h3>Docentvraag</h3>
+            <div class="oral-drill" id="therapy-drill"></div>
+            <button class="btn btn--primary" type="button" id="new-therapy-drill">Nieuwe vraag</button>
+          </article>
+        </div>
 
-      <div class="oral-grid oral-extra-grid">
-        <article class="oral-card">
-          <p class="oral-label">Samenwerking en prognose</p>
-          <h3>Maak het multidisciplinair</h3>
-          <div class="oral-collab" id="therapy-collab"></div>
-        </article>
-        <article class="oral-card">
-          <p class="oral-label">Rode vlaggen therapie</p>
-          <h3>Dit kost punten</h3>
-          <ul class="oral-redflags" id="therapy-redflags"></ul>
-        </article>
-      </div>
+        <div class="oral-grid oral-extra-grid">
+          <article class="oral-card">
+            <p class="oral-label">Samenwerking en prognose</p>
+            <h3>Maak het multidisciplinair</h3>
+            <div class="oral-collab" id="therapy-collab"></div>
+          </article>
+          <article class="oral-card">
+            <p class="oral-label">Rode vlaggen therapie</p>
+            <h3>Dit kost punten</h3>
+            <ul class="oral-redflags" id="therapy-redflags"></ul>
+          </article>
+        </div>
+      </details>
     </section>
 
     <section class="oral-view" id="view-simulation">
