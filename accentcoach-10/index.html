@@ -8,7 +8,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Accentcoach 10 &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=10" />
+  <link rel="stylesheet" href="/assets/site.css?v=11" />
 </head>
 <body>
   <div class="version-stamp">v10 &middot; Accentcoach</div>
@@ -34,6 +34,24 @@
         <p id="accent-hint">Scoor bewijs per criterium.</p>
       </aside>
     </header>
+
+    <section class="accent-card accent-coach-bar" aria-labelledby="accent-coach-title">
+      <div class="accent-section-head">
+        <div>
+          <p class="accent-label">Studentencoach</p>
+          <h3 id="accent-coach-title">Vraag iets over Bernard, ritmes of je aanpak</h3>
+        </div>
+      </div>
+      <div class="accent-coach-question">
+        <label class="sr-only" for="accent-coach-input">Stel een vraag aan de Accentcoach</label>
+        <input id="accent-coach-input" type="text" placeholder="Bijv. hoe leg ik Largo uit, wat doe ik bij harde offset, hoe geef ik huiswerk?" />
+        <button class="btn btn--primary" type="button" id="ask-accent-coach">Vraag coach</button>
+        <button class="btn btn--ghost" type="button" id="record-accent-question">Spreek in</button>
+      </div>
+      <div class="accent-coach-answer" id="accent-coach-answer">
+        <p>Stel een korte vraag. De coach geeft je één toetsgerichte actie, geen lange samenvatting.</p>
+      </div>
+    </section>
 
     <section class="accent-tabs" aria-label="Accentcoach onderdelen">
       <button class="accent-tab is-active" type="button" data-view="route">Route</button>
