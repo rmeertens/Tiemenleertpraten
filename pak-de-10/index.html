@@ -8,7 +8,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Pak de 10 &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=8" />
+  <link rel="stylesheet" href="/assets/site.css?v=9" />
 </head>
 <body>
   <div class="version-stamp">v1 &middot; 3 mei</div>
@@ -85,6 +85,21 @@
     </section>
 
     <section class="ten-panel" id="panel-treatment">
+      <article class="ten-card ten-coach-bar">
+        <div>
+          <p class="ten-card__label">Vraag de coach</p>
+          <h3>Waar loop je op vast?</h3>
+        </div>
+        <div class="ten-coach-question">
+          <label class="sr-only" for="treatment-question-input">Stel een vraag over de casuscoach</label>
+          <input id="treatment-question-input" type="text" placeholder="Bijv. waarom ZPD, hoe maak ik een KT-doel, waar staat TOS?" />
+          <button class="btn btn--primary" type="button" id="ask-treatment-coach">Vraag</button>
+          <button class="btn btn--ghost" type="button" id="speak-treatment-question">Spreek in</button>
+          <a class="btn btn--ghost" href="behandelplan.html" target="_blank" rel="noopener">Open behandelplan</a>
+        </div>
+        <div class="ten-coach-answer" id="treatment-coach-answer"></div>
+      </article>
+
       <div class="ten-grid">
         <article class="ten-card">
           <div class="ten-section-head">
@@ -104,80 +119,87 @@
         </article>
       </div>
 
-      <div class="ten-treatment-grid">
-        <article class="ten-card">
-          <p class="ten-card__label">Vaardigheidstrainer</p>
-          <h3>Leer zelf een behandelplan bouwen</h3>
-          <div class="ten-treatment-list" id="treatment-workflow"></div>
-        </article>
-        <article class="ten-card">
-          <p class="ten-card__label">Bronzoeker</p>
-          <h3>Waar moet je dit opzoeken?</h3>
-          <div class="ten-treatment-list" id="treatment-lookup"></div>
-        </article>
-      </div>
+      <details class="ten-coach-accordion" open>
+        <summary>Doelen en methode oefenen</summary>
+        <div class="ten-treatment-grid">
+          <article class="ten-card">
+            <p class="ten-card__label">Doelenwerkplaats</p>
+            <h3>Eerst zelf formuleren, daarna vergelijken</h3>
+            <div class="ten-treatment-list" id="treatment-goals"></div>
+          </article>
+          <article class="ten-card">
+            <p class="ten-card__label">Methodekeuze-trainer</p>
+            <h3>Bewijs waarom deze methode past</h3>
+            <div class="ten-treatment-list" id="treatment-methods"></div>
+          </article>
+        </div>
+      </details>
 
-      <div class="ten-treatment-grid">
-        <article class="ten-card">
-          <p class="ten-card__label">Bronnen-index</p>
-          <h3>Weten waar het staat</h3>
-          <div class="ten-treatment-list" id="treatment-source-index"></div>
-        </article>
-        <article class="ten-card">
-          <p class="ten-card__label">Pagina-toplijst</p>
-          <h3>Snelle onderbouwing voor mondeling</h3>
-          <div class="ten-treatment-list" id="treatment-page-toplist"></div>
-        </article>
-      </div>
+      <details class="ten-coach-accordion">
+        <summary>Vaardigheid en bronnen</summary>
+        <div class="ten-treatment-grid">
+          <article class="ten-card">
+            <p class="ten-card__label">Vaardigheidstrainer</p>
+            <h3>Leer zelf een behandelplan bouwen</h3>
+            <div class="ten-treatment-list" id="treatment-workflow"></div>
+          </article>
+          <article class="ten-card">
+            <p class="ten-card__label">Bronzoeker</p>
+            <h3>Waar moet je dit opzoeken?</h3>
+            <div class="ten-treatment-list" id="treatment-lookup"></div>
+          </article>
+        </div>
+        <div class="ten-treatment-grid">
+          <article class="ten-card">
+            <p class="ten-card__label">Bronnen-index</p>
+            <h3>Weten waar het staat</h3>
+            <div class="ten-treatment-list" id="treatment-source-index"></div>
+          </article>
+          <article class="ten-card">
+            <p class="ten-card__label">Pagina-toplijst</p>
+            <h3>Snelle onderbouwing voor mondeling</h3>
+            <div class="ten-treatment-list" id="treatment-page-toplist"></div>
+          </article>
+        </div>
+      </details>
 
-      <div class="ten-treatment-grid">
-        <article class="ten-card">
-          <p class="ten-card__label">Doelenwerkplaats</p>
-          <h3>Eerst zelf formuleren, daarna vergelijken</h3>
-          <div class="ten-treatment-list" id="treatment-goals"></div>
-        </article>
-        <article class="ten-card">
-          <p class="ten-card__label">Methodekeuze-trainer</p>
-          <h3>Bewijs waarom deze methode past</h3>
-          <div class="ten-treatment-list" id="treatment-methods"></div>
-        </article>
-      </div>
-
-      <div class="ten-grid">
-        <article class="ten-card">
-          <div class="ten-section-head">
-            <div>
-              <p class="ten-card__label">Mondeling script</p>
-              <h3>Zeg het op 10-niveau</h3>
+      <details class="ten-coach-accordion">
+        <summary>Mondeling oefenen, samenwerking en rode vlaggen</summary>
+        <div class="ten-grid">
+          <article class="ten-card">
+            <div class="ten-section-head">
+              <div>
+                <p class="ten-card__label">Mondeling script</p>
+                <h3>Zeg het op 10-niveau</h3>
+              </div>
+              <button class="btn btn--ghost" type="button" id="new-treatment-script">Nieuw script</button>
             </div>
-            <button class="btn btn--ghost" type="button" id="new-treatment-script">Nieuw script</button>
-          </div>
-          <div class="ten-treatment-drill" id="treatment-script"></div>
-        </article>
-        <article class="ten-card">
-          <div class="ten-section-head">
-            <div>
-              <p class="ten-card__label">Docentvraag</p>
-              <h3>Verdedig je keuze</h3>
+            <div class="ten-treatment-drill" id="treatment-script"></div>
+          </article>
+          <article class="ten-card">
+            <div class="ten-section-head">
+              <div>
+                <p class="ten-card__label">Docentvraag</p>
+                <h3>Verdedig je keuze</h3>
+              </div>
+              <button class="btn btn--ghost" type="button" id="new-treatment-drill">Nieuwe vraag</button>
             </div>
-            <button class="btn btn--ghost" type="button" id="new-treatment-drill">Nieuwe vraag</button>
-          </div>
-          <div class="ten-treatment-drill" id="treatment-drill"></div>
-        </article>
-      </div>
-
-      <div class="ten-treatment-grid">
-        <article class="ten-card">
-          <p class="ten-card__label">Samenwerking & prognose</p>
-          <h3>Maak de transfer toetsbaar</h3>
-          <div class="ten-treatment-list" id="treatment-collab"></div>
-        </article>
-        <article class="ten-card">
-          <p class="ten-card__label">Rode vlaggen</p>
-          <h3>Dit kost direct punten</h3>
-          <ul class="ten-treatment-redflags" id="treatment-redflags"></ul>
-        </article>
-      </div>
+            <div class="ten-treatment-drill" id="treatment-drill"></div>
+          </article>
+        </div>
+        <div class="ten-treatment-grid">
+          <article class="ten-card">
+            <p class="ten-card__label">Samenwerking & prognose</p>
+            <h3>Maak de transfer toetsbaar</h3>
+            <div class="ten-treatment-list" id="treatment-collab"></div>
+          </article>
+          <article class="ten-card">
+            <p class="ten-card__label">Rode vlaggen</p>
+            <h3>Dit kost direct punten</h3>
+            <ul class="ten-treatment-redflags" id="treatment-redflags"></ul>
+          </article>
+        </div>
+      </details>
     </section>
 
     <section class="ten-panel" id="panel-practice">

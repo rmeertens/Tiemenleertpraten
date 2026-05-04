@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Behandelplan stramien voor Pak de 10." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Behandelplan &middot; Pak de 10</title>
+  <link rel="stylesheet" href="/assets/site.css?v=9" />
+</head>
+<body>
+  <main class="studio ten-writer">
+    <nav class="studio__nav">
+      <a class="studio__home" href="index.html">&larr; Pak de 10</a>
+      <h1 class="studio__title">Behandelplan</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <header class="ten-writer-hero">
+      <div>
+        <p class="eyebrow">Stramien naar ZG</p>
+        <h2>Vul alle kopjes. Dan staat je behandelredenering.</h2>
+        <p>Gebruik korte klinische zinnen. Elk vak dwingt je om van casusbewijs naar doel, methode, transfer en prognose te gaan.</p>
+      </div>
+      <aside class="ten-scorecard">
+        <span>ZG-check</span>
+        <strong id="writer-score">0%</strong>
+        <p id="writer-hint">Vul minimaal de verplichte velden.</p>
+      </aside>
+    </header>
+
+    <section class="ten-card ten-writer-tools">
+      <button class="btn btn--primary" type="button" id="writer-check">Check stramien</button>
+      <button class="btn btn--ghost" type="button" id="writer-speak">Dicteer in actief vak</button>
+      <button class="btn btn--ghost" type="button" id="writer-clear">Wis concept</button>
+      <p class="ten-note" id="writer-note">Klik eerst in een tekstvak en dicteer daarna.</p>
+    </section>
+
+    <section class="ten-writer-grid" id="writer-fields">
+      <article class="ten-card">
+        <p class="ten-card__label">1. Casuskern</p>
+        <h3>Wie is het kind en wat is het hoofdprobleem?</h3>
+        <textarea data-required="true" rows="5" placeholder="Naam/leeftijd, belangrijkste spraak-taalprobleem, dagelijks functioneren, toetswaardige kernzin."></textarea>
+      </article>
+      <article class="ten-card">
+        <p class="ten-card__label">2. Casusbewijs</p>
+        <h3>Welke gegevens bewijzen dit?</h3>
+        <textarea data-required="true" rows="5" placeholder="Testscores, observaties, voorbeelden uit de casus, wat ontbreekt nog?"></textarea>
+      </article>
+      <article class="ten-card">
+        <p class="ten-card__label">3. ICF-brug</p>
+        <h3>Functie → activiteit → participatie</h3>
+        <textarea data-required="true" rows="5" placeholder="Functies/anatomie, activiteiten, participatie, externe factoren, persoonlijke factoren."></textarea>
+      </article>
+      <article class="ten-card">
+        <p class="ten-card__label">4. Probleemmechanisme</p>
+        <h3>Waarom juist deze behandelroute?</h3>
+        <textarea data-required="true" rows="5" placeholder="Fonologisch, fonetisch, VOD, morfosyntaxis, semantiek, pragmatiek, meertaligheid, cognitie, gehoor."></textarea>
+      </article>
+      <article class="ten-card">
+        <p class="ten-card__label">5. LT-doel</p>
+        <h3>Participatiedoel</h3>
+        <textarea data-required="true" rows="5" placeholder="Wie doet wat, in welke dagelijkse context, met welke steun, binnen welke termijn?"></textarea>
+      </article>
+      <article class="ten-card">
+        <p class="ten-card__label">6. KT-doel</p>
+        <h3>Meetbaar bouwblok</h3>
+        <textarea data-required="true" rows="5" placeholder="Observeerbaar gedrag + context + norm + cue-niveau + termijn."></textarea>
+      </article>
+      <article class="ten-card">
+        <p class="ten-card__label">7. Methode</p>
+        <h3>Indicatie en contra-indicatie</h3>
+        <textarea data-required="true" rows="5" placeholder="Welke methode, waarom past die, waarom niet een andere route, hoe pas je aan op dit kind?"></textarea>
+      </article>
+      <article class="ten-card">
+        <p class="ten-card__label">8. Vorm, frequentie, evaluatie</p>
+        <h3>Hoe ziet therapie eruit?</h3>
+        <textarea data-required="true" rows="5" placeholder="Individueel/indirect/groep, frequentie, duur, evaluatiemoment, wat meet je?"></textarea>
+      </article>
+      <article class="ten-card">
+        <p class="ten-card__label">9. Samenwerking</p>
+        <h3>Wie borgt transfer?</h3>
+        <textarea data-required="true" rows="5" placeholder="Ouders, leerkracht, IB, audiologie/KNO, fysio/ergo, psycholoog. Concrete afspraak per partner."></textarea>
+      </article>
+      <article class="ten-card">
+        <p class="ten-card__label">10. Prognose</p>
+        <h3>Voorzichtig en onderbouwd</h3>
+        <textarea data-required="true" rows="5" placeholder="Gunstige factoren, risicofactoren, realistische verwachting, wanneer bijsturen?"></textarea>
+      </article>
+      <article class="ten-card ten-writer-wide">
+        <p class="ten-card__label">11. Mondeling script</p>
+        <h3>90 seconden verdediging</h3>
+        <textarea data-required="true" rows="7" placeholder="Kernzin → bewijs → ICF → LT/KT → methode → samenwerking → evaluatie → prognose."></textarea>
+      </article>
+    </section>
+  </main>
+
+  <script src="behandelplan.js"></script>
+</body>
+</html>

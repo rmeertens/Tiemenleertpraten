@@ -57,9 +57,13 @@ const treatmentScript = document.getElementById('treatment-script');
 const treatmentDrill = document.getElementById('treatment-drill');
 const treatmentCollab = document.getElementById('treatment-collab');
 const treatmentRedflags = document.getElementById('treatment-redflags');
+const treatmentQuestionInput = document.getElementById('treatment-question-input');
+const treatmentCoachAnswer = document.getElementById('treatment-coach-answer');
 
 let recognition = null;
 let recording = false;
+let treatmentRecognition = null;
+let treatmentRecording = false;
 
 boot();
 
@@ -95,6 +99,12 @@ function bindEvents() {
   document.getElementById('new-treatment-drill').addEventListener('click', () => {
     state.treatmentDrill = randomItem(data.treatmentMachine.drills);
     renderTreatment();
+  });
+
+  document.getElementById('ask-treatment-coach').addEventListener('click', answerTreatmentQuestion);
+  document.getElementById('speak-treatment-question').addEventListener('click', toggleTreatmentQuestionRecording);
+  treatmentQuestionInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') answerTreatmentQuestion();
   });
 
   document.getElementById('new-question').addEventListener('click', () => {
@@ -273,7 +283,10 @@ function renderTreatment() {
       <strong>${escapeHtml(label)}</strong>
       <span>${escapeHtml('Opdracht: maak eerst zelf een LT-doel en KT-doel met gedrag, context, norm, steun en termijn. Vergelijk pas daarna met het voorbeeld.')}</span>
       <span>${escapeHtml(weak)}</span>
-      <p>${escapeHtml(strong)}</p>
+      <details class="ten-inline-details">
+        <summary>Bekijk ZG-voorbeeld</summary>
+        <p>${escapeHtml(strong)}</p>
+      </details>
     </article>
   `).join('');
 
@@ -283,7 +296,10 @@ function renderTreatment() {
       <span>${escapeHtml(data.treatmentMachine.skillCoach.methodQuestions[0])}</span>
       <span>${escapeHtml(indication)}</span>
       <span>${escapeHtml(contra)}</span>
-      <p>${escapeHtml(script)}</p>
+      <details class="ten-inline-details">
+        <summary>Bekijk mondelinge formulering</summary>
+        <p>${escapeHtml(script)}</p>
+      </details>
     </article>
   `).join('');
 
@@ -451,6 +467,107 @@ function buildCaseResearchTasks(coach) {
     'Gebruik maar een bronanker als primaire onderbouwing; kies pas extra bron als je antwoord anders onvoldoende bewijs heeft.',
     'Bedenk welke informatie nog ontbreekt voordat je prognose durft te formuleren.'
   ];
+}
+
+function answerTreatmentQuestion() {
+  const question = treatmentQuestionInput.value.trim();
+  if (!question) {
+    treatmentCoachAnswer.innerHTML = '<p>Stel eerst je vraag. Bijvoorbeeld: “waarom ZPD?” of “hoe maak ik een KT-doel?”</p>';
+    return;
+  }
+
+  const answer = buildCoachAnswer(question);
+  treatmentCoachAnswer.innerHTML = `
+    <strong>${escapeHtml(answer.title)}</strong>
+    <p>${escapeHtml(answer.body)}</p>
+    ${sourceAnchor(answer.anchor, 'Eén beste plek om te verdiepen')}
+  `;
+}
+
+function buildCoachAnswer(question) {
+  const clean = normalize(question);
+  const coach = data.caseTreatment[state.case.id];
+  if (clean.includes('kt') || clean.includes('korte') || clean.includes('doel')) {
+    return {
+      title: 'Zo bouw je een behandeldoel',
+      body: 'Begin niet met de voorbeeldzin. Kies eerst ICF-niveau, observeerbaar gedrag, context, norm, cue-niveau en termijn. Pas daarna vergelijk je met het ZG-voorbeeld in de Doelenwerkplaats.',
+      anchor: { href: '#treatment-goals', text: 'Doelenwerkplaats · gebruik de doelformule en klap pas daarna het ZG-voorbeeld open.' }
+    };
+  }
+  if (clean.includes('zpd') || clean.includes('scaffold') || clean.includes('steun')) {
+    return {
+      title: 'Waarom ZPD/scaffolding?',
+      body: 'Omdat je behandelt op het niveau dat het kind met hulp aankan. Je maakt de taak haalbaar, bouwt steun af en voorkomt dat het doel te makkelijk of te moeilijk wordt.',
+      anchor: { href: '#treatment-source-index', text: 'D3 p. 285-286 · ZPD en scaffolding zijn het beste bronanker.' }
+    };
+  }
+  if (clean.includes('tos')) {
+    return {
+      title: 'TOS onderbouwen',
+      body: 'Gebruik TOS niet als los label. Benoem hardnekkige taalverwerkingsproblemen, koppel die aan morfosyntaxis/woordenschat/pragmatiek en vertaal dit naar specifieke behandeling.',
+      anchor: { href: '#treatment-source-index', text: 'D3 p. 292 · TOS als neurocognitieve taalverwerkingsstoornis.' }
+    };
+  }
+  if (clean.includes('wietze')) {
+    return {
+      title: 'Wietze kernroute',
+      body: 'Voor Wietze ligt de focus op beperkte informatieverwerking, zwakke morfosyntaxis, VOD-kenmerken en participatie in de klas. Kies één primair probleem en bouw daar je doel/methode omheen.',
+      anchor: bestAnchorForCase(coach)
+    };
+  }
+  if (clean.includes('methode') || clean.includes('waarom kies')) {
+    return {
+      title: 'Methode kiezen',
+      body: 'Bewijs eerst het probleemmechanisme: fonologisch, fonetisch, VOD, morfosyntaxis, semantiek of pragmatiek. Kies daarna pas de methode en benoem waarom een andere route minder passend is.',
+      anchor: { href: '#treatment-methods', text: 'Methodekeuze-trainer · indicatie, contra-indicatie en formulering.' }
+    };
+  }
+  if (clean.includes('bron') || clean.includes('pagina') || clean.includes('waar staat')) {
+    return {
+      title: 'Bron zoeken zonder verdwalen',
+      body: 'Gebruik één primaire bron per antwoord. Voor behandeling meestal D3 p. 284-286 of p. 325; voor Wietze vaak D2 p. 187 plus D3 p. 288-292.',
+      anchor: { href: '#treatment-source-index', text: 'Bronnen-index · eerst de uitgelichte ankers, daarna pas volledige index.' }
+    };
+  }
+  return {
+    title: 'Coachadvies',
+    body: 'Maak je vraag specifieker: vraag naar doel, methode, bron, ZPD, TOS, Wietze, samenwerking of prognose. Voor nu: start bij casusbewijs en kies één bronanker als onderbouwing.',
+    anchor: bestAnchorForRoute(state.treatmentRoute.id)
+  };
+}
+
+function toggleTreatmentQuestionRecording() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    treatmentCoachAnswer.innerHTML = '<p>Spraakherkenning werkt niet in deze browser. Typ je vraag of gebruik Chrome/Edge.</p>';
+    return;
+  }
+
+  const button = document.getElementById('speak-treatment-question');
+  if (!treatmentRecognition) {
+    treatmentRecognition = new SpeechRecognition();
+    treatmentRecognition.lang = 'nl-NL';
+    treatmentRecognition.interimResults = true;
+    treatmentRecognition.continuous = false;
+    treatmentRecognition.onresult = event => {
+      treatmentQuestionInput.value = Array.from(event.results).map(result => result[0].transcript).join(' ');
+    };
+    treatmentRecognition.onend = () => {
+      treatmentRecording = false;
+      button.textContent = 'Spreek in';
+      if (treatmentQuestionInput.value.trim()) answerTreatmentQuestion();
+    };
+  }
+
+  if (treatmentRecording) {
+    treatmentRecognition.stop();
+    return;
+  }
+
+  treatmentRecording = true;
+  button.textContent = 'Stop';
+  treatmentCoachAnswer.innerHTML = '<p>Ik luister. Stel je vraag kort, bijvoorbeeld: “hoe formuleer ik een KT-doel?”</p>';
+  treatmentRecognition.start();
 }
 
 function checkAnswer() {
