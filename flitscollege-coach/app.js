@@ -4,6 +4,8 @@ const data = window.FLITS_DATA;
 const state = {
   index: Number(localStorage.getItem('flits_index') || 0),
   done: JSON.parse(localStorage.getItem('flits_done') || '{}'),
+  mastery: JSON.parse(localStorage.getItem('flits_mastery') || '{}'),
+  micro: null,
 };
 
 const list = document.getElementById('flits-list');
@@ -13,15 +15,22 @@ const feedbackCard = document.getElementById('feedback-card');
 const speechNote = document.getElementById('speech-note');
 const coachInput = document.getElementById('coach-input');
 const coachAnswer = document.getElementById('coach-answer');
+const microPanel = document.getElementById('micro-panel');
+const microInput = document.getElementById('micro-input');
+const microFeedback = document.getElementById('micro-feedback');
+const microNote = document.getElementById('micro-note');
 
 let answerRecognition = null;
 let answerRecording = false;
 let questionRecognition = null;
 let questionRecording = false;
+let microRecognition = null;
+let microRecording = false;
 
 boot();
 
 function boot() {
+  migrateDoneToMastery();
   renderOptions();
   bindEvents();
   renderLesson();
@@ -46,13 +55,22 @@ function bindEvents() {
   document.getElementById('record-answer').addEventListener('click', toggleAnswerRecording);
   document.getElementById('mark-done').addEventListener('click', () => {
     const lesson = currentLesson();
+    const mastery = masteryFor(lesson);
+    lesson.checks.forEach(check => {
+      mastery[masteryKey(check)] = true;
+    });
     state.done[lesson.id] = true;
+    saveMastery();
     saveDone();
     renderProgress();
+    renderMastery();
     renderLessonList();
   });
   document.getElementById('ask-coach').addEventListener('click', answerCoachQuestion);
   document.getElementById('record-question').addEventListener('click', toggleQuestionRecording);
+  document.getElementById('check-micro').addEventListener('click', checkMicroAnswer);
+  document.getElementById('record-micro').addEventListener('click', toggleMicroRecording);
+  document.getElementById('close-micro').addEventListener('click', closeMicroPanel);
   coachInput.addEventListener('keydown', event => {
     if (event.key === 'Enter') answerCoachQuestion();
   });
@@ -66,7 +84,7 @@ function renderOptions() {
 function renderLessonList() {
   list.innerHTML = data.lessons.map((lesson, index) => {
     const active = index === state.index ? ' is-active' : '';
-    const done = state.done[lesson.id] ? ' is-done' : '';
+    const done = lessonIsMastered(lesson) ? ' is-done' : '';
     return `
       <button class="flits-list-item${active}${done}" type="button" data-index="${index}">
         <span>${index + 1}</span>
@@ -100,16 +118,102 @@ function renderLesson() {
   answerInput.value = '';
   feedbackCard.innerHTML = '<p class="flits-note">Nog geen antwoord nagekeken.</p>';
   speechNote.textContent = '';
+  closeMicroPanel();
+  renderMastery();
   renderLessonList();
 }
 
 function renderProgress() {
-  const doneCount = data.lessons.filter(lesson => state.done[lesson.id]).length;
-  const ready = Math.round((doneCount / data.lessons.length) * 100);
+  const total = data.lessons.reduce((sum, lesson) => sum + lesson.checks.length, 0);
+  const mastered = data.lessons.reduce((sum, lesson) => {
+    if (state.done[lesson.id]) return sum + lesson.checks.length;
+    const mastery = state.mastery[lesson.id] || {};
+    return sum + lesson.checks.filter(check => mastery[masteryKey(check)]).length;
+  }, 0);
+  const doneCount = data.lessons.filter(lesson => lessonIsMastered(lesson)).length;
+  const ready = total ? Math.round((mastered / total) * 100) : 0;
   document.getElementById('flits-ready').textContent = `${ready}%`;
   document.getElementById('flits-hint').textContent = ready >= 80
-    ? 'Sterk. Herhaal nu alleen de zwakke flitsen hardop.'
-    : `${doneCount}/${data.lessons.length} flitscolleges beheerst.`;
+    ? 'Sterk. Herhaal alleen wat nog openstaat hardop.'
+    : `${mastered}/${total} onderwerpen beheerst · ${doneCount}/${data.lessons.length} flitscolleges rond.`;
+}
+
+function migrateDoneToMastery() {
+  let changed = false;
+  data.lessons.forEach(lesson => {
+    if (!state.done[lesson.id]) return;
+    const mastery = masteryFor(lesson);
+    lesson.checks.forEach(check => {
+      const key = masteryKey(check);
+      if (!mastery[key]) {
+        mastery[key] = true;
+        changed = true;
+      }
+    });
+  });
+  if (changed) saveMastery();
+}
+
+function renderMastery() {
+  const lesson = currentLesson();
+  const mastery = masteryFor(lesson);
+  const mastered = lesson.checks.filter(check => mastery[masteryKey(check)]);
+  const missing = lesson.checks.filter(check => !mastery[masteryKey(check)]);
+
+  document.getElementById('mastery-checklist').innerHTML = lesson.checks.map(check => {
+    const key = masteryKey(check);
+    const checked = mastery[key] ? ' checked' : '';
+    return `
+      <label class="flits-mastery-item">
+        <input type="checkbox" data-key="${escapeHtml(key)}"${checked} />
+        <span>${escapeHtml(check)}</span>
+      </label>
+    `;
+  }).join('');
+
+  document.querySelectorAll('#mastery-checklist input').forEach(input => {
+    input.addEventListener('change', () => {
+      mastery[input.dataset.key] = input.checked;
+      if (!input.checked) state.done[lesson.id] = false;
+      if (lesson.checks.every(check => mastery[masteryKey(check)])) state.done[lesson.id] = true;
+      saveMastery();
+      saveDone();
+      renderMastery();
+      renderProgress();
+      renderLessonList();
+    });
+  });
+
+  const trainList = document.getElementById('train-list');
+  if (!missing.length) {
+    trainList.innerHTML = `
+      <article class="flits-train-item is-complete">
+        <strong>Alles staat groen</strong>
+        <p>Mooi. Test jezelf nu met de casusvraag en zeg de mondelinge drill zonder modelantwoord.</p>
+      </article>
+    `;
+    return;
+  }
+
+  trainList.innerHTML = missing.map(check => `
+    <article class="flits-train-item">
+      <strong>${escapeHtml(check)}</strong>
+      <p>${escapeHtml(explainTerm(check))}</p>
+      <div class="flits-mini-actions">
+        <button type="button" data-topic="${escapeHtml(check)}" data-mode="controleer">Controleer</button>
+        <button type="button" data-topic="${escapeHtml(check)}" data-mode="toetszin">Toetszin</button>
+        <button type="button" data-topic="${escapeHtml(check)}" data-mode="casus">Casus</button>
+      </div>
+    </article>
+  `).join('');
+
+  trainList.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', () => openMicroPanel(button.dataset.topic, button.dataset.mode));
+  });
+
+  if (mastered.length && missing.length) {
+    trainList.insertAdjacentHTML('afterbegin', `<p class="flits-note">Al beheerst: ${mastered.length}. Nog open: ${missing.length}. Lekker klein houden.</p>`);
+  }
 }
 
 function moveLesson(delta) {
@@ -160,6 +264,123 @@ function upgradeText(missing, hasCase) {
   if (!hasCase) return 'Voeg één concrete casuszin toe: “Bij dit kind zie ik dit doordat...” en check opnieuw.';
   if (missing.length) return `Voeg dit ene punt toe: ${explainTerm(missing[0])} Check daarna opnieuw.`;
   return 'Zeg het nu korter en casusgerichter; dan is het 4/4.';
+}
+
+function openMicroPanel(topic, mode) {
+  const lesson = currentLesson();
+  state.micro = { topic, mode };
+  microPanel.hidden = false;
+  microInput.value = '';
+  microFeedback.innerHTML = '';
+  microNote.textContent = '';
+  document.getElementById('micro-mode').textContent = modeLabel(mode);
+  document.getElementById('micro-title').textContent = topic;
+  document.getElementById('micro-prompt').textContent = microPrompt(lesson, topic, mode);
+  microInput.focus();
+}
+
+function closeMicroPanel() {
+  if (microRecording && microRecognition) microRecognition.stop();
+  state.micro = null;
+  microPanel.hidden = true;
+  microInput.value = '';
+  microFeedback.innerHTML = '';
+  microNote.textContent = '';
+}
+
+function microPrompt(lesson, topic, mode) {
+  if (mode === 'toetszin') {
+    return `Maak één toetszin: “${topic} betekent..., bij dit kind zie ik..., daarom doe ik...”`;
+  }
+  if (mode === 'casus') {
+    return `Pas ${topic} toe op deze casusvraag: ${lesson.caseQuestion}`;
+  }
+  return `Leg ${topic} in maximaal 20 seconden uit. Noem wat het is en wat je ermee doet bij een kind.`;
+}
+
+function modeLabel(mode) {
+  if (mode === 'toetszin') return 'Toetszin';
+  if (mode === 'casus') return 'Casus';
+  return 'Controleer';
+}
+
+function checkMicroAnswer() {
+  const text = microInput.value.trim();
+  if (!state.micro || !text) {
+    microNote.textContent = 'Typ of spreek eerst je korte uitleg in.';
+    return;
+  }
+
+  const lesson = currentLesson();
+  const { topic } = state.micro;
+  const clean = normalize(text);
+  const topicClean = normalize(topic);
+  const mainWords = topicClean.split(/\s+/).filter(word => word.length > 3);
+  const hasTopic = clean.includes(topicClean) || mainWords.some(word => clean.includes(word));
+  const hasExplanation = /\b(betekent|is|omdat|zodat|daardoor|verschil)\b/.test(clean) || clean.includes('gaat over') || text.length > 80;
+  const hasApplication = ['kind', 'casus', 'onderzoek', 'behandeling', 'school', 'klas', 'ouders', 'doel', 'test'].some(word => clean.includes(word));
+  const score = [hasTopic, hasExplanation, hasApplication].filter(Boolean).length;
+  const missing = [];
+
+  if (!hasTopic) missing.push(`noem het begrip zelf: ${explainTerm(topic)}`);
+  if (!hasExplanation) missing.push('leg kort uit wat het betekent');
+  if (!hasApplication) missing.push('koppel het aan een kind, casus, onderzoek of behandeling');
+
+  if (score >= 3) {
+    const mastery = masteryFor(lesson);
+    mastery[masteryKey(topic)] = true;
+    if (lesson.checks.every(check => mastery[masteryKey(check)])) state.done[lesson.id] = true;
+    saveMastery();
+    saveDone();
+    renderMastery();
+    renderProgress();
+    renderLessonList();
+  }
+
+  microFeedback.innerHTML = `
+    <div class="flits-feedback-head">
+      <h3>${score >= 3 ? '3/3 · beheerst' : score === 2 ? '2/3 · bijna' : 'Nog scherper'}</h3>
+      <strong>${score}/3</strong>
+    </div>
+    ${block('Goed', hasTopic ? `Je raakt het onderwerp: ${explainTerm(topic)}` : 'Je probeert het kort te houden. Nu nog het begrip expliciet noemen.')}
+    ${score < 3 ? block('Mist nog', missing.join(' · ')) : block('Coach', 'Ik heb dit onderwerp gemarkeerd als beheerst. Zeg het nu nog één keer hardop zonder te lezen.')}
+    ${score < 3 ? block('Maak ZG door', `Gebruik dit stramien: “${explainTerm(topic)} Bij deze casus betekent dit dat... Daarom kies/onderzoek/oefen ik...”`) : ''}
+  `;
+}
+
+function toggleMicroRecording() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    microNote.textContent = 'Spraakherkenning werkt niet in deze browser. Typ je uitleg of gebruik Chrome/Edge.';
+    return;
+  }
+
+  const button = document.getElementById('record-micro');
+  if (!microRecognition) {
+    microRecognition = new SpeechRecognition();
+    microRecognition.lang = 'nl-NL';
+    microRecognition.interimResults = true;
+    microRecognition.continuous = false;
+    microRecognition.onresult = event => {
+      microInput.value = Array.from(event.results).map(result => result[0].transcript).join(' ');
+    };
+    microRecognition.onend = () => {
+      microRecording = false;
+      button.textContent = 'Spreek in';
+      if (microInput.value.trim()) checkMicroAnswer();
+    };
+  }
+
+  if (microRecording) {
+    microRecognition.stop();
+    return;
+  }
+  if (answerRecording && answerRecognition) answerRecognition.stop();
+  if (questionRecording && questionRecognition) questionRecognition.stop();
+  microRecording = true;
+  button.textContent = 'Stop';
+  microNote.textContent = 'Ik luister. Leg het uit alsof je docent tegenover je zit.';
+  microRecognition.start();
 }
 
 function explainTerm(term) {
@@ -383,12 +604,30 @@ function currentLesson() {
   return data.lessons[state.index] || data.lessons[0];
 }
 
+function masteryFor(lesson) {
+  if (!state.mastery[lesson.id]) state.mastery[lesson.id] = {};
+  return state.mastery[lesson.id];
+}
+
+function masteryKey(value) {
+  return normalize(value).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function lessonIsMastered(lesson) {
+  const mastery = state.mastery[lesson.id] || {};
+  return lesson.checks.every(check => mastery[masteryKey(check)]) || Boolean(state.done[lesson.id]);
+}
+
 function saveIndex() {
   localStorage.setItem('flits_index', String(state.index));
 }
 
 function saveDone() {
   localStorage.setItem('flits_done', JSON.stringify(state.done));
+}
+
+function saveMastery() {
+  localStorage.setItem('flits_mastery', JSON.stringify(state.mastery));
 }
 
 function block(label, text) {

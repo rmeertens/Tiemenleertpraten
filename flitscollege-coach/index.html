@@ -8,10 +8,10 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Flitscollege Coach &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=15" />
+  <link rel="stylesheet" href="/assets/site.css?v=16" />
 </head>
 <body>
-  <div class="version-stamp">v1 &middot; Flitscollege Coach</div>
+  <div class="version-stamp">v2 &middot; Flitscollege Coach</div>
   <main class="studio flits-app">
     <nav class="studio__nav">
       <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
@@ -69,6 +69,33 @@
           <h3 id="flits-title"></h3>
           <p id="flits-summary"></p>
           <div id="flits-tags" class="flits-tags"></div>
+        </article>
+
+        <article class="flits-card flits-route">
+          <p class="flits-label">Mijn leerroute</p>
+          <h3>Vink aan wat je al beheerst</h3>
+          <p class="flits-note">Wat je niet aanvinkt, wordt je korte coachroute. Zo train je alleen wat nog nodig is voor ZG.</p>
+          <div id="mastery-checklist" class="flits-mastery-list"></div>
+          <div class="flits-route-summary">
+            <strong>Nog trainen</strong>
+            <div id="train-list" class="flits-train-list"></div>
+          </div>
+          <div id="micro-panel" class="flits-micro-panel" hidden>
+            <div>
+              <p class="flits-label" id="micro-mode">Controleer</p>
+              <h3 id="micro-title"></h3>
+              <p id="micro-prompt" class="flits-prompt"></p>
+            </div>
+            <label class="sr-only" for="micro-input">Leg dit onderwerp kort uit</label>
+            <textarea id="micro-input" rows="4" class="flits-textarea" placeholder="Typ of spreek je uitleg. Kort mag, maar koppel aan een kind, casus of behandeling."></textarea>
+            <div class="flits-actions">
+              <button class="btn btn--primary" type="button" id="check-micro">Feedback</button>
+              <button class="btn btn--ghost" type="button" id="record-micro">Spreek in</button>
+              <button class="btn btn--ghost" type="button" id="close-micro">Sluit</button>
+            </div>
+            <p class="flits-note" id="micro-note"></p>
+            <div id="micro-feedback" class="flits-feedback"></div>
+          </div>
         </article>
 
         <div class="flits-grid">

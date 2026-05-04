@@ -491,6 +491,115 @@ a { color: inherit; }
   padding: 10px 12px;
 }
 
+.flits-route {
+  display: grid;
+  gap: 14px;
+}
+
+.flits-mastery-list,
+.flits-train-list {
+  display: grid;
+  gap: 10px;
+}
+
+.flits-mastery-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.flits-mastery-item {
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  min-height: 48px;
+  padding: 10px 12px;
+}
+
+.flits-mastery-item input {
+  accent-color: var(--accent);
+  flex: 0 0 auto;
+  height: 18px;
+  width: 18px;
+}
+
+.flits-route-summary {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.flits-route-summary > strong {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.flits-train-item {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.flits-train-item.is-complete {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--rule));
+}
+
+.flits-train-item strong {
+  color: var(--ink);
+}
+
+.flits-train-item p {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0;
+}
+
+.flits-mini-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.flits-mini-actions button {
+  appearance: none;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 7px 10px;
+}
+
+.flits-mini-actions button:hover,
+.flits-mini-actions button:focus {
+  border-color: var(--accent);
+}
+
+.flits-micro-panel {
+  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: 12px;
+  padding-top: 14px;
+}
+
+.flits-micro-panel[hidden] {
+  display: none;
+}
+
 .flits-prompt {
   background: var(--accent-soft);
   border-radius: var(--radius);
@@ -2176,7 +2285,8 @@ a { color: inherit; }
 @media (max-width: 900px) {
   .flits-hero,
   .flits-layout,
-  .flits-grid {
+  .flits-grid,
+  .flits-mastery-list {
     grid-template-columns: 1fr;
   }
 
