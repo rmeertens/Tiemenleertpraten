@@ -245,6 +245,304 @@ a { color: inherit; }
   color: var(--ink-faint);
 }
 
+/* ============ Flitscollege Coach ============ */
+
+.flits-app {
+  max-width: 1200px;
+}
+
+.flits-hero {
+  align-items: stretch;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  margin: 36px 0 18px;
+}
+
+.flits-hero h2 {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 72px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+  margin: 0 0 18px;
+}
+
+.flits-hero p {
+  color: var(--ink-soft);
+  font-size: 18px;
+  margin: 0;
+  max-width: 68ch;
+}
+
+.flits-score,
+.flits-coach,
+.flits-card,
+.flits-sidebar {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+.flits-score {
+  align-content: center;
+  display: grid;
+}
+
+.flits-score span,
+.flits-label {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.flits-score strong {
+  font-family: var(--font-display);
+  font-size: 52px;
+  line-height: 1;
+}
+
+.flits-score p,
+.flits-card p,
+.flits-note {
+  color: var(--ink-soft);
+}
+
+.flits-coach {
+  margin: 0 0 18px;
+}
+
+.flits-coach h3,
+.flits-card h3 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0 0 12px;
+}
+
+.flits-question {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  margin-top: 12px;
+}
+
+.flits-question input,
+.flits-select,
+.flits-textarea {
+  appearance: none;
+  background: var(--bg);
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.flits-answer {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 12px 14px;
+}
+
+.flits-answer strong {
+  color: var(--ink);
+}
+
+.flits-answer p,
+.flits-answer span {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0;
+}
+
+.flits-answer span {
+  font-weight: 800;
+}
+
+.flits-layout {
+  align-items: start;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 310px minmax(0, 1fr);
+}
+
+.flits-sidebar {
+  position: sticky;
+  top: 16px;
+}
+
+.flits-list {
+  display: grid;
+  gap: 8px;
+  max-height: 72vh;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.flits-list-item {
+  appearance: none;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  cursor: pointer;
+  display: grid;
+  gap: 3px;
+  grid-template-columns: 28px minmax(0, 1fr);
+  padding: 10px;
+  text-align: left;
+}
+
+.flits-list-item span {
+  align-items: center;
+  background: var(--accent-soft);
+  border-radius: 50%;
+  color: var(--accent);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  height: 24px;
+  justify-content: center;
+  width: 24px;
+}
+
+.flits-list-item strong {
+  font-size: 14px;
+}
+
+.flits-list-item small {
+  color: var(--ink-faint);
+  grid-column: 2;
+}
+
+.flits-list-item.is-active {
+  border-color: var(--accent);
+}
+
+.flits-list-item.is-done span {
+  background: var(--accent);
+  color: white;
+}
+
+.flits-main,
+.flits-grid,
+.flits-checklist,
+.flits-feedback {
+  display: grid;
+  gap: 14px;
+}
+
+.flits-toolbar,
+.flits-actions,
+.flits-feedback-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.flits-select {
+  width: 100%;
+}
+
+.flits-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.flits-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.flits-tags span {
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+
+.flits-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.flits-checklist li,
+.flits-feedback article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  padding: 10px 12px;
+}
+
+.flits-prompt {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-weight: 800;
+  padding: 14px;
+}
+
+.flits-textarea {
+  line-height: 1.55;
+  resize: vertical;
+  width: 100%;
+}
+
+.flits-feedback article {
+  display: grid;
+  gap: 5px;
+}
+
+.flits-feedback strong,
+.flits-feedback-head strong {
+  color: var(--accent);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.flits-feedback p,
+.flits-details p {
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.flits-feedback-head strong {
+  background: var(--accent);
+  border-radius: 999px;
+  color: white;
+  padding: 8px 12px;
+}
+
+.flits-details {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.flits-details summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
 /* ============ Pak de 10 ============ */
 
 .accent-app {
@@ -1876,6 +2174,20 @@ a { color: inherit; }
 }
 
 @media (max-width: 900px) {
+  .flits-hero,
+  .flits-layout,
+  .flits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flits-sidebar {
+    position: static;
+  }
+
+  .flits-list {
+    max-height: 360px;
+  }
+
   .oral-hero,
   .oral-grid,
   .oral-sim,
@@ -1887,6 +2199,28 @@ a { color: inherit; }
 }
 
 @media (max-width: 560px) {
+  .flits-score,
+  .flits-coach,
+  .flits-card,
+  .flits-sidebar {
+    padding: 20px;
+  }
+
+  .flits-question,
+  .flits-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .flits-question {
+    display: grid;
+  }
+
+  .flits-toolbar,
+  .flits-actions,
+  .flits-feedback-head {
+    flex-direction: column;
+  }
+
   .oral-card,
   .oral-clock {
     padding: 20px;

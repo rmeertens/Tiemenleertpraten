@@ -166,7 +166,7 @@ function checkSimulation() {
     </div>
     ${block('Wat is sterk', result.good)}
     ${block('Wat kost punten', result.missing)}
-    ${zgCoachBlock(result)}
+    ${result.score === 3 ? zgCoachBlock(result) : ''}
     ${block('Volgende poging', result.next)}
   `;
   renderEvidence();
@@ -182,25 +182,20 @@ function scoreAnswer(answer) {
 
   let score = scoreFromRatio(passed.length / profile.checks.length);
   if (warnings.length) score = Math.min(score, 2);
-  if (wordCount < profile.minimumWords) score = Math.min(score, 2);
 
   return {
     score,
     label: labelForScore(score),
     good: passed.length ? `Je raakt: ${passed.map(check => check.label).join(', ')}.` : 'Je antwoord is nog te algemeen voor deze simulatie.',
-    missing: missingForSimulation(missing, warnings, wordCount, profile.minimumWords),
+    missing: score >= 4 && !warnings.length ? 'Geen grote inhoudelijke gaten; train nu vooral timing, stemkwaliteit en zichtbare beweging.' : missingForSimulation(missing, warnings, wordCount, profile.minimumWords),
     zgSteps: zgStepsForSimulation(profile, missing, warnings, score),
     next: score >= 4 ? profile.nextStrong : profile.next
   };
 }
 
 function zgCoachBlock(result) {
-  const title = result.score >= 4 ? 'Score 4/4 vasthouden' : result.score >= 3 ? 'Van score 3/4 naar 4/4' : 'Eerst naar voldoende';
-  const intro = result.score >= 4
-    ? 'Sterk. Nu alleen nog uitvoeren zonder spiektekst en met zichtbare beweging.'
-    : result.score >= 3
-      ? 'Je basis is voldoende. Voeg dit kort toe voor ZG:'
-      : 'Maak eerst deze basis concreet:';
+  const title = 'Van score 3/4 naar 4/4';
+  const intro = 'Voeg dit kort toe en check opnieuw:';
 
   return `
     <article class="accent-zg-coach">
@@ -214,9 +209,9 @@ function zgCoachBlock(result) {
 }
 
 function scoreFromRatio(ratio) {
-  if (ratio >= 0.86) return 4;
-  if (ratio >= 0.62) return 3;
-  if (ratio >= 0.38) return 2;
+  if (ratio >= 0.75) return 4;
+  if (ratio >= 0.5) return 3;
+  if (ratio >= 0.25) return 2;
   return 1;
 }
 
@@ -230,17 +225,16 @@ function labelForScore(score) {
 function missingForSimulation(missing, warnings, wordCount, minimumWords) {
   const parts = [];
   warnings.forEach(warning => parts.push(warning.message));
-  if (wordCount < minimumWords) parts.push(`Te kort: zeg concreet wat jij doet en wat Bernard doet. Richting: minimaal ${minimumWords} woorden.`);
-  if (missing.length) parts.push(`Nog toevoegen: ${missing.slice(0, 4).map(check => check.missing).join('; ')}.`);
+  if (wordCount < minimumWords && missing.length) parts.push('Kort is prima, maar er mist nog een toetsstap.');
+  if (missing.length) parts.push(`Nog toevoegen: ${missing.slice(0, 3).map(check => check.missing).join('; ')}.`);
   return parts.length ? parts.join(' ') : 'Geen grote inhoudelijke gaten; train nu vooral timing, stemkwaliteit en zichtbare beweging.';
 }
 
 function zgStepsForSimulation(profile, missing, warnings, score) {
   if (warnings.length) return warnings.map(warning => warning.fix).slice(0, 3);
   const steps = missing.map(check => check.zg || check.missing);
-  if (score >= 3) steps.push(profile.upgrade);
-  if (score >= 4) steps.push('Laat dit nu door iemand live afvinken op beweging, tempo, kaak, inzet en afsluiting.');
-  return unique(steps).filter(Boolean).slice(0, score >= 3 ? 3 : 4);
+  if (!steps.length) steps.push(profile.upgrade);
+  return unique(steps).filter(Boolean).slice(0, 2);
 }
 
 function simulationProfile(title) {
@@ -309,7 +303,7 @@ function simulationProfile(title) {
         check('Andante/4-4', ['andante', '4/4', 'vierkwarts'], 'noem Andante als 4/4', 'Zeg expliciet: Andante is 4/4, niet Largo.'),
         check('1/8 adem', ['1/8', 'achtste', 'korte inademing', 'opmaat'], 'benoem 1/8 inademing/opmaat', 'Start met korte adem, niet drie tellen in.'),
         check('Onbeklemtoonde inzet', ['onbeklemtoond', 'inzet', 'opmaat'], 'benoem onbeklemtoonde inzet', 'Na de 1/8 adem komt de onbeklemtoonde inzet.'),
-        check('Drie accenten', ['drie accenten', '3 accenten', 'drie beklemtoonde', 'even sterk'], 'benoem drie gelijke accenten', 'Daarna volgen drie even sterke accenten.'),
+        check('Drie accenten', ['drie accenten', '3 accenten', 'drie gelijke', 'drie beklemtoonde', 'even sterk'], 'benoem drie gelijke accenten', 'Daarna volgen drie even sterke accenten.'),
         check('Beweging', ['draai', 'lichaamsas', 'onderarm', 'elleboog'], 'toon draaiing om lichaamsas en onderarm', 'Vervang voor-achter door draaiing en losse onderarm.'),
         check('Buikwand', ['buikwand', 'terugveren', 'recoil', 'loslaten'], 'check directe buikwandrecoil', 'Bewaak dat de buikwand direct terugveert na de klank.')
       ],

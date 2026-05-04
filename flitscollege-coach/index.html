@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Flitscollege Coach — train flitscolleges in Brightspace-volgorde met kennischeck, toepassing en mondelinge drill." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Flitscollege Coach &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=15" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; Flitscollege Coach</div>
+  <main class="studio flits-app">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Flitscollege Coach</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <header class="flits-hero">
+      <div>
+        <p class="eyebrow">Brightspace-volgorde &middot; Spraak-Taal</p>
+        <h2>Eerst snappen. Dan hardop bewijzen.</h2>
+        <p>
+          Werk de flitscolleges af in dezelfde leerroute. Elk college eindigt in een
+          oefenvraag, mondelinge prompt en toetswaardige feedback.
+        </p>
+      </div>
+      <aside class="flits-score">
+        <span>Toetsklaar</span>
+        <strong id="flits-ready">0%</strong>
+        <p id="flits-hint">Start bij flitscollege 1.</p>
+      </aside>
+    </header>
+
+    <section class="flits-coach" aria-labelledby="flits-coach-title">
+      <div>
+        <p class="flits-label">Studentencoach</p>
+        <h3 id="flits-coach-title">Vraag iets over dit flitscollege</h3>
+      </div>
+      <div class="flits-question">
+        <label class="sr-only" for="coach-input">Stel een vraag over het flitscollege</label>
+        <input id="coach-input" type="text" placeholder="Bijv. wat moet ik hierover kunnen zeggen bij een casus?" />
+        <button class="btn btn--primary" type="button" id="ask-coach">Vraag coach</button>
+        <button class="btn btn--ghost" type="button" id="record-question">Spreek in</button>
+      </div>
+      <div class="flits-answer" id="coach-answer">
+        <p>Stel een korte vraag. De coach geeft één leeractie en één toetszin.</p>
+      </div>
+    </section>
+
+    <section class="flits-layout">
+      <aside class="flits-sidebar" aria-label="Flitscollege volgorde">
+        <p class="flits-label">Volgorde Hanze Brightspace</p>
+        <div id="flits-list" class="flits-list"></div>
+      </aside>
+
+      <section class="flits-main" aria-live="polite">
+        <div class="flits-toolbar">
+          <button class="btn btn--ghost" type="button" id="prev-flits">Vorige</button>
+          <select id="flits-select" class="flits-select" aria-label="Kies flitscollege"></select>
+          <button class="btn btn--ghost" type="button" id="next-flits">Volgende</button>
+        </div>
+
+        <article class="flits-card flits-current">
+          <p class="flits-label" id="flits-meta"></p>
+          <h3 id="flits-title"></h3>
+          <p id="flits-summary"></p>
+          <div id="flits-tags" class="flits-tags"></div>
+        </article>
+
+        <div class="flits-grid">
+          <article class="flits-card">
+            <p class="flits-label">1. Snapkaart</p>
+            <h3>Wat is de kern?</h3>
+            <p id="snap-card"></p>
+          </article>
+          <article class="flits-card">
+            <p class="flits-label">2. Uit je hoofd</p>
+            <h3>Dit moet paraat zijn</h3>
+            <ul id="memory-list" class="flits-checklist"></ul>
+          </article>
+        </div>
+
+        <article class="flits-card">
+          <p class="flits-label">3. Toepassing</p>
+          <h3>Casusvraag</h3>
+          <p id="case-question" class="flits-prompt"></p>
+          <textarea id="answer-input" rows="6" class="flits-textarea" placeholder="Typ of spreek je antwoord. Kort mag, als het klinisch compleet is."></textarea>
+          <div class="flits-actions">
+            <button class="btn btn--primary" type="button" id="check-answer">Feedback</button>
+            <button class="btn btn--ghost" type="button" id="record-answer">Neem op</button>
+            <button class="btn btn--ghost" type="button" id="clear-answer">Wis</button>
+          </div>
+          <p class="flits-note" id="speech-note"></p>
+        </article>
+
+        <article class="flits-card flits-feedback" id="feedback-card">
+          <p class="flits-note">Nog geen antwoord nagekeken.</p>
+        </article>
+
+        <article class="flits-card">
+          <p class="flits-label">4. Mondelinge drill</p>
+          <h3>Zeg dit in 60 seconden</h3>
+          <p id="oral-prompt" class="flits-prompt"></p>
+          <details class="flits-details">
+            <summary>Toon 10-niveau antwoord</summary>
+            <p id="model-answer"></p>
+          </details>
+        </article>
+
+        <article class="flits-card">
+          <p class="flits-label">5. Bewijs</p>
+          <h3>Klaar met dit flitscollege?</h3>
+          <button class="btn btn--primary" type="button" id="mark-done">Markeer beheerst</button>
+          <p class="flits-note">Markeer pas als je de casusvraag en mondelinge drill zonder spiektekst kunt.</p>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
