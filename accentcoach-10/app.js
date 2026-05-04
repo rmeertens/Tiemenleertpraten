@@ -155,6 +155,7 @@ function checkSimulation() {
     </div>
     ${block('Wat is sterk', result.good)}
     ${block('Wat kost punten', result.missing)}
+    ${zgCoachBlock(result)}
     ${block('Volgende poging', result.next)}
   `;
   renderEvidence();
@@ -179,8 +180,52 @@ function scoreAnswer(answer) {
     label: score >= 4 ? 'Toetswaardig sterk' : score >= 3 ? 'Voldoende, nog scherper' : 'Nog te vaag',
     good: hits.length ? `Je raakt deze toetsdelen: ${hits.map(([label]) => label).join(', ')}.` : 'Je tekst heeft nog te weinig herkenbare toetsdelen.',
     missing: missingFor(clean),
+    zgSteps: zgStepsFor(clean, score),
     next: score >= 4 ? 'Herhaal nu zonder tekst en met zichtbare beweging.' : 'Maak je antwoord concreter: wat zeg je, wat doe je, wat ziet Bernard, wat krijgt hij mee?'
   };
+}
+
+function zgCoachBlock(result) {
+  const title = result.score >= 3 ? 'Zo maak je hiervan ZG' : 'Eerst naar voldoende';
+  const intro = result.score >= 3
+    ? 'Je basis is voldoende. Met deze aanpassingen klinkt het als therapeutisch handelen op hoog niveau:'
+    : 'Voordat dit ZG kan worden, moet eerst de uitvoering concreet en toetsbaar worden:';
+
+  return `
+    <article class="accent-zg-coach">
+      <strong>${title}</strong>
+      <p>${intro}</p>
+      <ul>
+        ${result.zgSteps.map(step => `<li>${escapeHtml(step)}</li>`).join('')}
+      </ul>
+    </article>
+  `;
+}
+
+function zgStepsFor(clean, score) {
+  const steps = [];
+  if (!clean.includes('bernard') && !clean.includes('drukkerij') && !clean.includes('koor')) {
+    steps.push('Koppel je uitleg expliciet aan Bernard: drukkerij, koor, stemvermoeidheid en zwelling.');
+  }
+  if (!clean.includes('non-verbaal') && !clean.includes('oogcontact') && !clean.includes('voordoen')) {
+    steps.push('Maak zichtbaar hoe je non-verbaal coacht: voordoen, oogcontact, hand/arm/kniecue of kaakcue.');
+  }
+  if (!clean.includes('zacht') && !clean.includes('weke') && !clean.includes('offset')) {
+    steps.push('Benoem zachte inzet én zachte afsluiting; dit was een belangrijk verbeterpunt.');
+  }
+  if (!clean.includes('wat merkte') && !clean.includes('hoe voelde') && !clean.includes('waar voelde')) {
+    steps.push('Laat Bernard zelf reflecteren en vraag door op keel, adem, kaak en gemak.');
+  }
+  if (!clean.includes('volgende') && !clean.includes('opnieuw') && !clean.includes('nog een keer')) {
+    steps.push('Sluit je feedback af met een nieuwe poging: één concrete cue en direct opnieuw oefenen.');
+  }
+  if (!clean.includes('thuis') && !clean.includes('huiswerk') && !clean.includes('audio') && !clean.includes('trommel')) {
+    steps.push('Maak huiswerk concreet: materiaal, frequentie, duur, aandachtspunten en transfer.');
+  }
+  if (score >= 3 && steps.length < 3) {
+    steps.push('Zeg minder theorie en meer therapie: wat doe jij, wat doet Bernard, wat observeer je, wat stuur je bij?');
+  }
+  return steps.slice(0, score >= 3 ? 4 : 3);
 }
 
 function missingFor(clean) {

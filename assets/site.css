@@ -414,7 +414,8 @@ a { color: inherit; }
 
 .accent-list article,
 .accent-power p,
-.accent-feedback article {
+.accent-feedback article,
+.accent-zg-coach {
   background: var(--bg);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
@@ -425,7 +426,8 @@ a { color: inherit; }
 }
 
 .accent-list strong,
-.accent-feedback strong {
+.accent-feedback strong,
+.accent-zg-coach strong {
   color: var(--accent);
   font-size: 12px;
   letter-spacing: 0.12em;
@@ -435,10 +437,27 @@ a { color: inherit; }
 .accent-list span,
 .accent-list p,
 .accent-feedback p,
+.accent-zg-coach p,
 .accent-note {
   color: var(--ink-soft);
   font-size: 14px;
   margin: 0;
+}
+
+.accent-zg-coach {
+  background: var(--accent-soft);
+}
+
+.accent-zg-coach ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.accent-zg-coach li {
+  color: var(--ink);
+  font-size: 14px;
 }
 
 .accent-route,
