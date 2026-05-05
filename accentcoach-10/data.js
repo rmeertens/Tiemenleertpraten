@@ -172,7 +172,7 @@ window.ACCENT_DATA = {
   ],
   simulations: [
     ['Start Largo', 'Leg Bernard in cliënttaal doel en werkwijze uit en start Largo met /f/.'],
-    ['Corrigeer beweging', 'Bernard staat op slot en beweegt nauwelijks vanuit de knieën. Geef non-verbale en verbale cue.'],
+    ['Corrigeer beweging', 'Bernard staat op slot en beweegt nauwelijks vanuit de knieën. Corrigeer vooral non-verbaal: doe de losse kniebeweging zichtbaar voor, gebruik oogcontact en laat hem direct opnieuw imiteren. Eventueel één ultrakorte begeleidende zin, geen uitlegcollege.'],
     ['Zelfreflectie', 'Vraag Bernard hoe het ging en vraag daarna door op adem, keel, kaak en gemak.'],
     ['Feedback na poging', 'Bernard doet Largo redelijk, maar sluit de vocaal hard af. Geef specifieke feedback en laat opnieuw proberen.'],
     ['Weerstand Bernard', 'Bernard zegt: “Ik wilde een truc om weer te zingen, waarom moet ik zo raar bewegen?” Reageer non-directief en motiverend.'],

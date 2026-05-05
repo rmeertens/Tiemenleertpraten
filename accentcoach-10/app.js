@@ -266,17 +266,17 @@ function simulationProfile(title) {
       nextStrong: 'Herhaal Start Largo staand: 30 seconden uitleg, daarna direct voordoen.'
     },
     'Corrigeer beweging': {
-      focus: ['Beweging losmaken', 'Non-verbaal groot genoeg', 'Geen lang college', 'Direct opnieuw'],
+      focus: ['Non-verbaal voordoen', 'Kniebeweging losmaken', 'Geen uitlegcollege', 'Direct opnieuw'],
       minimumWords: 30,
       checks: [
-        check('Probleem benoemen', ['op slot', 'statisch', 'knie', 'vast', 'beweging'], 'benoem wat je ziet', 'Benoem kort dat de beweging nog vast/statisch is.'),
-        check('Non-verbale cue', ['voordoen', 'non-verbaal', 'laat zien', 'knie', 'hand', 'arm'], 'geef zichtbare non-verbale cue', 'Laat met je eigen knieën/arm zien wat losser moet.'),
+        check('Zichtbare observatie', ['op slot', 'statisch', 'knie', 'vast', 'beweging'], 'laat merken dat je ziet dat de beweging vastzit', 'Beschrijf kort wat jij zichtbaar doet, niet wat je allemaal uitlegt.'),
+        check('Non-verbale cue', ['voordoen', 'non-verbaal', 'laat zien', 'knie', 'hand', 'arm', 'oogcontact'], 'geef zichtbare non-verbale cue', 'Doe met je eigen knieën/arm voor wat losser moet en gebruik oogcontact.'),
         check('Adem-stemkoppeling', ['adem', 'uitadem', 'stem', 'klank', 'samen'], 'koppel beweging aan adem/stem', 'Zeg dat de klank pas meegaat met de uitademende beweging.'),
-        check('Nieuwe poging', ['opnieuw', 'nog een keer', 'volgende poging', 'probeer'], 'laat direct opnieuw proberen', 'Sluit af met: we doen hem meteen nog een keer.')
+        check('Nieuwe poging', ['opnieuw', 'nog een keer', 'volgende poging', 'probeer', 'imiteren', 'meedoen'], 'laat direct opnieuw imiteren', 'Sluit af met opnieuw voordoen en Bernard laten meedoen.')
       ],
       warnings: [],
-      upgrade: 'Maak je cue therapeutisch: één observatie, één beweging voordoen, direct herhalen.',
-      next: 'Zeg precies welke beweging je corrigeert en laat Bernard meteen opnieuw doen.',
+      upgrade: 'Maak je cue methodisch zuiver: zichtbaar voordoen, hooguit één korte begeleidende zin, direct opnieuw imiteren.',
+      next: 'Minder praten: doe de kniebeweging zichtbaar voor en laat Bernard direct opnieuw meedoen.',
       nextStrong: 'Train dit live: iemand staat op slot en jij corrigeert met zo min mogelijk woorden.'
     },
     'Feedback na poging': {
@@ -634,6 +634,11 @@ function toggleRecording() {
       recording = false;
       button.textContent = 'Neem op';
     };
+    recognition.onerror = event => {
+      recording = false;
+      button.textContent = 'Neem op';
+      speechNote.textContent = recognitionErrorMessage(event.error);
+    };
   }
   if (recording) {
     recognition.stop();
@@ -643,7 +648,24 @@ function toggleRecording() {
   recording = true;
   button.textContent = 'Stop';
   speechNote.textContent = 'Opname loopt. Spreek alsof Bernard voor je staat.';
-  recognition.start();
+  try {
+    recognition.start();
+  } catch {
+    recording = false;
+    button.textContent = 'Neem op';
+    speechNote.textContent = 'De opname kon niet starten. Klik nog één keer of typ je antwoord in het tekstvak.';
+  }
+}
+
+function recognitionErrorMessage(error) {
+  const messages = {
+    'not-allowed': 'Microfoon niet toegestaan. Geef microfoontoegang in de browser of typ je antwoord.',
+    'audio-capture': 'Geen microfoon gevonden. Controleer je microfoon of typ je antwoord.',
+    network: 'Spraakherkenning krijgt geen verbinding. Typ je antwoord of probeer Chrome/Edge.',
+    'no-speech': 'Ik hoorde geen spraak. Klik opnieuw op Neem op en spreek iets dichter bij de microfoon.',
+    aborted: 'Opname gestopt.'
+  };
+  return messages[error] || 'Opname werkt hier niet goed. Typ je antwoord of probeer Chrome/Edge.';
 }
 
 function showView(name) {
