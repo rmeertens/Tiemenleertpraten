@@ -6,6 +6,10 @@ const state = {
   caseVariant: localStorage.getItem('flits_case_variant') || 'apply',
   done: JSON.parse(localStorage.getItem('flits_done') || '{}'),
   mastery: JSON.parse(localStorage.getItem('flits_mastery') || '{}'),
+  attempts: JSON.parse(localStorage.getItem('flits_attempts') || '{}'),
+  weaknesses: JSON.parse(localStorage.getItem('flits_weaknesses') || '{}'),
+  session: JSON.parse(localStorage.getItem('flits_session') || '{"active":false,"mode":"ten","step":0,"queue":[]}'),
+  immersion: localStorage.getItem('flits_immersion') === 'true',
   micro: null,
 };
 
@@ -17,6 +21,12 @@ const speechNote = document.getElementById('speech-note');
 const coachInput = document.getElementById('coach-input');
 const coachAnswer = document.getElementById('coach-answer');
 const caseVariantSelect = document.getElementById('case-variant-select');
+const sessionMode = document.getElementById('session-mode');
+const sessionCommand = document.getElementById('session-command');
+const sessionMemory = document.getElementById('session-memory');
+const sessionNote = document.getElementById('session-note');
+const immersionToggle = document.getElementById('immersion-toggle');
+const modelDetails = document.getElementById('model-details');
 const microPanel = document.getElementById('micro-panel');
 const microInput = document.getElementById('micro-input');
 const microFeedback = document.getElementById('micro-feedback');
@@ -37,6 +47,7 @@ function boot() {
   bindEvents();
   renderLesson();
   renderProgress();
+  renderSession();
 }
 
 function bindEvents() {
@@ -70,6 +81,19 @@ function bindEvents() {
   });
   document.getElementById('ask-coach').addEventListener('click', answerCoachQuestion);
   document.getElementById('record-question').addEventListener('click', toggleQuestionRecording);
+  sessionMode.addEventListener('change', () => {
+    state.session.mode = sessionMode.value;
+    saveSession();
+    renderSession();
+  });
+  document.getElementById('start-session').addEventListener('click', startSession);
+  document.getElementById('session-next').addEventListener('click', nextSessionStep);
+  document.getElementById('session-boss').addEventListener('click', startBossFight);
+  immersionToggle.addEventListener('change', () => {
+    state.immersion = immersionToggle.checked;
+    localStorage.setItem('flits_immersion', String(state.immersion));
+    renderImmersion();
+  });
   caseVariantSelect.addEventListener('change', () => {
     state.caseVariant = caseVariantSelect.value;
     localStorage.setItem('flits_case_variant', state.caseVariant);
@@ -131,6 +155,8 @@ function renderLesson() {
   renderCaseCoach();
   renderMastery();
   renderLessonList();
+  renderImmersion();
+  renderSession();
 }
 
 function renderCaseCoach() {
@@ -171,6 +197,172 @@ function renderProgress() {
   document.getElementById('flits-hint').textContent = ready >= 80
     ? 'Sterk. Herhaal alleen wat nog openstaat hardop.'
     : `${mastered}/${total} onderwerpen beheerst · ${doneCount}/${data.lessons.length} flitscolleges rond.`;
+}
+
+function renderSession() {
+  sessionMode.value = state.session.mode || 'ten';
+  immersionToggle.checked = state.immersion;
+  const weakest = weakestPattern();
+  sessionMemory.textContent = weakest
+    ? `Let op je vaste valkuil: ${weakest.label}. Die komt vandaag bewust terug.`
+    : 'Nog geen persoonlijke valkuil gevonden. De coach leert van je feedback.';
+
+  if (!state.session.active) {
+    sessionCommand.textContent = 'Kies 10 min, 20 min of toetsstress en start. Daarna krijg je steeds één opdracht.';
+    sessionNote.textContent = state.immersion
+      ? 'Dompelstand staat aan: eerst zelf proberen, model later.'
+      : 'Slimme herhaling staat klaar: rood komt terug, groen verdwijnt.';
+    return;
+  }
+
+  const lesson = currentLesson();
+  const selected = currentCaseVariant(lesson);
+  const commands = sessionCommands(lesson, selected);
+  sessionCommand.textContent = commands[state.session.step % commands.length];
+  sessionNote.textContent = `Sessie actief · ${modeLabelForSession(state.session.mode)} · stap ${state.session.step + 1}.`;
+}
+
+function sessionCommands(lesson, selected) {
+  const gap = missingChecksFor(lesson)[0] || lesson.checks[0];
+  const probe = teacherProbeFor(lesson, selected);
+  return [
+    `Lees de snapkaart 20 seconden. Sluit hem mentaal af en zeg: “De kern is...”`,
+    `Train nu ${selected.label.toLowerCase()}: ${selected.question}`,
+    `Stop. Bewijs minimaal één casusdetail en één vervolgstap. Gebruik: ${explainTerm(gap)}`,
+    `Docent vraagt door: ${probe}`,
+    `Spreek je antwoord opnieuw in. Korter, klinischer, met één “daarom”.`
+  ];
+}
+
+function teacherProbeFor(lesson, selected) {
+  const clean = normalize(`${lesson.domain} ${lesson.title} ${selected.question}`);
+  if (clean.includes('behandeling')) return 'Waarom kies je deze methode en wat ziet school morgen anders?';
+  if (clean.includes('diagnostiek') || clean.includes('test')) return 'Waarom is één score onvoldoende voor je conclusie?';
+  if (clean.includes('fonet') || clean.includes('fonolog') || clean.includes('spraak')) return 'Hoe weet je of dit fonetisch, fonologisch of planning is?';
+  if (clean.includes('pragmat')) return 'Waar zie je dit terug in echte interactie, niet alleen in een test?';
+  if (clean.includes('meertal')) return 'Waarom is lage Nederlandse score nog geen TOS-bewijs?';
+  if (clean.includes('omft') || clean.includes('tand') || clean.includes('mond')) return 'Welke structuur- of functiefactor onderhoudt het probleem?';
+  return 'Wat betekent dit concreet voor onderzoek, behandeling of klascontext?';
+}
+
+function modeLabelForSession(mode) {
+  if (mode === 'stress') return 'toetsstress';
+  if (mode === 'twenty') return '20 min verdiepen';
+  return '10 min kern';
+}
+
+function startSession() {
+  state.session = {
+    active: true,
+    mode: sessionMode.value,
+    step: 0,
+    queue: buildSessionQueue(sessionMode.value),
+  };
+  if (state.session.mode === 'stress') {
+    state.immersion = true;
+    localStorage.setItem('flits_immersion', 'true');
+  }
+  saveSession();
+  goToSessionLesson();
+  renderSession();
+  renderImmersion();
+  sessionCommand.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function buildSessionQueue(mode) {
+  const open = data.lessons
+    .map((lesson, index) => ({ lesson, index, missing: missingChecksFor(lesson).length }))
+    .filter(item => item.missing > 0)
+    .sort((a, b) => b.missing - a.missing)
+    .map(item => item.index);
+  const base = open.length ? open : data.lessons.map((_, index) => index);
+  const size = mode === 'twenty' ? 8 : mode === 'stress' ? 6 : 4;
+  return base.slice(0, size);
+}
+
+function nextSessionStep() {
+  if (!state.session.active) {
+    startSession();
+    return;
+  }
+
+  state.session.step += 1;
+  const commandCount = sessionCommands(currentLesson(), currentCaseVariant()).length;
+  if (state.session.step % commandCount === 0) {
+    rotateSessionQueue();
+    goToSessionLesson();
+  }
+  saveSession();
+  renderSession();
+  const activeCommand = state.session.step % commandCount;
+  if (activeCommand === 1 || activeCommand === 4) startCaseTraining();
+  sessionCommand.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function rotateSessionQueue() {
+  if (!state.session.queue.length) state.session.queue = buildSessionQueue(state.session.mode);
+  const [current, ...rest] = state.session.queue;
+  const followUp = nextRedFollowUp();
+  state.session.queue = followUp !== null ? [...rest.slice(0, 2), followUp, ...rest.slice(2), current].filter(uniqueIndex) : [...rest, current];
+}
+
+function uniqueIndex(value, index, array) {
+  return array.indexOf(value) === index;
+}
+
+function goToSessionLesson() {
+  if (!state.session.queue.length) state.session.queue = buildSessionQueue(state.session.mode);
+  state.index = state.session.queue[0] ?? state.index;
+  saveIndex();
+  renderLesson();
+}
+
+function nextRedFollowUp() {
+  const entries = Object.entries(state.attempts)
+    .filter(([, attempt]) => attempt.score < 4)
+    .sort((a, b) => b[1].time - a[1].time);
+  if (!entries.length) return null;
+  const [lessonId] = entries[0];
+  const index = data.lessons.findIndex(lesson => lesson.id === lessonId);
+  return index >= 0 ? index : null;
+}
+
+function startBossFight() {
+  const lesson = currentLesson();
+  const domainLessons = data.lessons
+    .filter(item => item.domain === lesson.domain)
+    .slice(0, 3);
+  const anchors = domainLessons.flatMap(item => item.checks.slice(0, 2)).slice(0, 5);
+  state.caseVariant = 'defend';
+  localStorage.setItem('flits_case_variant', state.caseVariant);
+  renderCaseCoach();
+  renderPracticePrompts();
+  answerInput.value = '';
+  answerInput.focus();
+  answerInput.placeholder = `Eindbaas ${lesson.domain}: verbind ${anchors.slice(0, 3).join(', ')} aan één casus.`;
+  speechNote.textContent = `Thema-eindbaas: verdedig ${lesson.domain} met deze ankers: ${anchors.join(' · ')}.`;
+}
+
+function renderImmersion() {
+  const key = attemptKey();
+  const attempts = state.attempts[key]?.tries || 0;
+  modelDetails.hidden = state.immersion && attempts < 2;
+}
+
+function attemptKey(lesson = currentLesson(), variant = currentCaseVariant(lesson)) {
+  return `${lesson.id}:${variant.id}`;
+}
+
+function weakestPattern() {
+  const entries = Object.entries(state.weaknesses).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) return null;
+  const labels = {
+    casus: 'je vergeet casusbewijs',
+    vervolg: 'je noemt nog geen vervolgstap',
+    vaktaal: 'je antwoord mist vaktaal',
+    volledigheid: 'je stopt te vroeg'
+  };
+  return { id: entries[0][0], label: labels[entries[0][0]] || entries[0][0] };
 }
 
 function migrateDoneToMastery() {
@@ -322,9 +514,11 @@ function checkAnswer() {
   const clean = normalize(text);
   const hits = lesson.checks.filter(check => clean.includes(normalize(check)));
   const hasCase = ['kind', 'casus', 'score', 'observatie', 'ouders', 'school', 'klas', 'onderzoek', 'behandeling'].some(word => clean.includes(word));
-  const score = Math.min(4, hits.length + (hasCase ? 1 : 0));
+  const hasNextStep = ['daarom', 'vervolg', 'onderzoek', 'behandel', 'doel', 'advies', 'school', 'ouders', 'methode'].some(word => clean.includes(word));
+  const score = Math.min(4, hits.length + (hasCase ? 1 : 0) + (hasNextStep ? 1 : 0));
   const missing = lesson.checks.filter(check => !hits.includes(check)).slice(0, 3);
   const explainedHits = hits.map(explainTerm);
+  updateAttempt(score, missing, hasCase, hasNextStep, text);
 
   feedbackCard.innerHTML = `
     <div class="flits-feedback-head">
@@ -333,18 +527,53 @@ function checkAnswer() {
     </div>
     ${coachScanHtml({
       good: explainedHits,
-      missing: [...missing.map(explainTerm), ...(!hasCase ? ['casuskoppeling: kind, onderzoek, behandeling of schoolcontext'] : [])],
-      vague: score >= 4 ? [] : ['Maak één toetszin: begrip -> casusbewijs -> vervolgstap.']
+      missing: [
+        ...missing.map(explainTerm),
+        ...(!hasCase ? ['casuskoppeling: kind, onderzoek, behandeling of schoolcontext'] : []),
+        ...(!hasNextStep ? ['vervolgstap: wat onderzoek, behandel of adviseer je nu?'] : [])
+      ],
+      vague: score >= 4 ? [] : [interruptText(missing, hasCase, hasNextStep)]
     })}
     ${block('Sterk', explainedHits.length ? `Je noemt al: ${explainedHits.join(' ')}` : 'Je antwoord heeft nog te weinig herkenbare vaktaal. Noem eerst het probleem en één voorbeeld uit de casus.')}
-    ${block('Feedback', feedbackText(score, missing, hasCase))}
-    ${score === 3 ? block('Van 3/4 naar 4/4', upgradeText(missing, hasCase)) : ''}
+    ${block('Coach onderbreekt', interruptText(missing, hasCase, hasNextStep))}
+    ${block('Feedback', feedbackText(score, missing, hasCase, hasNextStep))}
+    ${score === 3 ? block('Van 3/4 naar 4/4', upgradeText(missing, hasCase, hasNextStep)) : ''}
     ${score < 4 ? redRetryHtml() : ''}
   `;
   bindRedRetry(feedbackCard, answerInput, speechNote);
+  renderSession();
+  renderImmersion();
 }
 
-function feedbackText(score, missing, hasCase) {
+function updateAttempt(score, missing, hasCase, hasNextStep, text) {
+  const key = attemptKey();
+  const previous = state.attempts[key] || { tries: 0, score: 0 };
+  state.attempts[key] = {
+    tries: previous.tries + 1,
+    score: Math.max(previous.score || 0, score),
+    lastScore: score,
+    time: Date.now(),
+  };
+  if (missing.length) bumpWeakness('vaktaal');
+  if (!hasCase) bumpWeakness('casus');
+  if (!hasNextStep) bumpWeakness('vervolg');
+  if (text.split(/\s+/).filter(Boolean).length < 35) bumpWeakness('volledigheid');
+  localStorage.setItem('flits_attempts', JSON.stringify(state.attempts));
+  localStorage.setItem('flits_weaknesses', JSON.stringify(state.weaknesses));
+}
+
+function bumpWeakness(key) {
+  state.weaknesses[key] = (state.weaknesses[key] || 0) + 1;
+}
+
+function interruptText(missing, hasCase, hasNextStep) {
+  if (!hasCase) return 'Stop. Dit is nog los van een kind. Voeg nu één casusbewijs toe.';
+  if (missing.length) return `Stop. Je mist nog dit anker: ${explainTerm(missing[0])}`;
+  if (!hasNextStep) return 'Stop. Je beschrijft al, maar kiest nog geen vervolgstap. Voeg “daarom...” toe.';
+  return 'Goed. Nu dezelfde inhoud korter en hardop, alsof de docent doorvraagt.';
+}
+
+function feedbackText(score, missing, hasCase, hasNextStep) {
   if (score >= 4) return 'Inhoudelijk klaar. Oefen dit nu hardop in maximaal 60 seconden.';
   const parts = [];
   if (missing.length) {
@@ -353,12 +582,16 @@ function feedbackText(score, missing, hasCase) {
   if (!hasCase) {
     parts.push('Maak het minder los: zeg over welk kind of welke situatie je het hebt. Bijvoorbeeld: “Dit kind zegt /t/ voor /k/ in de klas, daardoor is hij minder verstaanbaar.”');
   }
+  if (!hasNextStep) {
+    parts.push('Sluit af met een vervolgstap: daarom onderzoek ik, behandel ik, adviseer ik of betrek ik school/ouders.');
+  }
   return parts.join(' ');
 }
 
-function upgradeText(missing, hasCase) {
+function upgradeText(missing, hasCase, hasNextStep) {
   if (!hasCase) return 'Voeg één concrete casuszin toe: “Bij dit kind zie ik dit doordat...” en check opnieuw.';
   if (missing.length) return `Voeg dit ene punt toe: ${explainTerm(missing[0])} Check daarna opnieuw.`;
+  if (!hasNextStep) return 'Voeg één “daarom”-zin toe met onderzoek, behandeling of advies.';
   return 'Zeg het nu korter en casusgerichter; dan is het 4/4.';
 }
 
@@ -389,7 +622,7 @@ function microPrompt(lesson, topic, mode) {
     return `Maak één toetszin: “${topic} betekent..., bij dit kind zie ik..., daarom doe ik...”`;
   }
   if (mode === 'casus') {
-    return `Pas ${topic} toe op deze casusvraag: ${lesson.caseQuestion}`;
+    return `Pas ${topic} toe op deze casusvraag: ${currentCaseVariant(lesson).question}`;
   }
   return `Leg ${topic} in maximaal 20 seconden uit. Noem wat het is en wat je ermee doet bij een kind.`;
 }
@@ -431,6 +664,8 @@ function checkMicroAnswer() {
     renderMastery();
     renderProgress();
     renderLessonList();
+    renderCaseCoach();
+    renderSession();
   }
 
   microFeedback.innerHTML = `
@@ -778,6 +1013,10 @@ function saveDone() {
 
 function saveMastery() {
   localStorage.setItem('flits_mastery', JSON.stringify(state.mastery));
+}
+
+function saveSession() {
+  localStorage.setItem('flits_session', JSON.stringify(state.session));
 }
 
 function block(label, text) {

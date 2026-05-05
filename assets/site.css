@@ -370,6 +370,56 @@ a { color: inherit; }
   font-weight: 800;
 }
 
+.flits-session {
+  margin: 0 0 18px;
+}
+
+.flits-session-tools {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: min(100%, 390px);
+}
+
+.flits-session-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1.25fr 1fr 1fr;
+  margin: 12px 0;
+}
+
+.flits-session-grid article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+}
+
+.flits-session-grid span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.flits-session-grid p {
+  margin: 0;
+}
+
+.flits-toggle {
+  align-items: center;
+  color: var(--ink-soft);
+  display: flex;
+  gap: 9px;
+}
+
+.flits-toggle input {
+  accent-color: var(--accent);
+}
+
 .flits-layout {
   align-items: start;
   display: grid;
@@ -2659,6 +2709,7 @@ a { color: inherit; }
   .flits-hero,
   .flits-layout,
   .flits-grid,
+  .flits-session-grid,
   .flits-coach-steps,
   .flits-mastery-list,
   .lesson-exam-grid,
@@ -2671,6 +2722,12 @@ a { color: inherit; }
   }
 
   .flits-case-tools {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .flits-session-tools {
     align-items: stretch;
     flex-direction: column;
     width: 100%;

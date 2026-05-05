@@ -8,10 +8,10 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Flitscollege Coach &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="../assets/site.css?v=25" />
+  <link rel="stylesheet" href="../assets/site.css?v=26" />
 </head>
 <body>
-  <div class="version-stamp">v4 &middot; Flitscollege Coach</div>
+  <div class="version-stamp">v5 &middot; Flitscollege Coach</div>
   <main class="studio flits-app">
     <nav class="studio__nav">
       <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
@@ -48,6 +48,46 @@
       </div>
       <div class="flits-answer" id="coach-answer">
         <p>Stel een korte vraag. De coach geeft één leeractie en één toetszin.</p>
+      </div>
+    </section>
+
+    <section class="flits-card flits-session" aria-labelledby="session-title">
+      <div class="flits-feedback-head">
+        <div>
+          <p class="flits-label">Sessiemodus</p>
+          <h3 id="session-title">Laat de coach je erdoorheen trekken</h3>
+        </div>
+        <div class="flits-session-tools">
+          <label class="sr-only" for="session-mode">Kies trainingsmodus</label>
+          <select id="session-mode" class="flits-select" aria-label="Kies trainingsmodus">
+            <option value="ten">10 min · kern</option>
+            <option value="twenty">20 min · verdiepen</option>
+            <option value="stress">Toetsstress · geen model</option>
+          </select>
+          <button class="btn btn--primary" type="button" id="start-session">Start sessie</button>
+        </div>
+      </div>
+      <div class="flits-session-grid">
+        <article>
+          <span>Nu doen</span>
+          <p id="session-command">Kies een sessie. De coach bepaalt daarna de volgorde.</p>
+        </article>
+        <article>
+          <span>Coachgeheugen</span>
+          <p id="session-memory">Nog geen persoonlijke valkuil gevonden.</p>
+        </article>
+        <article>
+          <span>Dompelstand</span>
+          <label class="flits-toggle">
+            <input type="checkbox" id="immersion-toggle" />
+            <strong>Model pas na twee pogingen</strong>
+          </label>
+        </article>
+      </div>
+      <div class="flits-actions">
+        <button class="btn btn--ghost" type="button" id="session-next">Volgende sessiestap</button>
+        <button class="btn btn--ghost" type="button" id="session-boss">Thema-eindbaas</button>
+        <p class="flits-note" id="session-note">De sessie gebruikt slimme herhaling: rood komt terug, groen verdwijnt.</p>
       </div>
     </section>
 
@@ -164,7 +204,7 @@
           <p class="flits-label">4. Mondelinge drill</p>
           <h3>Zeg dit in 60 seconden</h3>
           <p id="oral-prompt" class="flits-prompt"></p>
-          <details class="flits-details">
+          <details class="flits-details" id="model-details">
             <summary>Toon 10-niveau antwoord</summary>
             <p id="model-answer"></p>
           </details>
