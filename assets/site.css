@@ -652,6 +652,80 @@ a { color: inherit; }
   font-weight: 800;
 }
 
+/* ============ Lescoach 10 ============ */
+
+.lesson-app .flits-hero h2 {
+  max-width: 10ch;
+}
+
+.lesson-mode-tabs {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0 0 14px;
+  padding: 6px;
+}
+
+.lesson-mode-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--radius) - 4px);
+  color: var(--ink-soft);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+  padding: 11px 12px;
+}
+
+.lesson-mode-tab.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.lesson-drill-card {
+  overflow: hidden;
+}
+
+.lesson-drill-box {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.lesson-criteria-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.lesson-criteria-grid article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
+
+.lesson-criteria-grid strong {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lesson-criteria-grid p {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0;
+}
+
 /* ============ Pak de 10 ============ */
 
 .accent-app {
@@ -2286,7 +2360,8 @@ a { color: inherit; }
   .flits-hero,
   .flits-layout,
   .flits-grid,
-  .flits-mastery-list {
+  .flits-mastery-list,
+  .lesson-criteria-grid {
     grid-template-columns: 1fr;
   }
 

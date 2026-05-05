@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Lescoach 10 — train de lessamenvattingen Spraak-Taal richting mondelinge praktijktoets en schriftelijke toets." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Lescoach 10 &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=18" />
+</head>
+<body>
+  <div class="version-stamp">v2 &middot; Lescoach 10</div>
+  <main class="studio flits-app lesson-app">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Lescoach 10</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <header class="flits-hero">
+      <div>
+        <p class="eyebrow">Lessamenvattingen &middot; Mondeling + schriftelijk</p>
+        <h2>Van lesstof naar toetsantwoord.</h2>
+        <p>
+          Loop W1 tot en met W9 door, vink af wat je beheerst en train wat overblijft
+          met mondelinge praktijkvragen, schriftelijke toetsvragen en slimme drill.
+        </p>
+      </div>
+      <aside class="flits-score">
+        <span>Toetsklaar</span>
+        <strong id="lesson-ready">0%</strong>
+        <p id="lesson-hint">Start bij W1.</p>
+      </aside>
+    </header>
+
+    <section class="flits-coach" aria-labelledby="lesson-coach-title">
+      <div>
+        <p class="flits-label">Studentencoach</p>
+        <h3 id="lesson-coach-title">Vraag iets over deze les</h3>
+      </div>
+      <div class="flits-question">
+        <label class="sr-only" for="coach-input">Stel een vraag over deze les</label>
+        <input id="coach-input" type="text" placeholder="Bijv. hoe zeg ik dit mondeling op ZG-niveau?" />
+        <button class="btn btn--primary" type="button" id="ask-coach">Vraag coach</button>
+        <button class="btn btn--ghost" type="button" id="record-question">Spreek in</button>
+      </div>
+      <div class="flits-answer" id="coach-answer">
+        <p>Stel een korte vraag. De coach geeft één leeractie en één toetszin.</p>
+      </div>
+    </section>
+
+    <section class="flits-layout">
+      <aside class="flits-sidebar" aria-label="Lesvolgorde">
+        <p class="flits-label">Lesroute</p>
+        <div id="lesson-list" class="flits-list"></div>
+      </aside>
+
+      <section class="flits-main" aria-live="polite">
+        <div class="flits-toolbar">
+          <button class="btn btn--ghost" type="button" id="prev-lesson">Vorige</button>
+          <select id="lesson-select" class="flits-select" aria-label="Kies les"></select>
+          <button class="btn btn--ghost" type="button" id="next-lesson">Volgende</button>
+        </div>
+
+        <article class="flits-card flits-current">
+          <p class="flits-label" id="lesson-meta"></p>
+          <h3 id="lesson-title"></h3>
+          <p id="lesson-summary"></p>
+          <div id="lesson-tags" class="flits-tags"></div>
+          <div class="lesson-criteria-grid" aria-label="Criteriumgerichte coachlaag">
+            <article>
+              <strong>Criteriumfocus</strong>
+              <p id="lesson-criteria"></p>
+            </article>
+            <article>
+              <strong>Puntenverlies</strong>
+              <p id="lesson-pitfall"></p>
+            </article>
+            <article>
+              <strong>ZG-signaal</strong>
+              <p id="lesson-zg"></p>
+            </article>
+          </div>
+        </article>
+
+        <article class="flits-card flits-route">
+          <p class="flits-label">Mijn leerroute</p>
+          <h3>Vink aan wat je al beheerst</h3>
+          <p class="flits-note">Wat open blijft, wordt je korte route naar ZG. De coach maakt er direct mondelinge en schriftelijke oefeningen van.</p>
+          <div id="mastery-checklist" class="flits-mastery-list"></div>
+          <div class="flits-route-summary">
+            <strong>Nog trainen</strong>
+            <div id="train-list" class="flits-train-list"></div>
+          </div>
+          <div id="micro-panel" class="flits-micro-panel" hidden>
+            <div>
+              <p class="flits-label" id="micro-mode">Controleer</p>
+              <h3 id="micro-title"></h3>
+              <p id="micro-prompt" class="flits-prompt"></p>
+            </div>
+            <label class="sr-only" for="micro-input">Leg dit onderwerp kort uit</label>
+            <textarea id="micro-input" rows="4" class="flits-textarea" placeholder="Typ of spreek je uitleg. Kort mag, als je concreet toepast op kind, toets of casus."></textarea>
+            <div class="flits-actions">
+              <button class="btn btn--primary" type="button" id="check-micro">Feedback</button>
+              <button class="btn btn--ghost" type="button" id="record-micro">Spreek in</button>
+              <button class="btn btn--ghost" type="button" id="close-micro">Sluit</button>
+            </div>
+            <p class="flits-note" id="micro-note"></p>
+            <div id="micro-feedback" class="flits-feedback"></div>
+          </div>
+        </article>
+
+        <div class="flits-grid">
+          <article class="flits-card">
+            <p class="flits-label">1. Kernkaart</p>
+            <h3>Wat is de leskern?</h3>
+            <p id="core-card"></p>
+          </article>
+          <article class="flits-card">
+            <p class="flits-label">2. Toetsankers</p>
+            <h3>Hierop kun je bevraagd worden</h3>
+            <ul id="anchor-list" class="flits-checklist"></ul>
+          </article>
+        </div>
+
+        <article class="flits-card">
+          <p class="flits-label">3. Oefenmodus</p>
+          <h3>Mondeling of schriftelijk trainen</h3>
+          <div class="lesson-mode-tabs" role="tablist" aria-label="Kies oefenmodus">
+            <button class="lesson-mode-tab is-active" type="button" data-mode="oral">Mondeling praktijk</button>
+            <button class="lesson-mode-tab" type="button" data-mode="written">Schriftelijke toets</button>
+          </div>
+          <p id="mode-prompt" class="flits-prompt"></p>
+          <textarea id="answer-input" rows="6" class="flits-textarea" placeholder="Typ of spreek je antwoord. Denk: vaktaal + casus + consequentie."></textarea>
+          <div class="flits-actions">
+            <button class="btn btn--primary" type="button" id="check-answer">Feedback</button>
+            <button class="btn btn--ghost" type="button" id="record-answer">Neem op</button>
+            <button class="btn btn--ghost" type="button" id="clear-answer">Wis</button>
+          </div>
+          <p class="flits-note" id="speech-note"></p>
+        </article>
+
+        <article class="flits-card flits-feedback" id="feedback-card">
+          <p class="flits-note">Nog geen antwoord nagekeken.</p>
+        </article>
+
+        <article class="flits-card">
+          <p class="flits-label">4. Modelantwoord</p>
+          <h3>Gebruik pas na je eigen poging</h3>
+          <details class="flits-details">
+            <summary id="model-summary">Toon 10-niveau mondeling antwoord</summary>
+            <p id="model-answer"></p>
+          </details>
+        </article>
+
+        <article class="flits-card lesson-drill-card">
+          <p class="flits-label">5. Slimme toetsdrill</p>
+          <h3>Verrassing, maar zonder gaten</h3>
+          <p class="flits-note">
+            De drill kiest eerst onderwerpen die je nog niet geoefend hebt, daarna zwakke plekken,
+            en laat beheerste onderwerpen af en toe terugkomen.
+          </p>
+          <div class="flits-actions">
+            <button class="btn btn--primary" type="button" id="start-drill">Slimme vraag</button>
+            <button class="btn btn--ghost" type="button" id="reset-drill">Reset drill</button>
+          </div>
+          <div id="drill-box" class="lesson-drill-box"></div>
+        </article>
+
+        <article class="flits-card">
+          <p class="flits-label">6. Bewijs</p>
+          <h3>Klaar met deze les?</h3>
+          <button class="btn btn--primary" type="button" id="mark-done">Markeer les beheerst</button>
+          <p class="flits-note">Markeer pas als je mondeling én schriftelijk zonder modelantwoord tot een ZG-antwoord komt.</p>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

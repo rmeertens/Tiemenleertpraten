@@ -1,0 +1,740 @@
+'use strict';
+
+const data = window.LESSEN_DATA;
+const state = {
+  index: Number(localStorage.getItem('lessen_index') || 0),
+  mode: localStorage.getItem('lessen_mode') || 'oral',
+  done: JSON.parse(localStorage.getItem('lessen_done') || '{}'),
+  mastery: JSON.parse(localStorage.getItem('lessen_mastery') || '{}'),
+  drillStats: JSON.parse(localStorage.getItem('lessen_drill_stats') || '{}'),
+  drill: null,
+  micro: null,
+};
+
+const list = document.getElementById('lesson-list');
+const select = document.getElementById('lesson-select');
+const answerInput = document.getElementById('answer-input');
+const feedbackCard = document.getElementById('feedback-card');
+const speechNote = document.getElementById('speech-note');
+const coachInput = document.getElementById('coach-input');
+const coachAnswer = document.getElementById('coach-answer');
+const microPanel = document.getElementById('micro-panel');
+const microInput = document.getElementById('micro-input');
+const microFeedback = document.getElementById('micro-feedback');
+const microNote = document.getElementById('micro-note');
+const drillBox = document.getElementById('drill-box');
+
+let answerRecognition = null;
+let answerRecording = false;
+let questionRecognition = null;
+let questionRecording = false;
+let microRecognition = null;
+let microRecording = false;
+
+boot();
+
+function boot() {
+  migrateDoneToMastery();
+  renderOptions();
+  bindEvents();
+  renderLesson();
+  renderProgress();
+  renderDrillBox();
+}
+
+function bindEvents() {
+  select.addEventListener('change', () => {
+    state.index = Number(select.value);
+    saveIndex();
+    renderLesson();
+  });
+
+  document.getElementById('prev-lesson').addEventListener('click', () => moveLesson(-1));
+  document.getElementById('next-lesson').addEventListener('click', () => moveLesson(1));
+  document.getElementById('check-answer').addEventListener('click', checkAnswer);
+  document.getElementById('clear-answer').addEventListener('click', () => {
+    answerInput.value = '';
+    feedbackCard.innerHTML = '<p class="flits-note">Nog geen antwoord nagekeken.</p>';
+    speechNote.textContent = '';
+  });
+  document.getElementById('record-answer').addEventListener('click', toggleAnswerRecording);
+  document.getElementById('mark-done').addEventListener('click', markCurrentLessonDone);
+  document.getElementById('ask-coach').addEventListener('click', answerCoachQuestion);
+  document.getElementById('record-question').addEventListener('click', toggleQuestionRecording);
+  document.getElementById('check-micro').addEventListener('click', checkMicroAnswer);
+  document.getElementById('record-micro').addEventListener('click', toggleMicroRecording);
+  document.getElementById('close-micro').addEventListener('click', closeMicroPanel);
+  document.getElementById('start-drill').addEventListener('click', startSmartDrill);
+  document.getElementById('reset-drill').addEventListener('click', resetDrill);
+
+  document.querySelectorAll('.lesson-mode-tab').forEach(button => {
+    button.addEventListener('click', () => setMode(button.dataset.mode));
+  });
+
+  coachInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') answerCoachQuestion();
+  });
+}
+
+function renderOptions() {
+  select.innerHTML = data.lessons.map((lesson, index) => `<option value="${index}">${escapeHtml(lesson.title)}</option>`).join('');
+  renderLessonList();
+}
+
+function renderLessonList() {
+  list.innerHTML = data.lessons.map((lesson, index) => {
+    const active = index === state.index ? ' is-active' : '';
+    const done = lessonIsMastered(lesson) ? ' is-done' : '';
+    return `
+      <button class="flits-list-item${active}${done}" type="button" data-index="${index}">
+        <span>${index + 1}</span>
+        <strong>${escapeHtml(lesson.title)}</strong>
+        <small>${escapeHtml(lesson.domain)}</small>
+      </button>
+    `;
+  }).join('');
+
+  list.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', () => {
+      state.index = Number(button.dataset.index);
+      saveIndex();
+      renderLesson();
+    });
+  });
+}
+
+function renderLesson() {
+  const lesson = currentLesson();
+  select.value = String(state.index);
+  document.getElementById('lesson-meta').textContent = `${lesson.date} · ${state.index + 1} van ${data.lessons.length} · ${lesson.domain}`;
+  document.getElementById('lesson-title').textContent = lesson.title;
+  document.getElementById('lesson-summary').textContent = lesson.summary;
+  document.getElementById('lesson-tags').innerHTML = lesson.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
+  document.getElementById('lesson-criteria').textContent = lesson.criteria;
+  document.getElementById('lesson-pitfall').textContent = lesson.pitfall;
+  document.getElementById('lesson-zg').textContent = lesson.zg;
+  document.getElementById('core-card').textContent = lesson.core;
+  document.getElementById('anchor-list').innerHTML = lesson.anchors.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+  answerInput.value = '';
+  feedbackCard.innerHTML = '<p class="flits-note">Nog geen antwoord nagekeken.</p>';
+  speechNote.textContent = '';
+  closeMicroPanel();
+  renderMode();
+  renderMastery();
+  renderLessonList();
+}
+
+function renderMode() {
+  document.querySelectorAll('.lesson-mode-tab').forEach(button => {
+    button.classList.toggle('is-active', button.dataset.mode === state.mode);
+  });
+  const lesson = currentLesson();
+  const isOral = state.mode === 'oral';
+  document.getElementById('mode-prompt').textContent = isOral ? lesson.oralPrompt : lesson.writtenPrompt;
+  document.getElementById('model-summary').textContent = isOral
+    ? 'Toon 10-niveau mondeling antwoord'
+    : 'Toon 10-niveau schriftelijk antwoord';
+  document.getElementById('model-answer').textContent = isOral ? lesson.oralModel : lesson.writtenModel;
+}
+
+function renderProgress() {
+  const total = data.lessons.reduce((sum, lesson) => sum + lesson.checks.length, 0);
+  const mastered = data.lessons.reduce((sum, lesson) => {
+    if (state.done[lesson.id]) return sum + lesson.checks.length;
+    const mastery = state.mastery[lesson.id] || {};
+    return sum + lesson.checks.filter(check => mastery[topicKey(check)]).length;
+  }, 0);
+  const doneCount = data.lessons.filter(lesson => lessonIsMastered(lesson)).length;
+  const ready = total ? Math.round((mastered / total) * 100) : 0;
+  document.getElementById('lesson-ready').textContent = `${ready}%`;
+  document.getElementById('lesson-hint').textContent = ready >= 80
+    ? 'Sterk. Zet nu slimme drill aan voor toetsdruk.'
+    : `${mastered}/${total} onderwerpen beheerst · ${doneCount}/${data.lessons.length} lessen rond.`;
+}
+
+function renderMastery() {
+  const lesson = currentLesson();
+  const mastery = masteryFor(lesson);
+  const mastered = lesson.checks.filter(check => mastery[topicKey(check)]);
+  const missing = lesson.checks.filter(check => !mastery[topicKey(check)]);
+
+  document.getElementById('mastery-checklist').innerHTML = lesson.checks.map(check => {
+    const key = topicKey(check);
+    const checked = mastery[key] ? ' checked' : '';
+    return `
+      <label class="flits-mastery-item">
+        <input type="checkbox" data-key="${escapeHtml(key)}"${checked} />
+        <span>${escapeHtml(check.title)}</span>
+      </label>
+    `;
+  }).join('');
+
+  document.querySelectorAll('#mastery-checklist input').forEach(input => {
+    input.addEventListener('change', () => {
+      mastery[input.dataset.key] = input.checked;
+      if (!input.checked) state.done[lesson.id] = false;
+      if (lesson.checks.every(check => mastery[topicKey(check)])) state.done[lesson.id] = true;
+      saveMastery();
+      saveDone();
+      renderMastery();
+      renderProgress();
+      renderLessonList();
+    });
+  });
+
+  const trainList = document.getElementById('train-list');
+  if (!missing.length) {
+    trainList.innerHTML = `
+      <article class="flits-train-item is-complete">
+        <strong>Alles staat groen</strong>
+        <p>Mooi. Train nu de mondelinge en schriftelijke vraag zonder modelantwoord of start slimme drill.</p>
+      </article>
+    `;
+    return;
+  }
+
+  trainList.innerHTML = missing.map(check => `
+    <article class="flits-train-item">
+      <strong>${escapeHtml(check.title)}</strong>
+      <p>${escapeHtml(check.hint)}</p>
+      <div class="flits-mini-actions">
+        <button type="button" data-topic="${escapeHtml(topicKey(check))}" data-mode="controleer">Controleer</button>
+        <button type="button" data-topic="${escapeHtml(topicKey(check))}" data-mode="mondeling">Mondeling</button>
+        <button type="button" data-topic="${escapeHtml(topicKey(check))}" data-mode="schriftelijk">Schriftelijk</button>
+      </div>
+    </article>
+  `).join('');
+
+  trainList.querySelectorAll('button').forEach(button => {
+    const topic = lesson.checks.find(check => topicKey(check) === button.dataset.topic);
+    button.addEventListener('click', () => openMicroPanel(topic, button.dataset.mode));
+  });
+
+  if (mastered.length && missing.length) {
+    trainList.insertAdjacentHTML('afterbegin', `<p class="flits-note">Al beheerst: ${mastered.length}. Nog open: ${missing.length}. Dit is je snelste route.</p>`);
+  }
+}
+
+function setMode(mode) {
+  state.mode = mode;
+  localStorage.setItem('lessen_mode', mode);
+  answerInput.value = '';
+  feedbackCard.innerHTML = '<p class="flits-note">Nog geen antwoord nagekeken.</p>';
+  renderMode();
+}
+
+function moveLesson(delta) {
+  state.index = (state.index + delta + data.lessons.length) % data.lessons.length;
+  saveIndex();
+  renderLesson();
+}
+
+function checkAnswer() {
+  const text = answerInput.value.trim();
+  if (!text) {
+    speechNote.textContent = 'Typ of spreek eerst je antwoord in.';
+    return;
+  }
+
+  const lesson = currentLesson();
+  const result = scoreText(text, lesson.checks, state.mode);
+  if (result.score >= 4) {
+    const mastery = masteryFor(lesson);
+    result.hits.forEach(check => {
+      mastery[topicKey(check)] = true;
+    });
+    if (lesson.checks.every(check => mastery[topicKey(check)])) state.done[lesson.id] = true;
+    saveMastery();
+    saveDone();
+    renderMastery();
+    renderProgress();
+    renderLessonList();
+  }
+
+  feedbackCard.innerHTML = feedbackHtml(result, state.mode, lesson);
+}
+
+function scoreText(text, topics, mode) {
+  const clean = normalize(text);
+  const hits = topics.filter(topic => topic.terms.some(term => clean.includes(normalize(term))));
+  const hasApplication = ['kind', 'casus', 'ouder', 'ouders', 'pm', 'school', 'klas', 'mdo', 'behandeling', 'onderzoek', 'test'].some(word => clean.includes(word));
+  const hasConsequence = ['daarom', 'dus', 'waardoor', 'betekent', 'conclusie', 'advies', 'vervolg', 'kies', 'onderzoek', 'behandel'].some(word => clean.includes(word));
+  const hasOralOrder = ['ik', 'eerst', 'daarna', 'vervolgens', 'omdat', 'ik zou', 'ik check', 'ik onderzoek', 'ik adviseer'].some(word => clean.includes(word));
+  const hasWrittenDefinition = ['is', 'betekent', 'houdt in', 'wordt bedoeld'].some(word => clean.includes(word));
+  const hasWrittenStructure = ['ten eerste', 'daarnaast', 'omdat', 'concluderend', 'bijvoorbeeld', 'verschil', 'daarentegen', 'terwijl'].some(word => clean.includes(word));
+  const hasModeQuality = mode === 'written'
+    ? (hasWrittenDefinition && (hasWrittenStructure || hasConsequence))
+    : (hasOralOrder && hasConsequence);
+  const score = Math.min(4, (hits.length ? 1 : 0) + (hits.length >= 2 ? 1 : 0) + (hasApplication ? 1 : 0) + (hasModeQuality ? 1 : 0));
+  const missing = topics.filter(topic => !hits.includes(topic)).slice(0, 3);
+  return {
+    score,
+    hits,
+    missing,
+    hasApplication,
+    hasConsequence,
+    hasModeQuality,
+    hasOralOrder,
+    hasWrittenDefinition,
+    hasWrittenStructure
+  };
+}
+
+function feedbackHtml(result, mode, lesson) {
+  const title = result.score >= 4 ? '4/4 · toetswaardig' : result.score === 3 ? '3/4 · bijna ZG' : 'Nog aanvullen';
+  const strong = result.hits.length
+    ? `Je gebruikt al: ${result.hits.map(topic => explainTopic(topic)).join(' ')}`
+    : 'Je antwoord heeft nog te weinig herkenbare vaktaal. Begin met één kernbegrip uit de les.';
+  const feedback = buildFeedback(result, mode);
+  const pointsLoss = buildPointsLoss(result, mode, lesson);
+  const zg = buildZgTip(result, mode, lesson);
+  const upgrade = mode === 'oral'
+    ? 'Maak het mondeling sterker met: “Ik zie..., dat betekent..., daarom onderzoek/adviseer ik...”'
+    : 'Maak het schriftelijk sterker met: definitie + vergelijking + casustoepassing + conclusie.';
+
+  return `
+    <div class="flits-feedback-head">
+      <h3>${title}</h3>
+      <strong>${result.score}/4</strong>
+    </div>
+    ${block('Sterk', strong)}
+    ${block('Feedback', result.score >= 4 ? 'Inhoudelijk klaar. Oefen nu korter en zonder lezen.' : feedback)}
+    ${block('Puntenverlies', result.score >= 4 ? 'Geen groot puntenverlies zichtbaar. Let alleen op bondigheid.' : pointsLoss)}
+    ${block('ZG-signaal', result.score >= 4 ? lesson.zg : zg)}
+    ${result.score === 3 ? block('Van 3/4 naar 4/4', upgrade) : ''}
+  `;
+}
+
+function buildFeedback(result, mode) {
+  const feedback = [];
+  if (result.missing.length) feedback.push(`Voeg toe: ${result.missing.map(topic => explainTopic(topic)).join(' ')}`);
+  if (!result.hasApplication) feedback.push('Maak het casusvast: kind, ouder, PM-er, test, klas of MDO noemen.');
+  if (mode === 'oral' && !result.hasModeQuality) feedback.push('Zeg je handelingsvolgorde hardop: eerst check ik..., daarna..., daarom...');
+  if (mode === 'written' && !result.hasModeQuality) feedback.push('Maak het schrijfbaar: definitie + toepassing + conclusie/advies.');
+  if (!result.hasConsequence) feedback.push(mode === 'oral' ? 'Zeg wat je ermee doet.' : 'Sluit af met een puntscorende conclusie.');
+  return feedback.join(' ');
+}
+
+function buildPointsLoss(result, mode, lesson) {
+  const losses = [];
+  if (!result.hits.length) losses.push('Geen herkenbare lesbegrippen: docent kan je kennis niet beoordelen.');
+  if (result.missing.length) losses.push(`Mist toetsanker: ${result.missing[0].title}.`);
+  if (!result.hasApplication) losses.push('Blijft losse theorie zonder casusbewijs.');
+  if (mode === 'oral' && !result.hasModeQuality) losses.push('Mondeling klinkt niet handelend/professioneel genoeg.');
+  if (mode === 'written' && !result.hasWrittenDefinition) losses.push('Schriftelijk ontbreekt een heldere definitie.');
+  if (mode === 'written' && !result.hasConsequence) losses.push('Schriftelijk ontbreekt conclusie of advies.');
+  if (!losses.length) losses.push(lesson.pitfall);
+  return losses.join(' ');
+}
+
+function buildZgTip(result, mode, lesson) {
+  if (result.missing.length) {
+    return `Pak dit ene ontbrekende anker: ${result.missing[0].title}. ${lesson.zg}`;
+  }
+  if (!result.hasApplication) return `Voeg één concrete casuszin toe. ${lesson.zg}`;
+  if (mode === 'oral') return `Maak het actief: “Ik zie..., ik weeg..., ik kies...”. ${lesson.zg}`;
+  return `Maak het puntscorend: definitie, tegenstelling, toepassing, conclusie. ${lesson.zg}`;
+}
+
+function openMicroPanel(topic, mode) {
+  const lesson = currentLesson();
+  state.micro = { lessonId: lesson.id, topicKey: topicKey(topic), mode };
+  microPanel.hidden = false;
+  microInput.value = '';
+  microFeedback.innerHTML = '';
+  microNote.textContent = '';
+  document.getElementById('micro-mode').textContent = modeLabel(mode);
+  document.getElementById('micro-title').textContent = topic.title;
+  document.getElementById('micro-prompt').textContent = microPrompt(lesson, topic, mode);
+  microInput.focus();
+}
+
+function closeMicroPanel() {
+  if (microRecording && microRecognition) microRecognition.stop();
+  state.micro = null;
+  microPanel.hidden = true;
+  microInput.value = '';
+  microFeedback.innerHTML = '';
+  microNote.textContent = '';
+}
+
+function microPrompt(lesson, topic, mode) {
+  if (mode === 'mondeling') {
+    return `Zeg in 30 seconden: wat is ${topic.title}, wat zie je in een casus en wat doe je daarna?`;
+  }
+  if (mode === 'schriftelijk') {
+    return `Schrijf 3 zinnen: definitie van ${topic.title}, toepassing op een casus en conclusie/advies. Vermijd losse opsomming.`;
+  }
+  return `Leg ${topic.title} kort uit. Noem wat het is, waarom het toetsrelevant is en wat je ermee doet.`;
+}
+
+function modeLabel(mode) {
+  if (mode === 'mondeling') return 'Mondeling';
+  if (mode === 'schriftelijk') return 'Schriftelijk';
+  return 'Controleer';
+}
+
+function checkMicroAnswer() {
+  const text = microInput.value.trim();
+  if (!state.micro || !text) {
+    microNote.textContent = 'Typ of spreek eerst je korte uitleg in.';
+    return;
+  }
+
+  const lesson = data.lessons.find(item => item.id === state.micro.lessonId) || currentLesson();
+  const topic = lesson.checks.find(check => topicKey(check) === state.micro.topicKey);
+  if (!topic) return;
+
+  const result = scoreText(text, [topic], state.micro.mode === 'schriftelijk' ? 'written' : 'oral');
+  const clean = normalize(text);
+  const hasTopic = topic.terms.some(term => clean.includes(normalize(term))) || clean.includes(normalize(topic.title));
+  const hasApplication = result.hasApplication;
+  const hasExplanation = /\b(betekent|is|omdat|zodat|daardoor|verschil|gaat over)\b/.test(clean) || text.length > 90;
+  const hasAction = ['daarom', 'advies', 'onderzoek', 'behandeling', 'ik kies', 'ik check', 'ik verwijs', 'conclusie'].some(word => clean.includes(word));
+  const score = Math.min(3, [hasTopic, hasExplanation, hasApplication, hasAction].filter(Boolean).length);
+  const missing = [];
+  if (!hasTopic) missing.push(`noem het begrip zelf: ${explainTopic(topic)}`);
+  if (!hasExplanation) missing.push('leg kort uit wat het betekent');
+  if (!hasApplication) missing.push('koppel aan kind, casus, toets, test of behandeling');
+  if (!hasAction) missing.push('zeg welke keuze, check of conclusie eruit volgt');
+
+  if (score >= 3) {
+    markTopicMastered(lesson, topic);
+  }
+  if (state.drill && state.drill.topicKey === topicKey(topic)) {
+    updateDrillStats(lesson, topic, score);
+  }
+
+  microFeedback.innerHTML = `
+    <div class="flits-feedback-head">
+      <h3>${score >= 3 ? '3/3 · beheerst' : score === 2 ? '2/3 · bijna' : 'Nog scherper'}</h3>
+      <strong>${score}/3</strong>
+    </div>
+    ${block('Goed', hasTopic ? `Je raakt het onderwerp: ${explainTopic(topic)}` : 'Je probeert het kort te houden. Nu nog het begrip expliciet noemen.')}
+    ${score < 3 ? block('Mist nog', missing.join(' · ')) : block('Coach', 'Ik heb dit onderwerp gemarkeerd als beheerst. Herhaal het nu nog één keer zonder te lezen.')}
+    ${score < 3 ? block('Puntenverlies', `Zonder toepassing en vervolgstap blijft dit een losse term. Valkuil bij deze les: ${lesson.pitfall}`) : ''}
+    ${score < 3 ? block('Maak ZG door', `Gebruik: “${topic.title} betekent... In deze casus zie ik... Daarom...”`) : ''}
+  `;
+}
+
+function startSmartDrill() {
+  const pick = selectSmartTopic();
+  if (!pick) return;
+  state.index = pick.lessonIndex;
+  state.mode = pick.mode === 'schriftelijk' ? 'written' : 'oral';
+  state.drill = {
+    lessonId: pick.lesson.id,
+    topicKey: topicKey(pick.topic),
+    topicTitle: pick.topic.title,
+    mode: pick.mode,
+  };
+  saveIndex();
+  localStorage.setItem('lessen_mode', state.mode);
+  renderLesson();
+  openMicroPanel(pick.topic, pick.mode);
+  renderDrillBox();
+}
+
+function selectSmartTopic() {
+  const all = [];
+  data.lessons.forEach((lesson, lessonIndex) => {
+    const mastery = state.mastery[lesson.id] || {};
+    lesson.checks.forEach(topic => {
+      const key = topicKey(topic);
+      const stat = drillStat(lesson, topic);
+      const mastered = mastery[key] || state.done[lesson.id];
+      const sameAsLast = state.drill && state.drill.topicKey === key;
+      const weight = (stat.count * 5) + (stat.best * 2) + (mastered ? 3 : 0) + (sameAsLast ? 20 : 0);
+      all.push({ lesson, lessonIndex, topic, stat, weight });
+    });
+  });
+  if (!all.length) return null;
+  all.sort((a, b) => a.weight - b.weight || a.lessonIndex - b.lessonIndex);
+  const pool = all.slice(0, Math.min(4, all.length));
+  const chosen = pool[Math.floor(Math.random() * pool.length)];
+  const mode = chosen.stat.oral <= chosen.stat.written ? 'mondeling' : 'schriftelijk';
+  return { ...chosen, mode };
+}
+
+function renderDrillBox() {
+  if (!state.drill) {
+    drillBox.innerHTML = '<p class="flits-note">Nog geen slimme vraag gestart.</p>';
+    return;
+  }
+  drillBox.innerHTML = `
+    <article class="flits-train-item">
+      <strong>${escapeHtml(state.drill.mode)} · ${escapeHtml(state.drill.topicTitle)}</strong>
+      <p>Beantwoord de opengeklapte coachvraag hierboven. De coach let op vaktaal, toepassing en vervolgstap. Bij voldoende feedback telt dit onderwerp mee als beheerst.</p>
+    </article>
+  `;
+}
+
+function resetDrill() {
+  state.drillStats = {};
+  state.drill = null;
+  saveDrillStats();
+  renderDrillBox();
+}
+
+function updateDrillStats(lesson, topic, score) {
+  const stat = drillStat(lesson, topic);
+  stat.count += 1;
+  stat.best = Math.max(stat.best, score);
+  if (state.micro.mode === 'mondeling') stat.oral += 1;
+  if (state.micro.mode === 'schriftelijk') stat.written += 1;
+  stat.last = Date.now();
+  saveDrillStats();
+  renderDrillBox();
+}
+
+function drillStat(lesson, topic) {
+  const key = `${lesson.id}:${topicKey(topic)}`;
+  if (!state.drillStats[key]) state.drillStats[key] = { count: 0, best: 0, oral: 0, written: 0, last: 0 };
+  return state.drillStats[key];
+}
+
+function markCurrentLessonDone() {
+  const lesson = currentLesson();
+  const mastery = masteryFor(lesson);
+  lesson.checks.forEach(check => {
+    mastery[topicKey(check)] = true;
+  });
+  state.done[lesson.id] = true;
+  saveMastery();
+  saveDone();
+  renderMastery();
+  renderProgress();
+  renderLessonList();
+}
+
+function markTopicMastered(lesson, topic) {
+  const mastery = masteryFor(lesson);
+  mastery[topicKey(topic)] = true;
+  if (lesson.checks.every(check => mastery[topicKey(check)])) state.done[lesson.id] = true;
+  saveMastery();
+  saveDone();
+  renderMastery();
+  renderProgress();
+  renderLessonList();
+}
+
+function answerCoachQuestion() {
+  const question = coachInput.value.trim();
+  if (!question) {
+    coachAnswer.innerHTML = '<p>Stel eerst je vraag. Bijvoorbeeld: “hoe koppel ik W8 aan de toets?”</p>';
+    return;
+  }
+
+  const lesson = currentLesson();
+  const clean = normalize(question);
+  let title = 'Coachadvies';
+  let body = `Bij ${lesson.title} moet je vooral dit kunnen: ${lesson.core}`;
+  let action = `Actie: oefen nu één open onderwerp uit “Nog trainen”.`;
+
+  if (clean.includes('mondeling') || clean.includes('praktijk') || clean.includes('zeg')) {
+    title = 'Mondelinge route';
+    body = lesson.oralModel;
+    action = `Actie: zeg dit in 45 seconden en eindig met: ${lesson.zg}`;
+  } else if (clean.includes('schrift') || clean.includes('opschrijven') || clean.includes('toets')) {
+    title = 'Schriftelijke route';
+    body = lesson.writtenModel;
+    action = `Actie: schrijf dit als definitie + toepassing + conclusie. Vermijd: ${lesson.pitfall}`;
+  } else if (clean.includes('casus') || clean.includes('toepas')) {
+    title = 'Koppel aan casus';
+    body = 'Gebruik de brug: observatie -> begrip/model -> gevolg voor activiteit/participatie -> vervolgstap.';
+    action = `Actie: begin met “In deze casus betekent ${lesson.checks[0].title} dat...”`;
+  } else if (clean.includes('zg') || clean.includes('10')) {
+    title = 'Naar ZG';
+    body = `Een ZG-antwoord is niet langer, maar preciezer: ${lesson.zg}`;
+    action = `Actie: gebruik ${lesson.checks[0].title}, ${lesson.checks[1]?.title || lesson.domain} en een concrete vervolgstap.`;
+  }
+
+  coachAnswer.innerHTML = `
+    <strong>${escapeHtml(title)}</strong>
+    <p>${escapeHtml(body)}</p>
+    <span>${escapeHtml(action)}</span>
+  `;
+}
+
+function toggleAnswerRecording() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    speechNote.textContent = 'Spraakherkenning werkt niet in deze browser. Typ je antwoord of gebruik Chrome/Edge.';
+    return;
+  }
+
+  const button = document.getElementById('record-answer');
+  if (!answerRecognition) {
+    answerRecognition = new SpeechRecognition();
+    answerRecognition.lang = 'nl-NL';
+    answerRecognition.interimResults = true;
+    answerRecognition.continuous = true;
+    answerRecognition.onresult = event => {
+      answerInput.value = Array.from(event.results).map(result => result[0].transcript).join(' ');
+    };
+    answerRecognition.onend = () => {
+      answerRecording = false;
+      button.textContent = 'Neem op';
+    };
+  }
+
+  if (answerRecording) {
+    answerRecognition.stop();
+    return;
+  }
+  stopOtherRecording('answer');
+  answerRecording = true;
+  button.textContent = 'Stop';
+  speechNote.textContent = 'Opname loopt. Antwoord alsof je in de toets zit.';
+  answerRecognition.start();
+}
+
+function toggleQuestionRecording() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    coachAnswer.innerHTML = '<p>Spraakherkenning werkt niet in deze browser. Typ je vraag of gebruik Chrome/Edge.</p>';
+    return;
+  }
+
+  const button = document.getElementById('record-question');
+  if (!questionRecognition) {
+    questionRecognition = new SpeechRecognition();
+    questionRecognition.lang = 'nl-NL';
+    questionRecognition.interimResults = true;
+    questionRecognition.continuous = false;
+    questionRecognition.onresult = event => {
+      coachInput.value = Array.from(event.results).map(result => result[0].transcript).join(' ');
+    };
+    questionRecognition.onend = () => {
+      questionRecording = false;
+      button.textContent = 'Spreek in';
+      if (coachInput.value.trim()) answerCoachQuestion();
+    };
+  }
+
+  if (questionRecording) {
+    questionRecognition.stop();
+    return;
+  }
+  stopOtherRecording('question');
+  questionRecording = true;
+  button.textContent = 'Stop';
+  coachAnswer.innerHTML = '<p>Ik luister. Stel je vraag kort.</p>';
+  questionRecognition.start();
+}
+
+function toggleMicroRecording() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    microNote.textContent = 'Spraakherkenning werkt niet in deze browser. Typ je uitleg of gebruik Chrome/Edge.';
+    return;
+  }
+
+  const button = document.getElementById('record-micro');
+  if (!microRecognition) {
+    microRecognition = new SpeechRecognition();
+    microRecognition.lang = 'nl-NL';
+    microRecognition.interimResults = true;
+    microRecognition.continuous = false;
+    microRecognition.onresult = event => {
+      microInput.value = Array.from(event.results).map(result => result[0].transcript).join(' ');
+    };
+    microRecognition.onend = () => {
+      microRecording = false;
+      button.textContent = 'Spreek in';
+      if (microInput.value.trim()) checkMicroAnswer();
+    };
+  }
+
+  if (microRecording) {
+    microRecognition.stop();
+    return;
+  }
+  stopOtherRecording('micro');
+  microRecording = true;
+  button.textContent = 'Stop';
+  microNote.textContent = 'Ik luister. Leg het uit alsof je docent tegenover je zit.';
+  microRecognition.start();
+}
+
+function stopOtherRecording(except) {
+  if (except !== 'answer' && answerRecording && answerRecognition) answerRecognition.stop();
+  if (except !== 'question' && questionRecording && questionRecognition) questionRecognition.stop();
+  if (except !== 'micro' && microRecording && microRecognition) microRecognition.stop();
+}
+
+function migrateDoneToMastery() {
+  let changed = false;
+  data.lessons.forEach(lesson => {
+    if (!state.done[lesson.id]) return;
+    const mastery = masteryFor(lesson);
+    lesson.checks.forEach(check => {
+      const key = topicKey(check);
+      if (!mastery[key]) {
+        mastery[key] = true;
+        changed = true;
+      }
+    });
+  });
+  if (changed) saveMastery();
+}
+
+function currentLesson() {
+  return data.lessons[state.index] || data.lessons[0];
+}
+
+function masteryFor(lesson) {
+  if (!state.mastery[lesson.id]) state.mastery[lesson.id] = {};
+  return state.mastery[lesson.id];
+}
+
+function topicKey(topic) {
+  return normalize(topic.title).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function lessonIsMastered(lesson) {
+  const mastery = state.mastery[lesson.id] || {};
+  return lesson.checks.every(check => mastery[topicKey(check)]) || Boolean(state.done[lesson.id]);
+}
+
+function explainTopic(topic) {
+  return `${topic.title} (${topic.hint})`;
+}
+
+function saveIndex() {
+  localStorage.setItem('lessen_index', String(state.index));
+}
+
+function saveDone() {
+  localStorage.setItem('lessen_done', JSON.stringify(state.done));
+}
+
+function saveMastery() {
+  localStorage.setItem('lessen_mastery', JSON.stringify(state.mastery));
+}
+
+function saveDrillStats() {
+  localStorage.setItem('lessen_drill_stats', JSON.stringify(state.drillStats));
+}
+
+function block(label, text) {
+  return `
+    <article>
+      <strong>${escapeHtml(label)}</strong>
+      <p>${escapeHtml(text)}</p>
+    </article>
+  `;
+}
+
+function normalize(value) {
+  return String(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
