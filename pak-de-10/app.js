@@ -59,6 +59,7 @@ const treatmentCollab = document.getElementById('treatment-collab');
 const treatmentRedflags = document.getElementById('treatment-redflags');
 const treatmentQuestionInput = document.getElementById('treatment-question-input');
 const treatmentCoachAnswer = document.getElementById('treatment-coach-answer');
+const wietzeTrainLayer = document.getElementById('wietze-train-layer');
 
 let recognition = null;
 let recording = false;
@@ -224,6 +225,7 @@ function syncTreatmentRouteWithCase() {
 function renderTreatment() {
   const route = state.treatmentRoute;
   const coach = data.caseTreatment[state.case.id];
+  renderWietzeTrainLayer();
   treatmentRouteSelect.value = route.id;
   treatmentRouteDetail.innerHTML = `
     <article class="ten-treatment-route">
@@ -328,6 +330,91 @@ function renderTreatment() {
   `;
 
   treatmentRedflags.innerHTML = data.treatmentMachine.redFlags.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+}
+
+function renderWietzeTrainLayer() {
+  const layer = data.caseTraining?.[state.case.id];
+  if (!layer) {
+    wietzeTrainLayer.innerHTML = `
+      <article class="ten-card">
+        <p class="ten-card__label">Casusroute</p>
+        <h3 id="wietze-layer-title">Kies Wietze voor de volledige trainlaag</h3>
+        <p>Deze extra laag is nu specifiek gebouwd voor Wietze: eerst casus lezen, dan diagnostiek, daarna behandeling.</p>
+      </article>
+    `;
+    return;
+  }
+
+  wietzeTrainLayer.innerHTML = `
+    <article class="ten-card ten-wietze-hero">
+      <p class="ten-card__label">Casus Wietze trainlaag</p>
+      <h3 id="wietze-layer-title">${escapeHtml(layer.title)}</h3>
+      <p>${escapeHtml(layer.intro)}</p>
+    </article>
+    <div class="ten-wietze-grid">
+      ${layer.lenses.map(item => wietzeLensCard(item)).join('')}
+    </div>
+    <details class="ten-coach-accordion" open>
+      <summary>1. Diagnostisch door Wietze heen</summary>
+      <div class="ten-wietze-grid">
+        ${layer.diagnostics.map(item => wietzeStepCard(item)).join('')}
+      </div>
+    </details>
+    <details class="ten-coach-accordion" open>
+      <summary>2. Behandeling opbouwen vanuit de casus</summary>
+      <div class="ten-wietze-grid">
+        ${layer.treatment.map(item => wietzeStepCard(item)).join('')}
+      </div>
+    </details>
+    <details class="ten-coach-accordion">
+      <summary>3. Mondelinge microdrills: eerst zelf, dan pas voorbeeld</summary>
+      <div class="ten-wietze-grid">
+        ${layer.drills.map(item => wietzeDrillCard(item)).join('')}
+      </div>
+    </details>
+  `;
+}
+
+function wietzeLensCard(item) {
+  return `
+    <article class="ten-card ten-wietze-card">
+      <span>${escapeHtml(item.source)}</span>
+      <h4>${escapeHtml(item.title)}</h4>
+      <p>${escapeHtml(item.core)}</p>
+      <strong>Wat doe je ermee?</strong>
+      <p>${escapeHtml(item.action)}</p>
+    </article>
+  `;
+}
+
+function wietzeStepCard(item) {
+  return `
+    <article class="ten-card ten-wietze-card">
+      <span>${escapeHtml(item.anchor)}</span>
+      <h4>${escapeHtml(item.title)}</h4>
+      <p>${escapeHtml(item.task)}</p>
+      <strong>Toetszin</strong>
+      <p>${escapeHtml(item.line)}</p>
+      <details class="ten-inline-details">
+        <summary>Waar let de docent op?</summary>
+        <p>${escapeHtml(item.check)}</p>
+      </details>
+    </article>
+  `;
+}
+
+function wietzeDrillCard(item) {
+  return `
+    <article class="ten-card ten-wietze-card">
+      <span>${escapeHtml(item.mode)}</span>
+      <h4>${escapeHtml(item.question)}</h4>
+      <p>${escapeHtml(item.assignment)}</p>
+      <details class="ten-inline-details">
+        <summary>Bekijk ZG-richting</summary>
+        <p>${escapeHtml(item.answer)}</p>
+      </details>
+    </article>
+  `;
 }
 
 function treatmentFact(label, text) {

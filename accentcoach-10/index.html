@@ -8,7 +8,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Accentcoach 10 &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=23" />
+  <link rel="stylesheet" href="/assets/site.css?v=24" />
 </head>
 <body>
   <div class="version-stamp">v15 &middot; Accentcoach</div>
@@ -166,7 +166,10 @@
             <p id="simulation-transcript">Nog niets ingesproken. Spreek alsof Bernard tegenover je staat.</p>
           </div>
         </div>
-        <textarea id="simulation-answer" class="accent-answer accent-answer--fallback" rows="5" placeholder="Typ hier alleen als spraakherkenning niet werkt."></textarea>
+        <details class="accent-typing-fallback">
+          <summary>Ik kan nu niet hardop spreken, typ de tekst</summary>
+          <textarea id="simulation-answer" class="accent-answer accent-answer--fallback" rows="3" placeholder="Typ kort wat je tegen Bernard zegt en doet."></textarea>
+        </details>
         <div class="accent-actions accent-actions--simple">
           <button class="btn btn--primary" type="button" id="check-simulation">Feedback vragen</button>
           <button class="btn btn--ghost" type="button" id="clear-simulation">Opnieuw inspreken</button>

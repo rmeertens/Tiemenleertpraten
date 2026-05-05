@@ -395,6 +395,157 @@ window.PAK_DE_10_DATA = {
       ['Wanneer zet je ondersteunde communicatie in?', 'Als spreken nog onvoldoende functioneel is en het kind toch communicatief moet kunnen participeren.', 'Criterium 11/16']
     ]
   },
+  caseTraining: {
+    wietze: {
+      title: 'Eerst Wietze snappen, dan pas scoren',
+      intro: 'Deze laag trekt de les- en flitskennis door één casus heen. De volgorde is bewust: signalen herkennen, diagnostisch ordenen, ICF-brug maken en daarna pas behandelkeuzes verdedigen.',
+      lenses: [
+        {
+          source: 'Flitscollege spraak/fonologie',
+          title: 'Niet elke uitspraakfout is hetzelfde probleem',
+          core: 'Bij Wietze zie je fonologische processen, maar ook wisselende fouten en zoekgedrag. Dat maakt VOD/planning belangrijk in je redenering.',
+          action: 'Zeg nooit alleen “fonologisch probleem”. Benoem eerst het verschil tussen klanksysteem en spraakmotorische planning.'
+        },
+        {
+          source: 'Lesstof Levelt',
+          title: 'Lokaliseer waar het misgaat',
+          core: 'Wietze kan vastlopen in formuleren van taal én in uitvoeren/programmeren van spraak. Dat betekent dat één methode niet alles oplost.',
+          action: 'Gebruik Levelt als denkroute: idee/boodschap, taalvorm, klankkeuze en motorische uitvoering apart wegen.'
+        },
+        {
+          source: 'Taalvorm / morfosyntaxis',
+          title: 'Zinsbouw is behandelbaar, maar klein',
+          core: 'Zijn zinnen en morfologie zijn zwak. Door TIQ 62 moet je één concrete structuur tegelijk behandelen, met visuele steun.',
+          action: 'Formuleer geen vaag doel zoals “langere zinnen”, maar kies één observeerbare structuur, bijvoorbeeld SVO.'
+        },
+        {
+          source: 'TOS / informatieverwerking',
+          title: 'Beperkte verwerking bepaalt je tempo',
+          core: 'Wietze heeft minder ruimte voor lange uitleg, meerdere doelen tegelijk en abstracte reflectie. Overvraging maakt therapie minder effectief.',
+          action: 'Onderbouw korte instructies, veel herhaling, visuele cues en kleine stappen vanuit informatieverwerking en leerbaarheid.'
+        },
+        {
+          source: 'ICF en participatie',
+          title: 'Het eindpunt is meedoen in de klas',
+          core: 'De kern is niet een losse klank netjes maken, maar verstaanbaar en veilig kunnen deelnemen aan dagelijkse klassituaties.',
+          action: 'Elke diagnostische en behandelzin eindigt bij activiteit/participatie: wat kan Wietze daardoor beter doen?'
+        }
+      ],
+      diagnostics: [
+        {
+          anchor: 'Stap 1 · kernprobleem',
+          title: 'Maak één klinische kernzin',
+          task: 'Vat Wietze samen zonder lijstjesdrang: leeftijd, cognitie, spraak, taal en participatie in één redenering.',
+          line: 'Wietze is 7;0 jaar met lage cognitieve belastbaarheid, zwakke verstaanbaarheid, VOD-kenmerken en zwakke morfosyntaxis, waardoor hij in de klas communicatief vastloopt.',
+          check: 'De docent wil horen dat je spraak, taal, cognitie en participatie verbindt. Alleen symptomen opsommen is te vlak.'
+        },
+        {
+          anchor: 'Stap 2 · differentiaal',
+          title: 'VOD, fonologie en taal apart wegen',
+          task: 'Leg uit waarom Wietze niet puur fonologisch benaderd mag worden.',
+          line: 'De fonologische processen verklaren een deel van de onverstaanbaarheid, maar wisselende fouten en zoekgedrag maken spraakmotorische planning/VOD een noodzakelijke differentiaal.',
+          check: 'Noem contrast/stimulabiliteit waar passend, maar zeg ook waarom alleen minimale paren te smal kan zijn.'
+        },
+        {
+          anchor: 'Stap 3 · testleer',
+          title: 'Interpreteer scores voorzichtig',
+          task: 'Gebruik scores als bewijs, maar koppel ze aan observatie en dagelijks functioneren.',
+          line: 'Door zijn TIQ 62 interpreteer ik taal- en spraakscores in samenhang met belastbaarheid, observatie en schoolfunctioneren; ik trek geen conclusie uit één score alleen.',
+          check: 'Dit voorkomt dat je te hard diagnosticeert of zijn leerbaarheid overschat.'
+        },
+        {
+          anchor: 'Stap 4 · MDO',
+          title: 'Vraag precies wat je nog mist',
+          task: 'Bedenk welke informatie van school, ouders en andere disciplines je behandelplan verandert.',
+          line: 'In het MDO wil ik weten welke klassituaties communicatief mislukken, welke visuele steun al werkt en of er bredere motorische/planningsproblemen zichtbaar zijn.',
+          check: 'Een sterke MDO-vraag is niet algemeen, maar verandert je doel, methode of vorm.'
+        },
+        {
+          anchor: 'Stap 5 · ICF',
+          title: 'Maak de brug naar functioneren',
+          task: 'Vertaal functiestoornissen naar activiteit en participatie.',
+          line: 'Op functieniveau zie ik spraakplanning, fonologie en morfosyntaxis; op activiteitenniveau moeite met verstaanbare uitingen; op participatieniveau terugtrekken in de klas.',
+          check: 'ICF is hier geen invultabel, maar de reden waarom behandeling naar schooltransfer moet.'
+        }
+      ],
+      treatment: [
+        {
+          anchor: 'Stap 1 · prioriteit',
+          title: 'Kies functionele communicatie als hoofddoel',
+          task: 'Begin behandeling niet bij de mooiste klank, maar bij de grootste participatiewinst.',
+          line: 'Mijn behandelprioriteit is functionele verstaanbaarheid en communicatieve veiligheid in de klas; spraak- en taaldoelen zijn bouwstenen daarvoor.',
+          check: 'Dit voorkomt losse functietraining zonder transfer.'
+        },
+        {
+          anchor: 'Stap 2 · LT-doel',
+          title: 'Formuleer LT op participatie',
+          task: 'Maak een doel dat gaat over meedoen, niet over een losse klank.',
+          line: 'Binnen 6 maanden neemt Wietze met visuele steun actief deel aan dagelijkse klassituaties en gebruikt hij een herstelstrategie wanneer hij niet begrepen wordt.',
+          check: 'Goed LT-doel: wie, gedrag, context, steun, termijn en participatiewinst.'
+        },
+        {
+          anchor: 'Stap 3 · KT-doelen',
+          title: 'Maak kleine bouwstenen',
+          task: 'Koppel spraakmotoriek, fonologie en morfosyntaxis aan haalbare microdoelen.',
+          line: 'KT spraak: functionele CVC-woorden met cueing; KT taal: één SVO-structuur met visuele zinssteun; KT participatie: hulp vragen met pictogram of vaste zin.',
+          check: 'Door zijn beperkte verwerking kies je één focus per oefening en bouw je cues pas af bij succes.'
+        },
+        {
+          anchor: 'Stap 4 · methode',
+          title: 'Combineer methode, maar doseer scherp',
+          task: 'Verdedig waarom motorisch-planningsgericht werken de basis is en taalsteun parallel nodig blijft.',
+          line: 'Ik kies motorisch-planningsgericht oefenen met veel herhaling en multisensorische cues, aangevuld met concrete fonologische contrasten en scaffolding voor één zinsstructuur.',
+          check: 'Zeg ook wat je níet doet: geen abstracte Metaphon-uitleg zonder aanpassing, geen alle-klanken-tegelijk aanpak.'
+        },
+        {
+          anchor: 'Stap 5 · vorm en transfer',
+          title: 'Maak school onderdeel van therapie',
+          task: 'Leg vast wie buiten de logopediekamer hetzelfde doel ondersteunt.',
+          line: 'Ik combineer individuele korte sessies met leerkracht- en oudercoaching, zodat dezelfde woorden, zinssteun en herstelstrategie terugkomen in klas en thuis.',
+          check: 'Transfer is bij Wietze geen bonus maar behandelvoorwaarde.'
+        },
+        {
+          anchor: 'Stap 6 · prognose',
+          title: 'Wees hoopvol én eerlijk',
+          task: 'Formuleer geen wonderprognose; koppel verwachting aan leerbaarheid, TIQ en intensiteit.',
+          line: 'De prognose is voorzichtig maar functioneel positief: ik verwacht geen snelle normalisatie, wel groei in verstaanbaarheid, korte uitingen en klasparticipatie bij intensieve, visueel ondersteunde behandeling.',
+          check: 'Een ZG-prognose noemt gunstige en belemmerende factoren.'
+        }
+      ],
+      drills: [
+        {
+          mode: 'Mondeling 30 sec',
+          question: 'Waarom is Wietze geen puur fonologisch behandelkind?',
+          assignment: 'Zeg eerst je eigen antwoord. Gebruik verplicht: wisselende fouten, zoekgedrag, planning, contrast.',
+          answer: 'Omdat de fonologische processen maar een deel verklaren. Wisselende substituties en zoekgedrag wijzen op spraakmotorische planning/VOD, waardoor alleen contrasttherapie zoals minimale paren te smal is.'
+        },
+        {
+          mode: 'Diagnostiek',
+          question: 'Welke MDO-vraag stel je als eerste?',
+          assignment: 'Maak één vraag aan school of ouders die je behandelplan concreet verandert.',
+          answer: 'Ik vraag school in welke klassituaties Wietze communicatief vastloopt en welke visuele steun helpt, omdat dit bepaalt welke participatiedoelen en transferafspraken nodig zijn.'
+        },
+        {
+          mode: 'ICF',
+          question: 'Maak de ICF-brug in één adem.',
+          assignment: 'Zeg functie, activiteit, participatie en omgeving zonder uit te waaieren.',
+          answer: 'Functie: spraakplanning, fonologie en morfosyntaxis zijn kwetsbaar. Activiteit: Wietze formuleert en spreekt moeilijk verstaanbaar. Participatie: hij trekt zich terug in de klas. Omgeving: leerkracht en ouders moeten visuele steun en herstelstrategie borgen.'
+        },
+        {
+          mode: 'Behandeling',
+          question: 'Verdedig je methodekeuze.',
+          assignment: 'Noem methode, waarom passend, en waarom een andere route minder logisch is.',
+          answer: 'Ik kies motorisch-planningsgericht oefenen met veel herhaling en cues, omdat VOD-kenmerken de uitvoering beperken. Alleen minimale paren is onvoldoende, omdat dat vooral het klanksysteem traint en niet de motorische sequentieplanning.'
+        },
+        {
+          mode: 'Prognose',
+          question: 'Wat is een realistische prognose?',
+          assignment: 'Wees concreet: geen vage “zal verbeteren”, maar functie en participatie.',
+          answer: 'Voorzichtig maar functioneel positief: door TIQ 62 en VOD verwacht ik geen snelle normalisatie, maar wel betere verstaanbaarheid, korte functionele uitingen en meer deelname in de klas als behandeling intensief en contextgeborgd is.'
+        }
+      ]
+    }
+  },
   caseTreatment: {
     wietze: {
       route: 'vod',

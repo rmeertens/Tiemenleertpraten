@@ -617,6 +617,7 @@ function toggleRecording() {
   if (!SpeechRecognition) {
     speechNote.textContent = 'Spraakherkenning werkt niet in deze browser. Typ hieronder je therapeuttekst of gebruik Chrome/Edge.';
     simulationAnswer.classList.add('is-visible');
+    simulationAnswer.closest('.accent-typing-fallback').open = true;
     simulationAnswer.focus();
     return;
   }
@@ -657,6 +658,7 @@ function resetSimulationAttempt() {
   if (recording && recognition) recognition.stop();
   simulationAnswer.value = '';
   simulationAnswer.classList.remove('is-visible');
+  simulationAnswer.closest('.accent-typing-fallback').open = false;
   simulationTranscript.textContent = 'Nog niets ingesproken. Spreek alsof Bernard tegenover je staat.';
   speechNote.textContent = 'Nieuwe poging. Spreek eerst in, vraag daarna feedback.';
   simulationFeedback.innerHTML = '<p class="accent-note">Nog geen simulatie nagekeken.</p>';
