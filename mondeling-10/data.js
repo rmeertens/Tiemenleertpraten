@@ -1,6 +1,18 @@
 'use strict';
 
 window.ORAL_10_DATA = {
+  scoreScale: [
+    [0, 'O', 'onvoldoende'],
+    [1, 'BV', 'bijna voldoende'],
+    [2, 'V', 'voldoende'],
+    [3, 'G', 'goed'],
+    [4, 'ZG', 'zeer goed']
+  ],
+  criticalCriteria: {
+    diagnostics: [10],
+    therapy: [15, 17]
+  },
+  criticalNote: 'Voor een voldoende moet ieder onderdeel minimaal 20 punten hebben én de kritische criteria 10, 15 en 17 moeten minimaal V (2/4) zijn.',
   diagnostics: {
     label: 'Diagnostiek',
     pass: 20,
