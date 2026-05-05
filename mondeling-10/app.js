@@ -573,6 +573,10 @@ function toggleRecording(target) {
       oralAnswer.value = transcript;
     };
     recognition.onend = () => { recording = false; };
+    recognition.onerror = event => {
+      recording = false;
+      oralNote.textContent = recognitionErrorMessage(event.error, 'Neem op');
+    };
   }
   if (recording) {
     recognition.stop();
@@ -581,7 +585,23 @@ function toggleRecording(target) {
   recording = true;
   showView('simulation');
   oralNote.textContent = target === 'main' ? 'Opname loopt.' : 'Opname loopt. Je antwoord komt in de simulatiebox.';
-  recognition.start();
+  try {
+    recognition.start();
+  } catch {
+    recording = false;
+    oralNote.textContent = 'De opname kon niet starten. Klik nog één keer op Neem op of typ je antwoord.';
+  }
+}
+
+function recognitionErrorMessage(error, actionLabel = 'Neem op') {
+  const messages = {
+    'not-allowed': 'Microfoon niet toegestaan. Geef microfoontoegang in de browser of typ je antwoord.',
+    'audio-capture': 'Geen microfoon gevonden. Controleer je microfoon of typ je antwoord.',
+    network: 'Spraakherkenning krijgt geen verbinding. Typ je antwoord of probeer Chrome/Edge.',
+    'no-speech': `Ik hoorde geen spraak. Klik opnieuw op ${actionLabel} en spreek iets dichter bij de microfoon.`,
+    aborted: 'Opname gestopt.'
+  };
+  return messages[error] || 'Opname werkt hier niet goed. Typ je antwoord of probeer Chrome/Edge.';
 }
 
 function saveScores() {

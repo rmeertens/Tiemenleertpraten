@@ -173,6 +173,7 @@ function checkRubric(text, rubric) {
 
 let recognition = null;
 let isRecording = false;
+let recognitionHadError = false;
 
 function setupSpeech() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -209,10 +210,9 @@ function setupSpeech() {
   };
 
   recognition.onerror = (e) => {
-    setRecording(false);
-    if (e.error !== 'no-speech' && e.error !== 'aborted') {
-      setMicLabel('Fout: ' + e.error + '. Typ je antwoord.');
-    }
+    recognitionHadError = true;
+    setRecording(false, true);
+    setMicLabel(recognitionErrorMessage(e.error));
   };
 }
 
@@ -226,20 +226,36 @@ function toggleRecording() {
   document.getElementById('rc-results').hidden = true;
   updateCheckBtn();
   try {
+    recognitionHadError = false;
     recognition.start();
     setRecording(true);
   } catch {
-    // recognition already started in another tab
+    setRecording(false);
+    setMicLabel('De opname kon niet starten. Druk nog één keer op de microfoon of typ je antwoord.');
   }
 }
 
-function setRecording(active) {
+function recognitionErrorMessage(error) {
+  const messages = {
+    'not-allowed': 'Microfoon niet toegestaan. Geef toegang of typ je antwoord.',
+    'audio-capture': 'Geen microfoon gevonden. Controleer je microfoon of typ je antwoord.',
+    network: 'Spraakherkenning krijgt geen verbinding. Typ je antwoord of probeer Chrome/Edge.',
+    'no-speech': 'Ik hoorde geen spraak. Druk opnieuw en spreek iets dichter bij de microfoon.',
+    aborted: 'Opname gestopt. Druk opnieuw om te spreken.'
+  };
+  return messages[error] || 'Opname werkt hier niet goed. Typ je antwoord of probeer Chrome/Edge.';
+}
+
+function setRecording(active, keepError = false) {
   isRecording = active;
   const btn = document.getElementById('rc-mic');
   btn.classList.toggle('rc-mic-btn--recording', active);
   btn.setAttribute('aria-label', active ? 'Stop opname' : 'Start opname');
   btn.setAttribute('title', active ? 'Stop' : 'Start spreken');
-  setMicLabel(active ? 'Luistert… druk opnieuw om te stoppen' : 'Druk om te spreken');
+  if (!recognitionHadError) {
+    setMicLabel(active ? 'Luistert… druk opnieuw om te stoppen' : 'Druk om te spreken');
+  }
+  if (!active && !keepError) recognitionHadError = false;
 }
 
 function setMicLabel(text) {

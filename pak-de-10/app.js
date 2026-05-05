@@ -644,6 +644,11 @@ function toggleTreatmentQuestionRecording() {
       button.textContent = 'Spreek in';
       if (treatmentQuestionInput.value.trim()) answerTreatmentQuestion();
     };
+    treatmentRecognition.onerror = event => {
+      treatmentRecording = false;
+      button.textContent = 'Spreek in';
+      treatmentCoachAnswer.innerHTML = `<p>${recognitionErrorMessage(event.error, 'Spreek in')}</p>`;
+    };
   }
 
   if (treatmentRecording) {
@@ -654,7 +659,13 @@ function toggleTreatmentQuestionRecording() {
   treatmentRecording = true;
   button.textContent = 'Stop';
   treatmentCoachAnswer.innerHTML = '<p>Ik luister. Stel je vraag kort, bijvoorbeeld: “hoe formuleer ik een KT-doel?”</p>';
-  treatmentRecognition.start();
+  try {
+    treatmentRecognition.start();
+  } catch {
+    treatmentRecording = false;
+    button.textContent = 'Spreek in';
+    treatmentCoachAnswer.innerHTML = '<p>De opname kon niet starten. Klik nog één keer op Spreek in of typ je vraag.</p>';
+  }
 }
 
 function checkAnswer() {
@@ -846,6 +857,11 @@ function toggleRecording() {
       recording = false;
       document.getElementById('record-answer').textContent = 'Neem op';
     };
+    recognition.onerror = event => {
+      recording = false;
+      document.getElementById('record-answer').textContent = 'Neem op';
+      speechNote.textContent = recognitionErrorMessage(event.error, 'Neem op');
+    };
   }
 
   if (recording) {
@@ -856,7 +872,24 @@ function toggleRecording() {
   recording = true;
   document.getElementById('record-answer').textContent = 'Stop';
   speechNote.textContent = 'Opname loopt. Leg het uit alsof je in het MDO zit.';
-  recognition.start();
+  try {
+    recognition.start();
+  } catch {
+    recording = false;
+    document.getElementById('record-answer').textContent = 'Neem op';
+    speechNote.textContent = 'De opname kon niet starten. Klik nog één keer op Neem op of typ je antwoord.';
+  }
+}
+
+function recognitionErrorMessage(error, actionLabel = 'Neem op') {
+  const messages = {
+    'not-allowed': 'Microfoon niet toegestaan. Geef microfoontoegang in de browser of typ je antwoord.',
+    'audio-capture': 'Geen microfoon gevonden. Controleer je microfoon of typ je antwoord.',
+    network: 'Spraakherkenning krijgt geen verbinding. Typ je antwoord of probeer Chrome/Edge.',
+    'no-speech': `Ik hoorde geen spraak. Klik opnieuw op ${actionLabel} en spreek iets dichter bij de microfoon.`,
+    aborted: 'Opname gestopt.'
+  };
+  return messages[error] || 'Opname werkt hier niet goed. Typ je antwoord of probeer Chrome/Edge.';
 }
 
 function showPanel(name) {

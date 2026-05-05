@@ -120,6 +120,11 @@ function toggleWriterSpeech() {
       writerRecording = false;
       button.textContent = 'Dicteer in actief vak';
     };
+    writerRecognition.onerror = event => {
+      writerRecording = false;
+      button.textContent = 'Dicteer in actief vak';
+      writerNote.textContent = recognitionErrorMessage(event.error, 'Dicteer in actief vak');
+    };
   }
 
   if (writerRecording) {
@@ -130,5 +135,22 @@ function toggleWriterSpeech() {
   writerRecording = true;
   button.textContent = 'Stop dicteren';
   writerNote.textContent = 'Dicteren loopt. Je tekst komt in het tekstvak waar je het laatst in klikte.';
-  writerRecognition.start();
+  try {
+    writerRecognition.start();
+  } catch {
+    writerRecording = false;
+    button.textContent = 'Dicteer in actief vak';
+    writerNote.textContent = 'De opname kon niet starten. Klik nog één keer op dicteren of typ je tekst.';
+  }
+}
+
+function recognitionErrorMessage(error, actionLabel = 'Dicteer in actief vak') {
+  const messages = {
+    'not-allowed': 'Microfoon niet toegestaan. Geef microfoontoegang in de browser of typ je tekst.',
+    'audio-capture': 'Geen microfoon gevonden. Controleer je microfoon of typ je tekst.',
+    network: 'Spraakherkenning krijgt geen verbinding. Typ je tekst of probeer Chrome/Edge.',
+    'no-speech': `Ik hoorde geen spraak. Klik opnieuw op ${actionLabel} en spreek iets dichter bij de microfoon.`,
+    aborted: 'Opname gestopt.'
+  };
+  return messages[error] || 'Opname werkt hier niet goed. Typ je tekst of probeer Chrome/Edge.';
 }

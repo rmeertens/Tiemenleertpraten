@@ -385,6 +385,11 @@ function toggleMicroRecording() {
       button.textContent = 'Spreek in';
       if (microInput.value.trim()) checkMicroAnswer();
     };
+    microRecognition.onerror = event => {
+      microRecording = false;
+      button.textContent = 'Spreek in';
+      microNote.textContent = recognitionErrorMessage(event.error, 'Spreek in');
+    };
   }
 
   if (microRecording) {
@@ -396,7 +401,13 @@ function toggleMicroRecording() {
   microRecording = true;
   button.textContent = 'Stop';
   microNote.textContent = 'Ik luister. Leg het uit alsof je docent tegenover je zit.';
-  microRecognition.start();
+  try {
+    microRecognition.start();
+  } catch {
+    microRecording = false;
+    button.textContent = 'Spreek in';
+    microNote.textContent = 'De opname kon niet starten. Klik nog één keer op Spreek in of typ je uitleg.';
+  }
 }
 
 function explainTerm(term) {
@@ -569,6 +580,11 @@ function toggleAnswerRecording() {
       answerRecording = false;
       button.textContent = 'Neem op';
     };
+    answerRecognition.onerror = event => {
+      answerRecording = false;
+      button.textContent = 'Neem op';
+      speechNote.textContent = recognitionErrorMessage(event.error, 'Neem op');
+    };
   }
 
   if (answerRecording) {
@@ -579,7 +595,13 @@ function toggleAnswerRecording() {
   answerRecording = true;
   button.textContent = 'Stop';
   speechNote.textContent = 'Opname loopt. Geef je antwoord alsof je in de toets zit.';
-  answerRecognition.start();
+  try {
+    answerRecognition.start();
+  } catch {
+    answerRecording = false;
+    button.textContent = 'Neem op';
+    speechNote.textContent = 'De opname kon niet starten. Klik nog één keer op Neem op of typ je antwoord.';
+  }
 }
 
 function toggleQuestionRecording() {
@@ -603,6 +625,11 @@ function toggleQuestionRecording() {
       button.textContent = 'Spreek in';
       if (coachInput.value.trim()) answerCoachQuestion();
     };
+    questionRecognition.onerror = event => {
+      questionRecording = false;
+      button.textContent = 'Spreek in';
+      coachAnswer.innerHTML = `<p>${recognitionErrorMessage(event.error, 'Spreek in')}</p>`;
+    };
   }
 
   if (questionRecording) {
@@ -613,7 +640,24 @@ function toggleQuestionRecording() {
   questionRecording = true;
   button.textContent = 'Stop';
   coachAnswer.innerHTML = '<p>Ik luister. Stel je vraag kort.</p>';
-  questionRecognition.start();
+  try {
+    questionRecognition.start();
+  } catch {
+    questionRecording = false;
+    button.textContent = 'Spreek in';
+    coachAnswer.innerHTML = '<p>De opname kon niet starten. Klik nog één keer op Spreek in of typ je vraag.</p>';
+  }
+}
+
+function recognitionErrorMessage(error, actionLabel = 'Neem op') {
+  const messages = {
+    'not-allowed': 'Microfoon niet toegestaan. Geef microfoontoegang in de browser of typ je antwoord.',
+    'audio-capture': 'Geen microfoon gevonden. Controleer je microfoon of typ je antwoord.',
+    network: 'Spraakherkenning krijgt geen verbinding. Typ je antwoord of probeer Chrome/Edge.',
+    'no-speech': `Ik hoorde geen spraak. Klik opnieuw op ${actionLabel} en spreek iets dichter bij de microfoon.`,
+    aborted: 'Opname gestopt.'
+  };
+  return messages[error] || 'Opname werkt hier niet goed. Typ je antwoord of probeer Chrome/Edge.';
 }
 
 function currentLesson() {

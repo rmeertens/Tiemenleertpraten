@@ -61,6 +61,7 @@ const forbiddenCues = [
 let current = 0;
 let recognition = null;
 let isRecording = false;
+let recognitionHadError = false;
 
 const ageCases = [
   { birth: "2019-11-18", test: "2025-03-07" },
@@ -313,6 +314,7 @@ function setupSpeechRecognition() {
   recognition.continuous = false;
 
   recognition.onstart = () => {
+    recognitionHadError = false;
     isRecording = true;
     recordBtn.classList.add("is-recording");
     recordState.textContent = "Ik luister. Spreek je aanbieding rustig in.";
@@ -325,13 +327,20 @@ function setupSpeechRecognition() {
     transcript.value = text;
   };
 
-  recognition.onerror = () => {
-    recordState.textContent = "Opname lukte niet. Typ je antwoord of probeer opnieuw.";
+  recognition.onerror = (event) => {
+    recognitionHadError = true;
+    isRecording = false;
+    recordBtn.classList.remove("is-recording");
+    recordState.textContent = recognitionErrorMessage(event.error);
   };
 
   recognition.onend = () => {
     isRecording = false;
     recordBtn.classList.remove("is-recording");
+    if (recognitionHadError) {
+      recognitionHadError = false;
+      return;
+    }
     recordState.textContent = "Klaar. Controleer de transcriptie en vraag feedback.";
   };
 }
@@ -341,9 +350,27 @@ recordBtn.addEventListener("click", () => {
   if (isRecording) {
     recognition.stop();
   } else {
-    recognition.start();
+    try {
+      recognitionHadError = false;
+      recognition.start();
+    } catch {
+      isRecording = false;
+      recordBtn.classList.remove("is-recording");
+      recordState.textContent = "De opname kon niet starten. Klik nog één keer of typ je antwoord.";
+    }
   }
 });
+
+function recognitionErrorMessage(error) {
+  const messages = {
+    "not-allowed": "Microfoon niet toegestaan. Geef microfoontoegang in de browser of typ je antwoord.",
+    "audio-capture": "Geen microfoon gevonden. Controleer je microfoon of typ je antwoord.",
+    network: "Spraakherkenning krijgt geen verbinding. Typ je antwoord of probeer Chrome/Edge.",
+    "no-speech": "Ik hoorde geen spraak. Klik opnieuw en spreek iets dichter bij de microfoon.",
+    aborted: "Opname gestopt."
+  };
+  return messages[error] || "Opname werkt hier niet goed. Typ je antwoord of probeer Chrome/Edge.";
+}
 
 scenario.addEventListener("change", (event) => {
   current = Number(event.target.value);

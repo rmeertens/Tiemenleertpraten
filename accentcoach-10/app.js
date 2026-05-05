@@ -577,6 +577,11 @@ function toggleCoachQuestionRecording() {
       button.textContent = 'Spreek in';
       if (accentCoachInput.value.trim()) answerAccentCoachQuestion();
     };
+    coachRecognition.onerror = event => {
+      coachRecording = false;
+      button.textContent = 'Spreek in';
+      accentCoachAnswer.innerHTML = `<p>${recognitionErrorMessage(event.error, 'Spreek in')}</p>`;
+    };
   }
 
   if (coachRecording) {
@@ -588,7 +593,13 @@ function toggleCoachQuestionRecording() {
   coachRecording = true;
   button.textContent = 'Stop';
   accentCoachAnswer.innerHTML = '<p>Ik luister. Stel je vraag kort, bijvoorbeeld: “wat doe ik bij harde offset?”</p>';
-  coachRecognition.start();
+  try {
+    coachRecognition.start();
+  } catch {
+    coachRecording = false;
+    button.textContent = 'Spreek in';
+    accentCoachAnswer.innerHTML = '<p>De opname kon niet starten. Klik nog één keer op Spreek in of typ je vraag.</p>';
+  }
 }
 
 function renderEvidence() {
@@ -657,12 +668,12 @@ function toggleRecording() {
   }
 }
 
-function recognitionErrorMessage(error) {
+function recognitionErrorMessage(error, actionLabel = 'Neem op') {
   const messages = {
     'not-allowed': 'Microfoon niet toegestaan. Geef microfoontoegang in de browser of typ je antwoord.',
     'audio-capture': 'Geen microfoon gevonden. Controleer je microfoon of typ je antwoord.',
     network: 'Spraakherkenning krijgt geen verbinding. Typ je antwoord of probeer Chrome/Edge.',
-    'no-speech': 'Ik hoorde geen spraak. Klik opnieuw op Neem op en spreek iets dichter bij de microfoon.',
+    'no-speech': `Ik hoorde geen spraak. Klik opnieuw op ${actionLabel} en spreek iets dichter bij de microfoon.`,
     aborted: 'Opname gestopt.'
   };
   return messages[error] || 'Opname werkt hier niet goed. Typ je antwoord of probeer Chrome/Edge.';

@@ -414,6 +414,11 @@ function toggleRecording(type) {
       config.button.textContent = type === 'question' ? 'Spreek in' : 'Spreek in';
       if (config.input.value.trim()) config.onEnd();
     };
+    config.recognition.onerror = event => {
+      config.recording = false;
+      config.button.textContent = 'Spreek in';
+      setRecordingNote(type, config.note, recognitionErrorMessage(event.error, 'Spreek in'));
+    };
   }
 
   if (config.recording) {
@@ -427,7 +432,32 @@ function toggleRecording(type) {
   if (type === 'question') config.note.innerHTML = '<p>Ik luister. Kort is krachtig, dramatisch mag thuis blijven.</p>';
   if (type === 'hex') config.note.textContent = 'Ik luister. Beschrijf één concreet moment.';
   if (type === 'drill') config.note.textContent = 'Ik luister. Vertel wat je deed en merkte.';
-  config.recognition.start();
+  try {
+    config.recognition.start();
+  } catch {
+    config.recording = false;
+    config.button.textContent = 'Spreek in';
+    setRecordingNote(type, config.note, 'De opname kon niet starten. Klik nog één keer op Spreek in of typ je tekst.');
+  }
+}
+
+function setRecordingNote(type, note, message) {
+  if (type === 'question') {
+    note.innerHTML = `<p>${escapeHtml(message)}</p>`;
+    return;
+  }
+  note.textContent = message;
+}
+
+function recognitionErrorMessage(error, actionLabel = 'Spreek in') {
+  const messages = {
+    'not-allowed': 'Microfoon niet toegestaan. Geef microfoontoegang in de browser of typ je tekst.',
+    'audio-capture': 'Geen microfoon gevonden. Controleer je microfoon of typ je tekst.',
+    network: 'Spraakherkenning krijgt geen verbinding. Typ je tekst of probeer Chrome/Edge.',
+    'no-speech': `Ik hoorde geen spraak. Klik opnieuw op ${actionLabel} en spreek iets dichter bij de microfoon.`,
+    aborted: 'Opname gestopt.'
+  };
+  return messages[error] || 'Opname werkt hier niet goed. Typ je tekst of probeer Chrome/Edge.';
 }
 
 function stopOtherRecordings(activeType) {
