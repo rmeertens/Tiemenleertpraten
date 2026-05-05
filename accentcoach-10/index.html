@@ -156,23 +156,11 @@
         </div>
         <p id="simulation-prompt" class="accent-prompt"></p>
         <div id="simulation-focus" class="accent-micro-list"></div>
-        <div class="accent-speak-panel">
-          <button class="accent-mic-button" type="button" id="record-simulation" aria-label="Spreek je therapeuttekst in">
-            <span aria-hidden="true"></span>
-            <strong>Spreek in</strong>
-          </button>
-          <div class="accent-transcript" aria-live="polite">
-            <p class="accent-label">Transcript</p>
-            <p id="simulation-transcript">Nog niets ingesproken. Spreek alsof Bernard tegenover je staat.</p>
-          </div>
-        </div>
-        <details class="accent-typing-fallback">
-          <summary>Ik kan nu niet hardop spreken, typ de tekst</summary>
-          <textarea id="simulation-answer" class="accent-answer accent-answer--fallback" rows="3" placeholder="Typ kort wat je tegen Bernard zegt en doet."></textarea>
-        </details>
-        <div class="accent-actions accent-actions--simple">
-          <button class="btn btn--primary" type="button" id="check-simulation">Feedback vragen</button>
-          <button class="btn btn--ghost" type="button" id="clear-simulation">Opnieuw inspreken</button>
+        <textarea id="simulation-answer" class="accent-answer" rows="8" placeholder="Schrijf of dicteer precies wat je tegen Bernard zegt en wat je doet."></textarea>
+        <div class="accent-actions">
+          <button class="btn btn--primary" type="button" id="check-simulation">Feedback</button>
+          <button class="btn btn--ghost" type="button" id="record-simulation">Neem op</button>
+          <button class="btn btn--ghost" type="button" id="clear-simulation">Wis</button>
         </div>
         <p class="accent-note" id="speech-note"></p>
       </article>
