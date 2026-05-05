@@ -111,6 +111,7 @@ function renderLesson() {
   document.getElementById('lesson-summary').textContent = lesson.summary;
   document.getElementById('lesson-tags').innerHTML = lesson.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
   document.getElementById('lesson-criteria').textContent = lesson.criteria;
+  document.getElementById('lesson-written-focus').textContent = lesson.writtenFocus;
   document.getElementById('lesson-pitfall').textContent = lesson.pitfall;
   document.getElementById('lesson-zg').textContent = lesson.zg;
   document.getElementById('core-card').textContent = lesson.core;
@@ -132,8 +133,8 @@ function renderMode() {
   const isOral = state.mode === 'oral';
   document.getElementById('mode-prompt').textContent = isOral ? lesson.oralPrompt : lesson.writtenPrompt;
   document.getElementById('model-summary').textContent = isOral
-    ? 'Toon 10-niveau mondeling antwoord'
-    : 'Toon 10-niveau schriftelijk antwoord';
+    ? 'Toon ZG-mondeling antwoord'
+    : 'Toon puntenscorend schriftelijk antwoord';
   document.getElementById('model-answer').textContent = isOral ? lesson.oralModel : lesson.writtenModel;
 }
 
@@ -187,7 +188,7 @@ function renderMastery() {
     trainList.innerHTML = `
       <article class="flits-train-item is-complete">
         <strong>Alles staat groen</strong>
-        <p>Mooi. Train nu de mondelinge en schriftelijke vraag zonder modelantwoord of start slimme drill.</p>
+        <p>Mooi. Train nu apart: mondeling op rubric 0-4 en schriftelijk als punten/casusantwoord. Start daarna slimme drill.</p>
       </article>
     `;
     return;
@@ -281,28 +282,44 @@ function scoreText(text, topics, mode) {
 }
 
 function feedbackHtml(result, mode, lesson) {
-  const title = result.score >= 4 ? '4/4 · toetswaardig' : result.score === 3 ? '3/4 · bijna ZG' : 'Nog aanvullen';
+  const isOral = mode === 'oral';
+  const title = feedbackTitle(result.score, mode);
+  const scoreLabel = isOral ? `${result.score}/4` : `oefencheck ${result.score}/4`;
   const strong = result.hits.length
     ? `Je gebruikt al: ${result.hits.map(topic => explainTopic(topic)).join(' ')}`
     : 'Je antwoord heeft nog te weinig herkenbare vaktaal. Begin met één kernbegrip uit de les.';
   const feedback = buildFeedback(result, mode);
   const pointsLoss = buildPointsLoss(result, mode, lesson);
   const zg = buildZgTip(result, mode, lesson);
-  const upgrade = mode === 'oral'
+  const upgrade = isOral
     ? 'Maak het mondeling sterker met: “Ik zie..., dat betekent..., daarom onderzoek/adviseer ik...”'
     : 'Maak het schriftelijk sterker met: definitie + vergelijking + casustoepassing + conclusie.';
+  const lossLabel = isOral ? 'Criteriumverlies' : 'Puntenverlies';
+  const excellenceLabel = isOral ? 'ZG-signaal' : 'Puntensignaal';
+  const upgradeLabel = isOral ? 'Van G naar ZG' : 'Naar meer punten';
 
   return `
     <div class="flits-feedback-head">
       <h3>${title}</h3>
-      <strong>${result.score}/4</strong>
+      <strong>${scoreLabel}</strong>
     </div>
     ${block('Sterk', strong)}
     ${block('Feedback', result.score >= 4 ? 'Inhoudelijk klaar. Oefen nu korter en zonder lezen.' : feedback)}
-    ${block('Puntenverlies', result.score >= 4 ? 'Geen groot puntenverlies zichtbaar. Let alleen op bondigheid.' : pointsLoss)}
-    ${block('ZG-signaal', result.score >= 4 ? lesson.zg : zg)}
-    ${result.score === 3 ? block('Van 3/4 naar 4/4', upgrade) : ''}
+    ${block(lossLabel, result.score >= 4 ? 'Geen groot verlies zichtbaar. Let alleen op bondigheid.' : pointsLoss)}
+    ${block(excellenceLabel, result.score >= 4 ? lesson.zg : zg)}
+    ${result.score === 3 ? block(upgradeLabel, upgrade) : ''}
   `;
+}
+
+function feedbackTitle(score, mode) {
+  if (mode === 'oral') {
+    const labels = ['0/4 · O', '1/4 · BV', '2/4 · V', '3/4 · G', '4/4 · ZG'];
+    return labels[score] || 'Nog aanvullen';
+  }
+  if (score >= 4) return 'Schriftelijk · volledig casusantwoord';
+  if (score === 3) return 'Schriftelijk · bijna volledig';
+  if (score === 2) return 'Schriftelijk · basis staat';
+  return 'Schriftelijk · nog te weinig punten';
 }
 
 function buildFeedback(result, mode) {
@@ -407,14 +424,24 @@ function checkMicroAnswer() {
 
   microFeedback.innerHTML = `
     <div class="flits-feedback-head">
-      <h3>${score >= 3 ? '3/3 · beheerst' : score === 2 ? '2/3 · bijna' : 'Nog scherper'}</h3>
-      <strong>${score}/3</strong>
+      <h3>${microScoreTitle(score, state.micro.mode)}</h3>
+      <strong>${state.micro.mode === 'schriftelijk' ? `check ${score}/3` : `${score}/3`}</strong>
     </div>
     ${block('Goed', hasTopic ? `Je raakt het onderwerp: ${explainTopic(topic)}` : 'Je probeert het kort te houden. Nu nog het begrip expliciet noemen.')}
     ${score < 3 ? block('Mist nog', missing.join(' · ')) : block('Coach', 'Ik heb dit onderwerp gemarkeerd als beheerst. Herhaal het nu nog één keer zonder te lezen.')}
-    ${score < 3 ? block('Puntenverlies', `Zonder toepassing en vervolgstap blijft dit een losse term. Valkuil bij deze les: ${lesson.pitfall}`) : ''}
-    ${score < 3 ? block('Maak ZG door', `Gebruik: “${topic.title} betekent... In deze casus zie ik... Daarom...”`) : ''}
+    ${score < 3 ? block(state.micro.mode === 'mondeling' ? 'Criteriumverlies' : 'Puntenverlies', `Zonder toepassing en vervolgstap blijft dit een losse term. Valkuil bij deze les: ${lesson.pitfall}`) : ''}
+    ${score < 3 ? block(state.micro.mode === 'schriftelijk' ? 'Maak punten door' : 'Maak ZG door', `Gebruik: “${topic.title} betekent... In deze casus zie ik... Daarom...”`) : ''}
   `;
+}
+
+function microScoreTitle(score, mode) {
+  if (score >= 3) {
+    if (mode === 'mondeling') return '3/3 · mondeling klaar';
+    if (mode === 'schriftelijk') return '3/3 · schriftelijk bruikbaar';
+    return '3/3 · beheerst';
+  }
+  if (score === 2) return mode === 'schriftelijk' ? '2/3 · bijna puntenpakker' : '2/3 · bijna';
+  return mode === 'schriftelijk' ? 'Nog concreter schrijven' : 'Nog scherper';
 }
 
 function startSmartDrill() {
@@ -464,7 +491,7 @@ function renderDrillBox() {
   drillBox.innerHTML = `
     <article class="flits-train-item">
       <strong>${escapeHtml(state.drill.mode)} · ${escapeHtml(state.drill.topicTitle)}</strong>
-      <p>Beantwoord de opengeklapte coachvraag hierboven. De coach let op vaktaal, toepassing en vervolgstap. Bij voldoende feedback telt dit onderwerp mee als beheerst.</p>
+      <p>Beantwoord de opengeklapte coachvraag hierboven. Mondeling telt als rubric-training; schriftelijk telt als punten/casus-training. De coach let op vaktaal, toepassing en vervolgstap.</p>
     </article>
   `;
 }
@@ -531,7 +558,21 @@ function answerCoachQuestion() {
   let body = `Bij ${lesson.title} moet je vooral dit kunnen: ${lesson.core}`;
   let action = `Actie: oefen nu één open onderwerp uit “Nog trainen”.`;
 
-  if (clean.includes('mondeling') || clean.includes('praktijk') || clean.includes('zeg')) {
+  if (clean.includes('punt') || clean.includes('score') || clean.includes('cijfer')) {
+    if (clean.includes('schrift')) {
+      title = 'Schriftelijke puntentelling';
+      body = 'Schriftelijk is 135 punten: 15 stellingen samen 25 punten en 5 open casussen samen 110 punten. Casus 1, 3 en 5 tellen 20 punten; casus 2 en 4 tellen 25 punten.';
+      action = 'Actie: train bij deze les vooral open casusantwoorden: definitie, casusbewijs, conclusie/advies.';
+    } else if (clean.includes('mondeling') || clean.includes('praktijk')) {
+      title = 'Mondelinge puntentelling';
+      body = 'Mondeling werkt met 0 O, 1 BV, 2 V, 3 G en 4 ZG per criterium. Deel 1 en deel 2 hebben elk 10 criteria en minimaal 20 van de 40 punten nodig.';
+      action = 'Actie: score jezelf per criterium en bewaak extra criterium 10, 15 en 17: die moeten minimaal V zijn.';
+    } else {
+      title = 'Kies eerst de toetsvorm';
+      body = 'Gebruik rubric-taal alleen voor mondeling. Gebruik punten/casus-taal voor schriftelijk. Zo houd je voorbereiding en feedback schoon gescheiden.';
+      action = 'Actie: kies bovenaan Mondeling · rubric 0-4 of Schriftelijk · punten/casus en oefen daarna pas.';
+    }
+  } else if (clean.includes('mondeling') || clean.includes('praktijk') || clean.includes('zeg')) {
     title = 'Mondelinge route';
     body = lesson.oralModel;
     action = `Actie: zeg dit in 45 seconden en eindig met: ${lesson.zg}`;
