@@ -1180,6 +1180,104 @@ a { color: inherit; }
   width: 100%;
 }
 
+.accent-answer--fallback {
+  display: none;
+}
+
+.accent-answer--fallback.is-visible {
+  display: block;
+}
+
+.accent-speak-panel {
+  align-items: stretch;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 210px minmax(0, 1fr);
+  margin: 14px 0;
+  padding: 20px;
+}
+
+.accent-mic-button {
+  align-items: center;
+  appearance: none;
+  background: var(--accent);
+  border: 0;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  font-weight: 900;
+  gap: 10px;
+  height: 168px;
+  justify-content: center;
+  justify-self: center;
+  text-align: center;
+  width: 168px;
+}
+
+.accent-mic-button span {
+  background: white;
+  border-radius: 28px 28px 22px 22px;
+  display: block;
+  height: 58px;
+  position: relative;
+  width: 38px;
+}
+
+.accent-mic-button span::before {
+  border: 5px solid white;
+  border-top: 0;
+  border-radius: 0 0 28px 28px;
+  bottom: -18px;
+  content: "";
+  height: 28px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 56px;
+}
+
+.accent-mic-button span::after {
+  background: white;
+  bottom: -30px;
+  content: "";
+  height: 18px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 5px;
+}
+
+.accent-mic-button.is-recording {
+  animation: rc-pulse 1.4s ease-in-out infinite;
+  background: var(--bad);
+}
+
+.accent-transcript {
+  align-content: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  min-height: 168px;
+  padding: 18px;
+}
+
+.accent-transcript p:last-child {
+  color: var(--ink);
+  font-size: 18px;
+  margin: 0;
+}
+
+.accent-actions--simple {
+  justify-content: flex-start;
+}
+
 .accent-feedback:empty {
   display: none;
 }
@@ -2634,6 +2732,7 @@ a { color: inherit; }
 @media (max-width: 900px) {
   .accent-hero,
   .accent-grid,
+  .accent-speak-panel,
   .ten-hero,
   .ten-grid,
   .ten-practice-layout,
@@ -2675,6 +2774,11 @@ a { color: inherit; }
 
   .accent-coach-question {
     grid-template-columns: 1fr;
+  }
+
+  .accent-mic-button {
+    height: 142px;
+    width: 142px;
   }
 
   .ten-writer-tools {

@@ -14,6 +14,7 @@ const criterionSelect = document.getElementById('criterion-select');
 const rhythmSelect = document.getElementById('rhythm-select');
 const simulationSelect = document.getElementById('simulation-select');
 const simulationAnswer = document.getElementById('simulation-answer');
+const simulationTranscript = document.getElementById('simulation-transcript');
 const simulationFeedback = document.getElementById('simulation-feedback');
 const speechNote = document.getElementById('speech-note');
 const accentCoachInput = document.getElementById('accent-coach-input');
@@ -71,10 +72,7 @@ function bindEvents() {
   });
 
   document.getElementById('check-simulation').addEventListener('click', checkSimulation);
-  document.getElementById('clear-simulation').addEventListener('click', () => {
-    simulationAnswer.value = '';
-    speechNote.textContent = '';
-  });
+  document.getElementById('clear-simulation').addEventListener('click', resetSimulationAttempt);
   document.getElementById('record-simulation').addEventListener('click', toggleRecording);
   document.getElementById('ask-accent-coach').addEventListener('click', answerAccentCoachQuestion);
   document.getElementById('record-accent-question').addEventListener('click', toggleCoachQuestionRecording);
@@ -135,6 +133,7 @@ function renderSimulation() {
   const profile = simulationProfile(state.simulation[0]);
   document.getElementById('simulation-focus').innerHTML = profile.focus.map(item => `<span>${escapeHtml(item)}</span>`).join('');
   simulationFeedback.innerHTML = '<p class="accent-note">Nog geen simulatie nagekeken.</p>';
+  resetSimulationAttempt();
 }
 
 function renderHomework() {
@@ -616,7 +615,9 @@ function renderEvidence() {
 function toggleRecording() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    speechNote.textContent = 'Spraakherkenning werkt niet in deze browser. Typ je antwoord of gebruik Chrome/Edge.';
+    speechNote.textContent = 'Spraakherkenning werkt niet in deze browser. Typ hieronder je therapeuttekst of gebruik Chrome/Edge.';
+    simulationAnswer.classList.add('is-visible');
+    simulationAnswer.focus();
     return;
   }
   const button = document.getElementById('record-simulation');
@@ -626,11 +627,17 @@ function toggleRecording() {
     recognition.interimResults = true;
     recognition.continuous = true;
     recognition.onresult = event => {
-      simulationAnswer.value = Array.from(event.results).map(result => result[0].transcript).join(' ');
+      const transcript = Array.from(event.results).map(result => result[0].transcript).join(' ');
+      simulationAnswer.value = transcript;
+      simulationTranscript.textContent = transcript || 'Ik luister...';
     };
     recognition.onend = () => {
       recording = false;
-      button.textContent = 'Neem op';
+      button.classList.remove('is-recording');
+      button.querySelector('strong').textContent = 'Spreek in';
+      if (simulationAnswer.value.trim()) {
+        speechNote.textContent = 'Opname klaar. Vraag feedback of spreek opnieuw in.';
+      }
     };
   }
   if (recording) {
@@ -639,9 +646,20 @@ function toggleRecording() {
   }
   if (coachRecording && coachRecognition) coachRecognition.stop();
   recording = true;
-  button.textContent = 'Stop';
-  speechNote.textContent = 'Opname loopt. Spreek alsof Bernard voor je staat.';
+  button.classList.add('is-recording');
+  button.querySelector('strong').textContent = 'Stop';
+  speechNote.textContent = 'Ik luister. Spreek je volledige therapeutmoment in: wat zeg je tegen Bernard en wat doe je zichtbaar?';
+  simulationTranscript.textContent = 'Ik luister...';
   recognition.start();
+}
+
+function resetSimulationAttempt() {
+  if (recording && recognition) recognition.stop();
+  simulationAnswer.value = '';
+  simulationAnswer.classList.remove('is-visible');
+  simulationTranscript.textContent = 'Nog niets ingesproken. Spreek alsof Bernard tegenover je staat.';
+  speechNote.textContent = 'Nieuwe poging. Spreek eerst in, vraag daarna feedback.';
+  simulationFeedback.innerHTML = '<p class="accent-note">Nog geen simulatie nagekeken.</p>';
 }
 
 function showView(name) {
@@ -680,8 +698,9 @@ function bindRedRetry(container, input, note) {
   const button = container.querySelector('[data-red-retry]');
   if (!button) return;
   button.addEventListener('click', () => {
-    input.focus();
-    note.textContent = 'Nieuwe poging: voeg alleen de rode punten toe.';
+    resetSimulationAttempt();
+    note.textContent = 'Nieuwe poging: spreek opnieuw in en voeg alleen de rode punten toe.';
+    document.getElementById('record-simulation').focus();
   });
 }
 
