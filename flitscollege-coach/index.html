@@ -8,10 +8,10 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Flitscollege Coach &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=24" />
+  <link rel="stylesheet" href="../assets/site.css?v=25" />
 </head>
 <body>
-  <div class="version-stamp">v2 &middot; Flitscollege Coach</div>
+  <div class="version-stamp">v4 &middot; Flitscollege Coach</div>
   <main class="studio flits-app">
     <nav class="studio__nav">
       <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
@@ -69,6 +69,38 @@
           <h3 id="flits-title"></h3>
           <p id="flits-summary"></p>
           <div id="flits-tags" class="flits-tags"></div>
+        </article>
+
+        <article class="flits-card flits-coach-layer" aria-labelledby="case-coach-title">
+          <div class="flits-feedback-head">
+            <div>
+              <p class="flits-label">Casuïstische coachlaag</p>
+              <h3 id="case-coach-title">Train dit flitscollege als toetsmoment</h3>
+            </div>
+            <div class="flits-case-tools">
+              <label class="sr-only" for="case-variant-select">Kies casusvariant</label>
+              <select id="case-variant-select" class="flits-select" aria-label="Kies casusvariant"></select>
+              <button class="btn btn--ghost" type="button" id="coach-train-gap">Train zwakste punt</button>
+            </div>
+          </div>
+          <div class="flits-coach-steps">
+            <section>
+              <span>1. Casus</span>
+              <p id="coach-case-question"></p>
+            </section>
+            <section>
+              <span>2. Punten pakken</span>
+              <div id="coach-anchors" class="flits-coach-anchors"></div>
+            </section>
+            <section>
+              <span>3. Spreekopdracht</span>
+              <p id="coach-speaking-task"></p>
+            </section>
+          </div>
+          <div class="flits-actions">
+            <button class="btn btn--primary" type="button" id="coach-start-case">Start casustraining</button>
+            <p class="flits-note">Geen samenvatting: meteen begrip → casusbewijs → vervolgstap.</p>
+          </div>
         </article>
 
         <article class="flits-card flits-route">

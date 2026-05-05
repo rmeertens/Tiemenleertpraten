@@ -476,6 +476,60 @@ a { color: inherit; }
   padding: 7px 10px;
 }
 
+.flits-coach-layer {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--rule));
+}
+
+.flits-coach-steps {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.flits-coach-steps section {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+}
+
+.flits-coach-steps span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.flits-coach-steps p {
+  margin: 0;
+}
+
+.flits-coach-anchors {
+  display: grid;
+  gap: 7px;
+}
+
+.flits-coach-anchors span {
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--ink);
+  display: block;
+  line-height: 1.35;
+  padding: 8px 10px;
+  text-transform: none;
+}
+
+.flits-case-tools {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  min-width: min(100%, 360px);
+}
+
 .flits-checklist {
   list-style: none;
   margin: 0;
@@ -2605,6 +2659,7 @@ a { color: inherit; }
   .flits-hero,
   .flits-layout,
   .flits-grid,
+  .flits-coach-steps,
   .flits-mastery-list,
   .lesson-exam-grid,
   .lesson-criteria-grid {
@@ -2613,6 +2668,12 @@ a { color: inherit; }
 
   .flits-sidebar {
     position: static;
+  }
+
+  .flits-case-tools {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
   }
 
   .flits-list {

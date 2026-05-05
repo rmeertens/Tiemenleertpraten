@@ -3,6 +3,7 @@
 const data = window.FLITS_DATA;
 const state = {
   index: Number(localStorage.getItem('flits_index') || 0),
+  caseVariant: localStorage.getItem('flits_case_variant') || 'apply',
   done: JSON.parse(localStorage.getItem('flits_done') || '{}'),
   mastery: JSON.parse(localStorage.getItem('flits_mastery') || '{}'),
   micro: null,
@@ -15,6 +16,7 @@ const feedbackCard = document.getElementById('feedback-card');
 const speechNote = document.getElementById('speech-note');
 const coachInput = document.getElementById('coach-input');
 const coachAnswer = document.getElementById('coach-answer');
+const caseVariantSelect = document.getElementById('case-variant-select');
 const microPanel = document.getElementById('micro-panel');
 const microInput = document.getElementById('micro-input');
 const microFeedback = document.getElementById('micro-feedback');
@@ -68,6 +70,14 @@ function bindEvents() {
   });
   document.getElementById('ask-coach').addEventListener('click', answerCoachQuestion);
   document.getElementById('record-question').addEventListener('click', toggleQuestionRecording);
+  caseVariantSelect.addEventListener('change', () => {
+    state.caseVariant = caseVariantSelect.value;
+    localStorage.setItem('flits_case_variant', state.caseVariant);
+    renderCaseCoach();
+    renderPracticePrompts();
+  });
+  document.getElementById('coach-start-case').addEventListener('click', startCaseTraining);
+  document.getElementById('coach-train-gap').addEventListener('click', trainWeakestPoint);
   document.getElementById('check-micro').addEventListener('click', checkMicroAnswer);
   document.getElementById('record-micro').addEventListener('click', toggleMicroRecording);
   document.getElementById('close-micro').addEventListener('click', closeMicroPanel);
@@ -112,15 +122,40 @@ function renderLesson() {
   document.getElementById('flits-tags').innerHTML = lesson.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
   document.getElementById('snap-card').textContent = lesson.snap;
   document.getElementById('memory-list').innerHTML = lesson.memory.map(item => `<li>${escapeHtml(item)}</li>`).join('');
-  document.getElementById('case-question').textContent = lesson.caseQuestion;
-  document.getElementById('oral-prompt').textContent = lesson.oralPrompt;
+  renderPracticePrompts();
   document.getElementById('model-answer').textContent = lesson.model;
   answerInput.value = '';
   feedbackCard.innerHTML = '<p class="flits-note">Nog geen antwoord nagekeken.</p>';
   speechNote.textContent = '';
   closeMicroPanel();
+  renderCaseCoach();
   renderMastery();
   renderLessonList();
+}
+
+function renderCaseCoach() {
+  const lesson = currentLesson();
+  const variants = caseVariantsFor(lesson);
+  const selected = currentCaseVariant(lesson);
+  const missing = missingChecksFor(lesson);
+  const anchors = (missing.length ? missing : lesson.checks).slice(0, 3);
+  caseVariantSelect.innerHTML = variants.map(variant => `
+    <option value="${variant.id}">${variant.label}</option>
+  `).join('');
+  caseVariantSelect.value = selected.id;
+  document.getElementById('coach-case-question').textContent = selected.question;
+  document.getElementById('coach-anchors').innerHTML = anchors.map(check => `
+    <span>${escapeHtml(explainTerm(check))}</span>
+  `).join('');
+  document.getElementById('coach-speaking-task').textContent =
+    `Zeg in ${selected.seconds} seconden: ${selected.speakingTask} Gebruik het stramien: begrip, casusbewijs, vervolgstap.`;
+}
+
+function renderPracticePrompts() {
+  const lesson = currentLesson();
+  const selected = currentCaseVariant(lesson);
+  document.getElementById('case-question').textContent = selected.question;
+  document.getElementById('oral-prompt').textContent = selected.speakingTask;
 }
 
 function renderProgress() {
@@ -181,6 +216,7 @@ function renderMastery() {
       renderMastery();
       renderProgress();
       renderLessonList();
+      renderCaseCoach();
     });
   });
 
@@ -214,6 +250,59 @@ function renderMastery() {
   if (mastered.length && missing.length) {
     trainList.insertAdjacentHTML('afterbegin', `<p class="flits-note">Al beheerst: ${mastered.length}. Nog open: ${missing.length}. Lekker klein houden.</p>`);
   }
+}
+
+function missingChecksFor(lesson) {
+  const mastery = masteryFor(lesson);
+  return lesson.checks.filter(check => !mastery[masteryKey(check)]);
+}
+
+function caseVariantsFor(lesson) {
+  const [first, second, third] = lesson.checks;
+  return [
+    {
+      id: 'recognize',
+      label: '1. Herkennen',
+      seconds: 30,
+      question: `Welke kernbegrippen uit ${lesson.title} herken je in deze situatie: ${lesson.caseQuestion}`,
+      speakingTask: `Benoem het probleem en gebruik minimaal ${first} en ${second || lesson.domain}.`
+    },
+    {
+      id: 'apply',
+      label: '2. Toepassen',
+      seconds: 45,
+      question: lesson.caseQuestion,
+      speakingTask: lesson.oralPrompt
+    },
+    {
+      id: 'defend',
+      label: '3. ZG-verdedigen',
+      seconds: 60,
+      question: `Verdedig je klinische redenering bij deze casus: ${lesson.caseQuestion} Wat betekent dit voor diagnostiek of behandeling, en welke vervolgstap kies je?`,
+      speakingTask: `Geef een ZG-antwoord met ${first}, ${second || 'casusbewijs'}, ${third || 'vervolgstap'} en één concrete consequentie voor onderzoek, behandeling of school.`
+    }
+  ];
+}
+
+function currentCaseVariant(lesson = currentLesson()) {
+  const variants = caseVariantsFor(lesson);
+  return variants.find(variant => variant.id === state.caseVariant) || variants[1];
+}
+
+function startCaseTraining() {
+  const lesson = currentLesson();
+  const selected = currentCaseVariant(lesson);
+  answerInput.focus();
+  answerInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  answerInput.placeholder = `Start met: “In deze ${selected.label.toLowerCase()} betekent ${lesson.checks[0]} dat...”`;
+  speechNote.textContent = `Casustraining gestart: spreek of typ nu ${selected.seconds} seconden. Daarna klik je op Feedback.`;
+}
+
+function trainWeakestPoint() {
+  const lesson = currentLesson();
+  const [firstMissing] = missingChecksFor(lesson);
+  openMicroPanel(firstMissing || lesson.checks[0], 'casus');
+  microPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function moveLesson(delta) {
@@ -536,21 +625,22 @@ function answerCoachQuestion() {
   let action = `Actie: beantwoord de casusvraag met minimaal twee kernwoorden: ${lesson.checks.slice(0, 2).join(' en ')}.`;
 
   if (clean.includes('casus') || clean.includes('toepas')) {
+    const selected = currentCaseVariant(lesson);
     title = 'Koppel aan casus';
-    body = `Gebruik de brug: observatie -> taalniveau/probleem -> gevolg voor activiteit/participatie. Bij ${lesson.title} is het belangrijkste kernwoord: ${lesson.checks[0]}.`;
-    action = 'Actie: begin je antwoord met “In deze casus betekent dit dat...”.';
+    body = `Gebruik deze casusvariant: ${selected.question} Je brug is: begrip -> casusbewijs -> gevolg voor onderzoek of behandeling. Het eerste anker is ${explainTerm(lesson.checks[0])}`;
+    action = 'Actie: klik op “Start casustraining” en begin met: “In deze casus betekent dit dat...”.';
   } else if (clean.includes('mondeling') || clean.includes('zeg')) {
     title = 'Mondelinge formulering';
-    body = lesson.model;
-    action = 'Actie: zeg dit nu in 30 seconden zonder te lezen.';
+    body = `${lesson.oralPrompt} Zeg niet alles uit de snapkaart na; bewijs drie punten met een casusvoorbeeld.`;
+    action = `Actie: gebruik deze drie ankers: ${lesson.checks.slice(0, 3).map(explainTerm).join(' ')}`;
   } else if (clean.includes('leren') || clean.includes('onthoud')) {
     title = 'Wat moet je onthouden?';
     body = lesson.memory.slice(0, 3).join(' · ');
     action = 'Actie: schrijf deze drie punten uit je hoofd op en maak daarna de casusvraag.';
   } else if (clean.includes('zg') || clean.includes('10') || clean.includes('toets')) {
     title = 'Naar ZG';
-    body = 'Een ZG-antwoord noemt niet alleen het begrip, maar past het toe op een kind en zegt wat dit betekent voor diagnostiek of behandeling.';
-    action = `Actie: gebruik ${lesson.checks[0]}, ${lesson.checks[1] || lesson.domain} en een casusgevolg in één antwoord.`;
+    body = 'Een ZG-antwoord is niet langer, maar klinischer: je noemt het begrip, bewijst het met de casus en kiest één vervolgactie.';
+    action = `Actie: maak één zin met ${explainTerm(lesson.checks[0])} + casusbewijs + “daarom onderzoek/behandel ik...”.`;
   }
 
   coachAnswer.innerHTML = `
