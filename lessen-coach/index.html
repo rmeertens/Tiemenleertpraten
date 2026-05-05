@@ -8,10 +8,10 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Lescoach 10 &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=18" />
+  <link rel="stylesheet" href="/assets/site.css?v=19" />
 </head>
 <body>
-  <div class="version-stamp">v2 &middot; Lescoach 10</div>
+  <div class="version-stamp">v3 &middot; Lescoach 10</div>
   <main class="studio flits-app lesson-app">
     <nav class="studio__nav">
       <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
@@ -34,6 +34,27 @@
         <p id="lesson-hint">Start bij W1.</p>
       </aside>
     </header>
+
+    <section class="lesson-exam-map" aria-labelledby="lesson-exam-title">
+      <div class="lesson-exam-head">
+        <p class="flits-label">Toetskaart</p>
+        <h3 id="lesson-exam-title">Houd mondeling en schriftelijk strak gescheiden.</h3>
+      </div>
+      <div class="lesson-exam-grid">
+        <article class="lesson-exam-card">
+          <span>Mondelinge toets</span>
+          <strong>Rubric 0-4 per criterium</strong>
+          <p>Deel 1 Schlichting: 10 criteria, max. 40 punten. Deel 2 Behandeling: 10 criteria, max. 40 punten. Beide delen minimaal 20 punten.</p>
+          <p>Labels: 0 O · 1 BV · 2 V · 3 G · 4 ZG. Kritisch: criterium 10, 15 en 17 minimaal V.</p>
+        </article>
+        <article class="lesson-exam-card">
+          <span>Schriftelijke toets</span>
+          <strong>135 punten totaal</strong>
+          <p>15 stellingen samen 25 punten. 5 open casussen samen 110 punten: casus 1, 3 en 5 tellen 20 punten; casus 2 en 4 tellen 25 punten.</p>
+          <p>Train dus vooral: begrip juist gebruiken, casusbewijs noemen en afsluiten met conclusie of advies.</p>
+        </article>
+      </div>
+    </section>
 
     <section class="flits-coach" aria-labelledby="lesson-coach-title">
       <div>
@@ -71,8 +92,12 @@
           <div id="lesson-tags" class="flits-tags"></div>
           <div class="lesson-criteria-grid" aria-label="Criteriumgerichte coachlaag">
             <article>
-              <strong>Criteriumfocus</strong>
+              <strong>Mondelinge focus</strong>
               <p id="lesson-criteria"></p>
+            </article>
+            <article>
+              <strong>Schriftelijke focus</strong>
+              <p id="lesson-written-focus"></p>
             </article>
             <article>
               <strong>Puntenverlies</strong>
@@ -129,8 +154,8 @@
           <p class="flits-label">3. Oefenmodus</p>
           <h3>Mondeling of schriftelijk trainen</h3>
           <div class="lesson-mode-tabs" role="tablist" aria-label="Kies oefenmodus">
-            <button class="lesson-mode-tab is-active" type="button" data-mode="oral">Mondeling praktijk</button>
-            <button class="lesson-mode-tab" type="button" data-mode="written">Schriftelijke toets</button>
+            <button class="lesson-mode-tab is-active" type="button" data-mode="oral">Mondeling · rubric 0-4</button>
+            <button class="lesson-mode-tab" type="button" data-mode="written">Schriftelijk · punten/casus</button>
           </div>
           <p id="mode-prompt" class="flits-prompt"></p>
           <textarea id="answer-input" rows="6" class="flits-textarea" placeholder="Typ of spreek je antwoord. Denk: vaktaal + casus + consequentie."></textarea>
@@ -173,7 +198,7 @@
           <p class="flits-label">6. Bewijs</p>
           <h3>Klaar met deze les?</h3>
           <button class="btn btn--primary" type="button" id="mark-done">Markeer les beheerst</button>
-          <p class="flits-note">Markeer pas als je mondeling én schriftelijk zonder modelantwoord tot een ZG-antwoord komt.</p>
+          <p class="flits-note">Markeer pas als je mondeling zonder modelantwoord richting ZG komt én schriftelijk een volledig casusantwoord kunt schrijven.</p>
         </article>
       </section>
     </section>

@@ -7,6 +7,7 @@ const state = {
   therapyPrompt: data.therapy.prompts[0],
   simCase: data.cases[0],
   scores: JSON.parse(localStorage.getItem('oral10_scores') || '{"diagnostics":0,"therapy":0}'),
+  criteriaScores: JSON.parse(localStorage.getItem('oral10_criteria_scores') || '{"diagnostics":{},"therapy":{}}'),
 };
 
 const timerEl = document.getElementById('oral-timer');
@@ -144,6 +145,7 @@ function promptHtml(prompt, model) {
 function renderChecks() {
   diagnosticChecks.innerHTML = checksHtml('diagnostics', data.diagnostics.criteria);
   therapyChecks.innerHTML = checksHtml('therapy', data.therapy.criteria);
+  bindCriterionScores();
 }
 
 function renderTherapyMachine() {
@@ -309,12 +311,34 @@ function renderRedFlags() {
 }
 
 function checksHtml(group, criteria) {
-  return criteria.map(([id, label], index) => `
-    <label>
-      <input type="checkbox" data-group="${group}" data-criterion="${id}" />
-      <span>${index + 1}. ${escapeHtml(label)}</span>
+  const offset = group === 'therapy' ? 10 : 0;
+  return criteria.map(([id, label], index) => {
+    const number = offset + index + 1;
+    const critical = isCritical(group, number);
+    const saved = state.criteriaScores[group]?.[id] ?? 0;
+    return `
+    <label class="${critical ? 'is-critical' : ''}">
+      <span>${number}. ${escapeHtml(label)} ${critical ? '<b>Kritisch · minimaal V</b>' : ''}</span>
+      <select data-group="${group}" data-criterion="${id}" data-number="${number}" aria-label="Score criterium ${number}">
+        ${data.scoreScale.map(([value, code, labelText]) => `
+          <option value="${value}" ${Number(saved) === value ? 'selected' : ''}>${value} · ${code} · ${escapeHtml(labelText)}</option>
+        `).join('')}
+      </select>
     </label>
-  `).join('');
+  `;
+  }).join('');
+}
+
+function bindCriterionScores() {
+  document.querySelectorAll('.oral-checks select').forEach(select => {
+    select.addEventListener('change', () => {
+      const group = select.dataset.group;
+      const id = select.dataset.criterion;
+      if (!state.criteriaScores[group]) state.criteriaScores[group] = {};
+      state.criteriaScores[group][id] = Number(select.value);
+      saveCriteriaScores();
+    });
+  });
 }
 
 function renderSimulation() {
@@ -340,9 +364,14 @@ function renderPrepTools() {
 }
 
 function scoreChecklist(group) {
-  const checked = document.querySelectorAll(`input[data-group="${group}"]:checked`).length;
-  const points = checked * 4;
+  const selects = [...document.querySelectorAll(`select[data-group="${group}"]`)];
+  const points = selects.reduce((sum, select) => sum + Number(select.value), 0);
+  if (!state.criteriaScores[group]) state.criteriaScores[group] = {};
+  selects.forEach(select => {
+    state.criteriaScores[group][select.dataset.criterion] = Number(select.value);
+  });
   state.scores[group] = points;
+  saveCriteriaScores();
   saveScores();
   renderDashboard();
   showView('dashboard');
@@ -368,18 +397,22 @@ function strictFeedback() {
   ];
   const hits = rubricWords.filter(word => clean.includes(word));
   const structure = ['omdat', 'dus', 'daarom', 'passend', 'concreet'].filter(word => clean.includes(word));
-  const points = Math.min(4, Math.round((hits.length + structure.length) / 4));
+  let points = Math.min(4, Math.round((hits.length + structure.length) / 4));
   const mode = clean.includes('therapie') || clean.includes('doel') || clean.includes('methode') ? 'therapy' : 'diagnostics';
+  const hasCritical = mode === 'therapy'
+    ? ['methode', 'verantwoord', 'vorm', 'therapievorm', 'waarom'].some(word => clean.includes(word))
+    : ['fout', 'zelfcorrectie', 'verantwoord', 'betrouwbaar', 'validiteit'].some(word => clean.includes(word));
+  if (!hasCritical && points > 2) points = 2;
   state.scores[mode] = Math.max(state.scores[mode], points * 10);
   saveScores();
 
   feedback.hidden = false;
   feedbackHeading.textContent = labelFor(points);
-  feedbackPoints.textContent = `${points}/4`;
+  feedbackPoints.textContent = `${points}/4 · ${scoreCode(points)}`;
   feedbackBody.innerHTML = `
     ${block('Goed', hits.length ? `Je gebruikt toetswoorden: ${hits.slice(0, 6).join(', ')}.` : 'Je durft te antwoorden, maar vaktaal ontbreekt nog.')}
     ${block('Mist', missingLine(hits, mode))}
-    ${block('Kost punten', points >= 3 ? 'Je kunt nog punten verliezen door volgorde of te weinig casusbewijs.' : 'Te algemeen: de beoordelaar hoort nog geen criteriumbewijs.')}
+    ${block('Kost punten', criticalFeedback(mode, hasCritical, points))}
     ${block('Volgende poging', points >= 3 ? 'Zeg hetzelfde nu in 45 seconden met één foutverantwoording of één therapiekeuze extra.' : 'Gebruik: kernzin -> criterium -> casusbewijs -> verantwoording.')}
   `;
   feedbackModel.textContent = mode === 'therapy' ? data.therapy.model : data.diagnostics.model;
@@ -400,23 +433,34 @@ function renderDashboard() {
   const therapy = state.scores.therapy || 0;
   const diagnosticGrade = gradeFor(diagnostic);
   const therapyGrade = gradeFor(therapy);
-  const total = diagnostic >= 20 && therapy >= 20 ? ((diagnosticGrade + therapyGrade) / 2).toFixed(1) : 'onvoldoende';
+  const diagnosticCritical = criticalOk('diagnostics');
+  const therapyCritical = criticalOk('therapy');
+  const total = diagnostic >= 20 && therapy >= 20 && diagnosticCritical.ok && therapyCritical.ok
+    ? ((diagnosticGrade + therapyGrade) / 2).toFixed(1)
+    : 'onvoldoende';
 
   oralBars.innerHTML = [
-    ['Diagnostiek', diagnostic, diagnosticGrade],
-    ['Therapie', therapy, therapyGrade],
-    ['Eindbeeld', Math.min(40, Math.round((diagnostic + therapy) / 2)), total]
-  ].map(([label, points, grade]) => `
+    ['Diagnostiek', diagnostic, diagnosticGrade, diagnosticCritical],
+    ['Therapie', therapy, therapyGrade, therapyCritical],
+    ['Eindbeeld', Math.min(40, Math.round((diagnostic + therapy) / 2)), total, { ok: diagnosticCritical.ok && therapyCritical.ok, message: data.criticalNote }]
+  ].map(([label, points, grade, critical]) => `
     <div class="oral-bar">
-      <div><strong>${label}</strong><span>${points}/40 · ${grade}</span></div>
+      <div><strong>${label}</strong><span>${points}/40 · ${formatGrade(grade)}</span></div>
       <meter min="0" max="40" value="${points}">${points}/40</meter>
+      <p>${escapeHtml(critical.ok ? 'Kritische criteria op minimaal V.' : critical.message)}</p>
     </div>
   `).join('');
 
-  oralPlan.innerHTML = planFor(diagnostic, therapy).map(item => `<li>${escapeHtml(item)}</li>`).join('');
+  oralPlan.innerHTML = planFor(diagnostic, therapy, diagnosticCritical, therapyCritical).map(item => `<li>${escapeHtml(item)}</li>`).join('');
 }
 
-function planFor(diagnostic, therapy) {
+function planFor(diagnostic, therapy, diagnosticCritical, therapyCritical) {
+  if (!diagnosticCritical.ok) {
+    return ['Eerst criterium 10: benoem je eigen fout, versprekingen of zelfcorrectie en verantwoord invloed op validiteit/betrouwbaarheid.', 'Oefen één zin: “Ik merkte dat..., daardoor..., daarom beoordeel ik dit item als...”.', 'Pas daarna opnieuw je diagnostiekscore invullen.'];
+  }
+  if (!therapyCritical.ok) {
+    return ['Eerst criterium 15 en 17: motiveer methode én therapievorm minimaal op V-niveau.', 'Oefen: “Ik kies deze methode omdat... Deze therapievorm past omdat...”.', 'Koppel beide keuzes expliciet aan beginsituatie, doelen en generalisatie.'];
+  }
   if (diagnostic >= 36 && therapy >= 36) {
     return ['Vandaag: volledige simulatie zonder spiekkaart.', 'Morgen: alleen fouten verantwoorden en prognose oefenen.', 'Laatste check: 30 minuten in tweetal op echt toetsritme.'];
   }
@@ -428,7 +472,45 @@ function planFor(diagnostic, therapy) {
 
 function gradeFor(points) {
   const match = data.scoreTable.find(([max]) => points <= max);
-  return match ? match[1].toFixed(1) : '10.0';
+  return match ? match[1] : 10.0;
+}
+
+function formatGrade(value) {
+  return typeof value === 'number' ? value.toFixed(1) : value;
+}
+
+function scoreCode(points) {
+  const row = data.scoreScale.find(([value]) => value === points);
+  return row ? row[1] : 'O';
+}
+
+function isCritical(group, number) {
+  return (data.criticalCriteria[group] || []).includes(number);
+}
+
+function criticalOk(group) {
+  const scores = state.criteriaScores[group] || {};
+  const criteria = group === 'therapy' ? data.therapy.criteria : data.diagnostics.criteria;
+  const offset = group === 'therapy' ? 10 : 0;
+  const missing = criteria
+    .map(([id], index) => ({ id, number: offset + index + 1, score: Number(scores[id] || 0) }))
+    .filter(item => isCritical(group, item.number) && item.score < 2);
+  return {
+    ok: missing.length === 0,
+    message: missing.length
+      ? `Kritisch criterium ${missing.map(item => item.number).join(', ')} staat onder V. Zet deze minimaal op 2 · V.`
+      : 'Kritische criteria op minimaal V.'
+  };
+}
+
+function criticalFeedback(mode, hasCritical, points) {
+  if (hasCritical && points >= 3) {
+    return 'Let nog op casusbewijs, maar het kritische criterium is herkenbaar aanwezig.';
+  }
+  if (mode === 'therapy') {
+    return 'Criterium 15 en 17 tellen zwaar: methode én therapievorm moeten niet alleen genoemd, maar gemotiveerd worden vanuit beginsituatie, doelen en generalisatie.';
+  }
+  return 'Criterium 10 telt zwaar: benoem je eigen handelen, fout/zelfcorrectie en de invloed op betrouwbaarheid of validiteit.';
 }
 
 function showView(view) {
@@ -493,16 +575,20 @@ function saveScores() {
   localStorage.setItem('oral10_scores', JSON.stringify(state.scores));
 }
 
+function saveCriteriaScores() {
+  localStorage.setItem('oral10_criteria_scores', JSON.stringify(state.criteriaScores));
+}
+
 function block(title, body) {
   return `<article><h4>${escapeHtml(title)}</h4><p>${escapeHtml(body)}</p></article>`;
 }
 
 function labelFor(points) {
-  if (points >= 4) return 'Zeer goed: richting 10';
-  if (points === 3) return 'Goed, nog niet foutloos';
-  if (points === 2) return 'Voldoende basis';
-  if (points === 1) return 'Bijna voldoende';
-  return 'Onvoldoende toetsbewijs';
+  if (points >= 4) return 'ZG · zeer goed';
+  if (points === 3) return 'G · goed';
+  if (points === 2) return 'V · voldoende';
+  if (points === 1) return 'BV · bijna voldoende';
+  return 'O · onvoldoende';
 }
 
 function normalize(value) {

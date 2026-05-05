@@ -1773,6 +1773,16 @@ a { color: inherit; }
   max-width: 760px;
 }
 
+.oral-scale-note {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  color: var(--accent) !important;
+  font-size: 14px;
+  font-weight: 900;
+  margin-top: 14px !important;
+  padding: 10px 12px;
+}
+
 .oral-clock,
 .oral-card {
   background: var(--bg-elevated);
@@ -1947,18 +1957,41 @@ a { color: inherit; }
 }
 
 .oral-checks label {
-  align-items: flex-start;
+  align-items: center;
   background: var(--bg);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   cursor: pointer;
-  display: flex;
+  display: grid;
   gap: 10px;
+  grid-template-columns: minmax(0, 1fr) 150px;
   padding: 11px 12px;
 }
 
-.oral-checks input {
-  margin-top: 4px;
+.oral-checks label.is-critical {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
+}
+
+.oral-checks label b {
+  color: var(--accent);
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  margin-left: 6px;
+  text-transform: uppercase;
+}
+
+.oral-checks select {
+  appearance: none;
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 9px 10px;
+  width: 100%;
 }
 
 .oral-checks span {
@@ -2347,6 +2380,12 @@ a { color: inherit; }
   width: 100%;
 }
 
+.oral-bar p {
+  color: var(--ink-faint);
+  font-size: 13px;
+  margin: 6px 0 0;
+}
+
 .oral-plan li {
   background: var(--bg);
   border: 1px solid var(--rule);
@@ -2409,6 +2448,10 @@ a { color: inherit; }
   .oral-card,
   .oral-clock {
     padding: 20px;
+  }
+
+  .oral-checks label {
+    grid-template-columns: 1fr;
   }
 
   .oral-feedback__head {
