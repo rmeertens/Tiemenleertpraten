@@ -250,7 +250,9 @@ function checkAnswer() {
     ${block('Sterk', explainedHits.length ? `Je noemt al: ${explainedHits.join(' ')}` : 'Je antwoord heeft nog te weinig herkenbare vaktaal. Noem eerst het probleem en één voorbeeld uit de casus.')}
     ${block('Feedback', feedbackText(score, missing, hasCase))}
     ${score === 3 ? block('Van 3/4 naar 4/4', upgradeText(missing, hasCase)) : ''}
+    ${score < 4 ? redRetryHtml() : ''}
   `;
+  bindRedRetry(feedbackCard, answerInput, speechNote);
 }
 
 function feedbackText(score, missing, hasCase) {
@@ -651,6 +653,25 @@ function block(label, text) {
       <p>${escapeHtml(text)}</p>
     </article>
   `;
+}
+
+function redRetryHtml() {
+  return `
+    <article class="red-retry-card">
+      <strong>Rood naar groen</strong>
+      <p>Laat staan wat goed was. Voeg alleen de rode punten toe en check opnieuw.</p>
+      <button class="btn btn--primary" type="button" data-red-retry>Probeer opnieuw met rood</button>
+    </article>
+  `;
+}
+
+function bindRedRetry(container, input, note) {
+  const button = container.querySelector('[data-red-retry]');
+  if (!button) return;
+  button.addEventListener('click', () => {
+    input.focus();
+    note.textContent = 'Nieuwe poging: voeg alleen de rode punten toe.';
+  });
 }
 
 function coachScanHtml({ good = [], missing = [], vague = [] }) {

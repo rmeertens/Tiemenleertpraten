@@ -169,7 +169,9 @@ function checkSimulation() {
     ${block('Wat kost punten', result.missing)}
     ${result.score === 3 ? zgCoachBlock(result) : ''}
     ${block('Volgende poging', result.next)}
+    ${result.score < 4 ? redRetryHtml() : ''}
   `;
+  bindRedRetry(simulationFeedback, simulationAnswer, speechNote);
   renderEvidence();
 }
 
@@ -662,6 +664,25 @@ function block(label, text) {
       <span>${escapeHtml(text)}</span>
     </article>
   `;
+}
+
+function redRetryHtml() {
+  return `
+    <article class="red-retry-card">
+      <strong>Rood naar groen</strong>
+      <p>Laat je goede therapeutzin staan. Voeg alleen de ontbrekende cue, beweging of Bernard-koppeling toe.</p>
+      <button class="btn btn--primary" type="button" data-red-retry>Probeer opnieuw met rood</button>
+    </article>
+  `;
+}
+
+function bindRedRetry(container, input, note) {
+  const button = container.querySelector('[data-red-retry]');
+  if (!button) return;
+  button.addEventListener('click', () => {
+    input.focus();
+    note.textContent = 'Nieuwe poging: voeg alleen de rode punten toe.';
+  });
 }
 
 function coachScanHtml({ good = [], missing = [], vague = [] }) {

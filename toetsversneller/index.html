@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Toetsversneller — dagelijkse coachfeed, ZG-heatmap en boss fights voor logopediestudenten." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Toetsversneller &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=22" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; Toetsversneller</div>
+  <main class="studio accelerator-app">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Toetsversneller</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <header class="accelerator-hero">
+      <div>
+        <p class="eyebrow">Dagelijkse coachfeed &middot; rood naar groen</p>
+        <h2>Openen. Oefenen. Eén rood punt wegwerken.</h2>
+        <p>
+          Deze pagina kiest de snelste volgende actie uit je voortgang. Geen bibliotheek,
+          maar een trainingsmachine: korte taak, directe coachscan, volgende poging.
+        </p>
+      </div>
+      <aside class="accelerator-streak">
+        <span>Vandaag</span>
+        <strong id="daily-count">0/4</strong>
+        <p id="daily-hint">Start met de snelle winst.</p>
+      </aside>
+    </header>
+
+    <section class="accelerator-feed" aria-labelledby="feed-title">
+      <div class="accelerator-section-head">
+        <div>
+          <p class="accelerator-label">Vandaag trainen</p>
+          <h3 id="feed-title">De dagelijkse 4</h3>
+        </div>
+        <button class="btn btn--ghost" type="button" id="reset-daily">Reset vandaag</button>
+      </div>
+      <div class="accelerator-daily" id="daily-feed"></div>
+    </section>
+
+    <section class="accelerator-grid">
+      <article class="accelerator-card">
+        <p class="accelerator-label">ZG-heatmap</p>
+        <h3>Waar zit de meeste toetswinst?</h3>
+        <div class="accelerator-heatmap" id="heatmap"></div>
+      </article>
+
+      <article class="accelerator-card">
+        <p class="accelerator-label">Beste volgende actie</p>
+        <h3 id="next-title">Kies een oefening</h3>
+        <p id="next-body"></p>
+        <a class="btn btn--primary" id="next-link" href="/mondeling-10/">Start training</a>
+      </article>
+    </section>
+
+    <section class="accelerator-feed" aria-labelledby="boss-title">
+      <div class="accelerator-section-head">
+        <div>
+          <p class="accelerator-label">Boss fights</p>
+          <h3 id="boss-title">Toetsdruk, maar klein genoeg om te starten</h3>
+        </div>
+      </div>
+      <div class="accelerator-bosses" id="boss-list"></div>
+    </section>
+
+    <section class="accelerator-card">
+      <p class="accelerator-label">Powerzinnen</p>
+      <h3>Bewaar de zinnen die je morgen letterlijk wilt kunnen zeggen</h3>
+      <div class="accelerator-power">
+        <input id="power-input" type="text" placeholder="Bijv. Ik kies deze therapievorm omdat..." />
+        <button class="btn btn--primary" type="button" id="save-power">Bewaar</button>
+      </div>
+      <div class="accelerator-lines" id="power-lines"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

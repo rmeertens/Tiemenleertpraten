@@ -253,6 +253,7 @@ function checkAnswer() {
   }
 
   feedbackCard.innerHTML = feedbackHtml(result, state.mode, lesson);
+  bindRedRetry(feedbackCard, answerInput, speechNote);
 }
 
 function scoreText(text, topics, mode) {
@@ -309,6 +310,7 @@ function feedbackHtml(result, mode, lesson) {
     ${block(lossLabel, result.score >= 4 ? 'Geen groot verlies zichtbaar. Let alleen op bondigheid.' : pointsLoss)}
     ${block(excellenceLabel, result.score >= 4 ? lesson.zg : zg)}
     ${result.score === 3 ? block(upgradeLabel, upgrade) : ''}
+    ${result.score < 4 ? redRetryHtml() : ''}
   `;
 }
 
@@ -803,6 +805,25 @@ function block(label, text) {
       <p>${escapeHtml(text)}</p>
     </article>
   `;
+}
+
+function redRetryHtml() {
+  return `
+    <article class="red-retry-card">
+      <strong>Rood naar groen</strong>
+      <p>Laat staan wat goed was. Voeg alleen de rode punten toe en check opnieuw.</p>
+      <button class="btn btn--primary" type="button" data-red-retry>Probeer opnieuw met rood</button>
+    </article>
+  `;
+}
+
+function bindRedRetry(container, input, note) {
+  const button = container.querySelector('[data-red-retry]');
+  if (!button) return;
+  button.addEventListener('click', () => {
+    input.focus();
+    note.textContent = 'Nieuwe poging: voeg alleen de rode punten toe.';
+  });
 }
 
 function coachScanHtml({ good = [], missing = [], vague = [] }) {

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Stotter Alfa — holistische stottercoach voor vrijer, natuurlijker spreken." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Stotter Alfa &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=22" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; Stotter Alfa</div>
+  <main class="studio stutter-app">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Stotter Alfa</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <header class="stutter-hero">
+      <div>
+        <p class="eyebrow">Holistische stottercoach &middot; spreken als stroom</p>
+        <h2>Niet harder controleren. Slimmer loslaten.</h2>
+        <p>
+          Stotter Alfa traint aandacht, intentie, lichaam en spreekdurf. Vloeiendheid is hier
+          geen kunstje om te forceren, maar een bijproduct van minder bemoeienis. De interne
+          controleur mag koffie halen.
+        </p>
+      </div>
+      <aside class="stutter-score">
+        <span>Vandaag</span>
+        <strong id="alfa-ready">0/5</strong>
+        <p id="alfa-hint">Start met de dagroute.</p>
+      </aside>
+    </header>
+
+    <section class="stutter-coach" aria-labelledby="alfa-coach-title">
+      <div>
+        <p class="stutter-label">Stotter Alfa</p>
+        <h3 id="alfa-coach-title">Vraag de coach</h3>
+      </div>
+      <div class="stutter-question">
+        <label class="sr-only" for="coach-input">Stel een vraag aan Stotter Alfa</label>
+        <input id="coach-input" type="text" placeholder="Bijv. wat doe ik als ik voel dat ik ga blokkeren?" />
+        <button class="btn btn--primary" type="button" id="ask-coach">Vraag coach</button>
+        <button class="btn btn--ghost" type="button" id="record-question">Spreek in</button>
+      </div>
+      <div class="stutter-answer" id="coach-answer">
+        <p>Vraag kort. De coach geeft één verklaring, één oefening en één nuchtere schop onder de stoel.</p>
+      </div>
+    </section>
+
+    <section class="stutter-grid">
+      <article class="stutter-card">
+        <p class="stutter-label">1. Dagroute</p>
+        <h3>12 minuten intensief, geen theater</h3>
+        <div id="daily-route" class="stutter-route"></div>
+      </article>
+
+      <article class="stutter-card">
+        <p class="stutter-label">2. Zeshoekscan</p>
+        <h3>Wat blokkeert de stroom?</h3>
+        <p class="stutter-note">Beschrijf één spreekmoment. De coach zoekt naar perceptie, overtuiging, gedrag, emotie, lichaam en intentie.</p>
+        <textarea id="hex-input" class="stutter-textarea" rows="7" placeholder="Bijv. Ik moest mijn naam zeggen, voelde druk in mijn keel, dacht: dit gaat mis, en probeerde extra adem te pakken."></textarea>
+        <div class="stutter-actions">
+          <button class="btn btn--primary" type="button" id="scan-hex">Scan moment</button>
+          <button class="btn btn--ghost" type="button" id="record-hex">Spreek in</button>
+          <button class="btn btn--ghost" type="button" id="save-hex">Bewaar log</button>
+        </div>
+        <p class="stutter-note" id="hex-note"></p>
+        <div id="hex-feedback" class="stutter-feedback"></div>
+      </article>
+    </section>
+
+    <section class="stutter-grid">
+      <article class="stutter-card">
+        <p class="stutter-label">3. Spreektraining</p>
+        <h3>Van woordcontrole naar betekenis</h3>
+        <p id="drill-prompt" class="stutter-prompt"></p>
+        <textarea id="drill-input" class="stutter-textarea" rows="6" placeholder="Typ of spreek wat je deed. Focus niet op perfectie; dat is precies het punt."></textarea>
+        <div class="stutter-actions">
+          <button class="btn btn--primary" type="button" id="new-drill">Nieuwe oefening</button>
+          <button class="btn btn--primary" type="button" id="check-drill">Feedback</button>
+          <button class="btn btn--ghost" type="button" id="record-drill">Spreek in</button>
+        </div>
+        <p class="stutter-note" id="drill-note"></p>
+        <div id="drill-feedback" class="stutter-feedback"></div>
+      </article>
+
+      <article class="stutter-card">
+        <p class="stutter-label">4. Vrij schrijven</p>
+        <h3>Uitbaggeren, niet redigeren</h3>
+        <p class="stutter-note">Schrijf snel. Geen mooie zinnen. Geen bewijsdrang. Alleen rommel uit je hoofd halen, daar is het voor.</p>
+        <textarea id="freewrite-input" class="stutter-textarea" rows="8" placeholder="Ik merk dat ik... Ik ben bang dat... Eigenlijk wil ik zeggen..."></textarea>
+        <div class="stutter-actions">
+          <button class="btn btn--primary" type="button" id="save-freewrite">Bewaar schrijflog</button>
+          <button class="btn btn--ghost" type="button" id="clear-freewrite">Leeg veld</button>
+        </div>
+        <div id="freewrite-feedback" class="stutter-feedback"></div>
+      </article>
+    </section>
+
+    <section class="stutter-card">
+      <p class="stutter-label">5. Voortgangsrapport</p>
+      <h3>Laat Stotter Alfa je logs samenvatten</h3>
+      <p class="stutter-note">Het rapport blijft lokaal in je browser. Het is een coachspiegel, geen medisch dossier.</p>
+      <div class="stutter-actions">
+        <button class="btn btn--primary" type="button" id="build-report">Maak rapport</button>
+        <button class="btn btn--ghost" type="button" id="clear-logs">Wis logs</button>
+      </div>
+      <div id="report-output" class="stutter-report"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -422,7 +422,9 @@ function strictFeedback() {
     ${block('Mist', missingLine(hits, mode))}
     ${block('Kost punten', criticalFeedback(mode, hasCritical, points))}
     ${block('Volgende poging', points >= 3 ? 'Zeg hetzelfde nu in 45 seconden met één foutverantwoording of één therapiekeuze extra.' : 'Gebruik: kernzin -> criterium -> casusbewijs -> verantwoording.')}
+    ${points < 4 ? redRetryHtml() : ''}
   `;
+  bindRedRetry(feedbackBody, oralAnswer, oralNote);
   feedbackModel.textContent = mode === 'therapy' ? data.therapy.model : data.diagnostics.model;
   renderDashboard();
   feedback.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -592,6 +594,25 @@ function saveCriteriaScores() {
 
 function block(title, body) {
   return `<article><h4>${escapeHtml(title)}</h4><p>${escapeHtml(body)}</p></article>`;
+}
+
+function redRetryHtml() {
+  return `
+    <article class="red-retry-card">
+      <strong>Rood naar groen</strong>
+      <p>Laat je kernzin staan. Voeg alleen het ontbrekende criteriumwoord of de verantwoording toe en check opnieuw.</p>
+      <button class="btn btn--primary" type="button" data-red-retry>Probeer opnieuw met rood</button>
+    </article>
+  `;
+}
+
+function bindRedRetry(container, input, note) {
+  const button = container.querySelector('[data-red-retry]');
+  if (!button) return;
+  button.addEventListener('click', () => {
+    input.focus();
+    note.textContent = 'Nieuwe poging: voeg alleen de rode punten toe.';
+  });
 }
 
 function coachScanHtml({ good = [], missing = [], vague = [] }) {
