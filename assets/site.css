@@ -619,12 +619,118 @@ a { color: inherit; }
   gap: 5px;
 }
 
+.coach-scan {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.coach-scan[hidden] {
+  display: none;
+}
+
+.coach-scan > strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.coach-scan__grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.coach-scan__group {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: calc(var(--radius) - 3px);
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.coach-scan__group span {
+  align-items: center;
+  display: flex;
+  font-size: 12px;
+  font-weight: 900;
+  gap: 6px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.coach-scan__group span::before {
+  border-radius: 50%;
+  content: "";
+  display: inline-block;
+  height: 9px;
+  width: 9px;
+}
+
+.coach-scan__group.is-good span {
+  color: #16724a;
+}
+
+.coach-scan__group.is-good span::before {
+  background: #2ca66f;
+}
+
+.coach-scan__group.is-missing span {
+  color: #a33a2c;
+}
+
+.coach-scan__group.is-missing span::before {
+  background: #d84d3c;
+}
+
+.coach-scan__group.is-vague span {
+  color: #9b6a05;
+}
+
+.coach-scan__group.is-vague span::before {
+  background: #d99a10;
+}
+
+.coach-scan__group ul {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.coach-scan__group li {
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
 .flits-feedback strong,
 .flits-feedback-head strong {
   color: var(--accent);
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.flits-feedback .coach-scan > strong,
+.accent-feedback .coach-scan > strong,
+.ten-feedback-grid .coach-scan > strong,
+.oral-feedback-grid .coach-scan > strong,
+.coach-scan > strong {
+  color: var(--ink);
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.accent-feedback .coach-scan,
+.ten-feedback-grid .coach-scan,
+.oral-feedback-grid .coach-scan {
+  grid-column: 1 / -1;
 }
 
 .flits-feedback p,
@@ -656,6 +762,59 @@ a { color: inherit; }
 
 .lesson-app .flits-hero h2 {
   max-width: 10ch;
+}
+
+.lesson-exam-map {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 14px;
+  margin: 0 0 18px;
+  padding: 22px;
+}
+
+.lesson-exam-head h3 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.lesson-exam-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lesson-exam-card {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+}
+
+.lesson-exam-card span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lesson-exam-card strong {
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.lesson-exam-card p {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0;
 }
 
 .lesson-mode-tabs {
@@ -699,7 +858,7 @@ a { color: inherit; }
 .lesson-criteria-grid {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: 16px;
 }
 
@@ -2400,6 +2559,7 @@ a { color: inherit; }
   .flits-layout,
   .flits-grid,
   .flits-mastery-list,
+  .lesson-exam-grid,
   .lesson-criteria-grid {
     grid-template-columns: 1fr;
   }
@@ -2443,6 +2603,10 @@ a { color: inherit; }
   .flits-actions,
   .flits-feedback-head {
     flex-direction: column;
+  }
+
+  .coach-scan__grid {
+    grid-template-columns: 1fr;
   }
 
   .oral-card,

@@ -249,46 +249,55 @@ function topic(title, hint, terms) {
 const lessonMeta = {
   w1: {
     criteria: 'Je ordent observaties professioneel: taalniveau, leeftijd, context en preventieve vervolgstap.',
+    writtenFocus: 'Definieer kernbegrippen kort en pas ze toe op een observatie of preventieve vervolgstap.',
     pitfall: 'Alleen zeggen “taalontwikkeling is vertraagd” zonder niveau of handelingsadvies.',
     zg: 'Je vertaalt losse signalen naar een preventieve route: observeren, screenen, ouders/PM-er meenemen en zo nodig verwijzen.'
   },
   w2: {
     criteria: 'Je lokaliseert fouten met Levelt en differentieert fonetisch, fonologisch en planning.',
+    writtenFocus: 'Vergelijk begrippen zoals fonetisch/fonologisch en onderbouw de behandelkeuze met casusbewijs.',
     pitfall: 'Een klankvervanging direct behandelen zonder contrast, stimulabiliteit of consistentie te checken.',
     zg: 'Je zegt waar in het taal-spraaksysteem het misgaat en welke diagnostische check daar logisch uit volgt.'
   },
   w3: {
     criteria: 'Je maakt van theorie een werkbare signalerings- en voorlichtingsaanpak voor PM-ers.',
+    writtenFocus: 'Schrijf uit wat signaleren is, wat geen diagnose is en welke vervolgstap logisch volgt.',
     pitfall: 'PM-ers laten diagnosticeren of alleen een lijst alarmsignalen geven zonder handelingsstap.',
     zg: 'Je gebruikt observeerbaar gedrag, leeftijdsnorm, oudercommunicatie en heldere vervolgstappen.'
   },
   w4: {
     criteria: 'Je koppelt meertaligheid, pragmatiek en voorlezen aan interactie en ontwikkelingsniveau.',
+    writtenFocus: 'Geef een puntscorend advies: begrip uitleggen, ouder/kindcontext noemen en concrete routine adviseren.',
     pitfall: 'Thuistaal afraden of interactief voorlezen uitleggen als alleen “meer boekjes lezen”.',
     zg: 'Je geeft oudervriendelijk advies dat taalaanbod, identiteit, beurtwisseling en concrete routines verbindt.'
   },
   w5: {
     criteria: 'Je onderscheidt TOS van blootstellingsachterstand bij meertaligheid.',
+    writtenFocus: 'Bouw je antwoord als differentiaaldiagnose: beide talen, input, leerbaarheid en hardnekkigheid.',
     pitfall: 'Lage Nederlandse score gelijkstellen aan TOS of alles wegverklaren door meertaligheid.',
     zg: 'Je weegt beide talen, input, leerbaarheid, hardnekkigheid en risico op over- of onderdiagnose.'
   },
   w6: {
     criteria: 'Je borgt preventie in dagelijkse routines, materialen en ouder/PM-er-gedrag.',
+    writtenFocus: 'Beschrijf niet alleen materiaal, maar ook wie het gebruikt, wanneer en hoe effect wordt geëvalueerd.',
     pitfall: 'Een mooie voorlichting ontwerpen zonder transfer naar de groep of thuis.',
     zg: 'Je maakt concreet wie wat morgen doet, met welk materiaal, wanneer geëvalueerd wordt en hoe ouders worden meegenomen.'
   },
   w7: {
     criteria: 'Je redeneert medisch-logopedisch bij schisis en werkt multidisciplinair.',
+    writtenFocus: 'Koppel anatomie aan functie en sluit af met multidisciplinaire consequentie of ouderadvies.',
     pitfall: 'Schisis reduceren tot anatomie of operatie, zonder gehoor, resonantie, ouders en teamzorg.',
     zg: 'Je verbindt anatomie met functie, timing, KNO/teamzorg en realistische logopedische follow-up.'
   },
   w8: {
     criteria: 'Je verantwoordt gestandaardiseerde afname, scoring en voorzichtige interpretatie.',
+    writtenFocus: 'Laat scoretaal zorgvuldig zijn: ruwe score, normering, BI/percentiel, protocol en observatie.',
     pitfall: 'Alleen ruwe scores noemen of protocolfouten niet benoemen.',
     zg: 'Je koppelt kalenderleeftijd, instap, protocoltrouw, Q-score/BI/percentiel en observatie aan een betrouwbare conclusie.'
   },
   w9: {
     criteria: 'Je brengt ICF, Levelt en fonetisch-fonologische diagnostiek samen in MDO-taal.',
+    writtenFocus: 'Maak een casusantwoord met ICF-brug: functie, activiteit, participatie, externe factor en advies.',
     pitfall: 'Alleen klankfouten opsommen zonder functie, activiteit, participatie of behandelconsequentie.',
     zg: 'Je maakt een ICF-brug, lokaliseert met Levelt en vertaalt diagnostiek naar samenwerking en advies.'
   }
@@ -297,6 +306,7 @@ const lessonMeta = {
 window.LESSEN_DATA.lessons.forEach(lesson => {
   Object.assign(lesson, lessonMeta[lesson.id] || {
     criteria: 'Vakinhoud toepassen op casus, toetsvorm en vervolgstap.',
+    writtenFocus: 'Kernbegrip uitleggen, toepassen op casus en afsluiten met conclusie.',
     pitfall: 'Losse kennis noemen zonder klinische consequentie.',
     zg: 'Kort, concreet en verantwoord redeneren.'
   });

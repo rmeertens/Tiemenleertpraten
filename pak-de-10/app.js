@@ -585,6 +585,7 @@ function checkAnswer() {
   feedbackTitle.textContent = result.label;
   feedbackScore.textContent = `${result.score}/5`;
   feedbackGrid.innerHTML = `
+    ${result.scan}
     ${feedbackBlock('Wat is goed', result.good)}
     ${feedbackBlock('Wat mist', result.missing)}
     ${feedbackBlock('Wat kost punten', result.cost)}
@@ -604,10 +605,26 @@ function scoreAnswer(answer) {
   const raw = criterionHits.length + Math.min(2, caseHits.length) + Math.min(2, structureHits.length) + lengthPoint;
   const score = Math.min(5, Math.max(0, Math.round(raw / 3)));
   const missingChecks = state.criterion.checks.filter(check => !criterionHits.includes(check)).slice(0, 4);
+  const scanGood = [
+    ...criterionHits.slice(0, 6),
+    ...caseHits.slice(0, 3).map(item => `casusbewijs: ${item}`),
+    ...structureHits.slice(0, 4).map(item => `redeneerwoord: ${item}`)
+  ];
+  const scanMissing = [
+    ...missingChecks,
+    ...(!caseHits.length ? ['bewijs uit de casus'] : []),
+    ...(!structureHits.includes('conclusie') && !structureHits.includes('advies') ? ['conclusie of advies'] : []),
+    ...(!lengthPoint ? ['antwoord iets vollediger maken'] : [])
+  ];
 
   return {
     score,
     label: labelFor(score),
+    scan: coachScanHtml({
+      good: scanGood,
+      missing: scanMissing,
+      vague: score >= 4 ? [] : ['Maak de brug expliciet: criterium -> casusbewijs -> gevolg voor functioneren.']
+    }),
     good: criterionHits.length
       ? `Je gebruikt herkenbare toetswoorden: ${criterionHits.slice(0, 5).join(', ')}.`
       : 'Je antwoord heeft nog te weinig herkenbare vaktaal.',
@@ -775,6 +792,25 @@ function feedbackBlock(title, body) {
     <article>
       <h4>${escapeHtml(title)}</h4>
       <p>${escapeHtml(body)}</p>
+    </article>
+  `;
+}
+
+function coachScanHtml({ good = [], missing = [], vague = [] }) {
+  const group = (className, label, items, emptyText) => `
+    <div class="coach-scan__group ${className}">
+      <span>${label}</span>
+      <ul>${(items.length ? items : [emptyText]).map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+    </div>
+  `;
+  return `
+    <article class="coach-scan">
+      <strong>Coachscan na inspreken</strong>
+      <div class="coach-scan__grid">
+        ${group('is-good', 'Groen · benoemd', good, 'Nog niets overtuigend benoemd.')}
+        ${group('is-missing', 'Rood · mist nog', missing, 'Geen harde gaten meer.')}
+        ${group('is-vague', 'Geel · maak scherper', vague, 'Nu vooral bondiger en toetsgerichter formuleren.')}
+      </div>
     </article>
   `;
 }

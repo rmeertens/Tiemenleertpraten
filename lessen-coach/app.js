@@ -303,6 +303,7 @@ function feedbackHtml(result, mode, lesson) {
       <h3>${title}</h3>
       <strong>${scoreLabel}</strong>
     </div>
+    ${coachScanHtml(coachScanForResult(result, mode))}
     ${block('Sterk', strong)}
     ${block('Feedback', result.score >= 4 ? 'Inhoudelijk klaar. Oefen nu korter en zonder lezen.' : feedback)}
     ${block(lossLabel, result.score >= 4 ? 'Geen groot verlies zichtbaar. Let alleen op bondigheid.' : pointsLoss)}
@@ -320,6 +321,28 @@ function feedbackTitle(score, mode) {
   if (score === 3) return 'Schriftelijk · bijna volledig';
   if (score === 2) return 'Schriftelijk · basis staat';
   return 'Schriftelijk · nog te weinig punten';
+}
+
+function coachScanForResult(result, mode) {
+  const good = [
+    ...result.hits.map(topic => topic.title),
+    ...(result.hasApplication ? ['casus/context toegepast'] : []),
+    ...(result.hasConsequence ? ['conclusie of vervolgstap genoemd'] : []),
+    ...(mode === 'oral' && result.hasOralOrder ? ['mondelinge handelingsvolgorde'] : []),
+    ...(mode === 'written' && result.hasWrittenDefinition ? ['schriftelijke definitie'] : []),
+    ...(mode === 'written' && result.hasWrittenStructure ? ['schriftelijke structuur/vergelijking'] : [])
+  ];
+  const missing = [
+    ...result.missing.map(topic => topic.title),
+    ...(!result.hasApplication ? ['casusbewijs of context'] : []),
+    ...(!result.hasConsequence ? ['conclusie/advies/vervolgstap'] : []),
+    ...(mode === 'oral' && !result.hasOralOrder ? ['hardop volgorde: eerst, daarna, daarom'] : []),
+    ...(mode === 'written' && !result.hasWrittenDefinition ? ['heldere definitie'] : [])
+  ];
+  const vague = mode === 'oral'
+    ? ['Zeg het als handelen van jou als logopedist, niet als losse theorie.']
+    : ['Schrijf in puntenvolgorde: definitie -> casusbewijs -> conclusie.'];
+  return { good, missing, vague: result.score >= 4 ? [] : vague };
 }
 
 function buildFeedback(result, mode) {
@@ -427,6 +450,16 @@ function checkMicroAnswer() {
       <h3>${microScoreTitle(score, state.micro.mode)}</h3>
       <strong>${state.micro.mode === 'schriftelijk' ? `check ${score}/3` : `${score}/3`}</strong>
     </div>
+    ${coachScanHtml({
+      good: [
+        ...(hasTopic ? [`begrip genoemd: ${topic.title}`] : []),
+        ...(hasExplanation ? ['uitleg gegeven'] : []),
+        ...(hasApplication ? ['casus/context genoemd'] : []),
+        ...(hasAction ? ['keuze, check of conclusie genoemd'] : [])
+      ],
+      missing,
+      vague: score >= 3 ? [] : ['Maak van je uitleg één toetszin met gevolg voor handelen.']
+    })}
     ${block('Goed', hasTopic ? `Je raakt het onderwerp: ${explainTopic(topic)}` : 'Je probeert het kort te houden. Nu nog het begrip expliciet noemen.')}
     ${score < 3 ? block('Mist nog', missing.join(' · ')) : block('Coach', 'Ik heb dit onderwerp gemarkeerd als beheerst. Herhaal het nu nog één keer zonder te lezen.')}
     ${score < 3 ? block(state.micro.mode === 'mondeling' ? 'Criteriumverlies' : 'Puntenverlies', `Zonder toepassing en vervolgstap blijft dit een losse term. Valkuil bij deze les: ${lesson.pitfall}`) : ''}
@@ -561,8 +594,8 @@ function answerCoachQuestion() {
   if (clean.includes('punt') || clean.includes('score') || clean.includes('cijfer')) {
     if (clean.includes('schrift')) {
       title = 'Schriftelijke puntentelling';
-      body = 'Schriftelijk is 135 punten: 15 stellingen samen 25 punten en 5 open casussen samen 110 punten. Casus 1, 3 en 5 tellen 20 punten; casus 2 en 4 tellen 25 punten.';
-      action = 'Actie: train bij deze les vooral open casusantwoorden: definitie, casusbewijs, conclusie/advies.';
+      body = 'Schriftelijk is 135 punten totaal, met een voldoende vanaf 74,25 punten. De 15 stellingen leveren samen 25 punten op met gokkanscorrectie; de 5 open casussen leveren samen 110 punten op.';
+      action = 'Actie: train open casusantwoorden met definitie, casusbewijs en conclusie. Casus 2 en 4 zijn extra zwaar: 25 punten.';
     } else if (clean.includes('mondeling') || clean.includes('praktijk')) {
       title = 'Mondelinge puntentelling';
       body = 'Mondeling werkt met 0 O, 1 BV, 2 V, 3 G en 4 ZG per criterium. Deel 1 en deel 2 hebben elk 10 criteria en minimaal 20 van de 40 punten nodig.';
@@ -585,9 +618,14 @@ function answerCoachQuestion() {
     body = 'Gebruik de brug: observatie -> begrip/model -> gevolg voor activiteit/participatie -> vervolgstap.';
     action = `Actie: begin met “In deze casus betekent ${lesson.checks[0].title} dat...”`;
   } else if (clean.includes('zg') || clean.includes('10')) {
-    title = 'Naar ZG';
-    body = `Een ZG-antwoord is niet langer, maar preciezer: ${lesson.zg}`;
-    action = `Actie: gebruik ${lesson.checks[0].title}, ${lesson.checks[1]?.title || lesson.domain} en een concrete vervolgstap.`;
+    const isWritten = state.mode === 'written' || clean.includes('schrift');
+    title = isWritten ? 'Naar meer schriftelijke punten' : 'Naar ZG';
+    body = isWritten
+      ? `Een sterk schriftelijk antwoord is puntenscorend: ${lesson.writtenFocus}`
+      : `Een ZG-antwoord is niet langer, maar preciezer: ${lesson.zg}`;
+    action = isWritten
+      ? `Actie: schrijf ${lesson.checks[0].title} als definitie, casusbewijs en conclusie.`
+      : `Actie: gebruik ${lesson.checks[0].title}, ${lesson.checks[1]?.title || lesson.domain} en een concrete vervolgstap.`;
   }
 
   coachAnswer.innerHTML = `
@@ -763,6 +801,25 @@ function block(label, text) {
     <article>
       <strong>${escapeHtml(label)}</strong>
       <p>${escapeHtml(text)}</p>
+    </article>
+  `;
+}
+
+function coachScanHtml({ good = [], missing = [], vague = [] }) {
+  const group = (className, label, items, emptyText) => `
+    <div class="coach-scan__group ${className}">
+      <span>${label}</span>
+      <ul>${(items.length ? items : [emptyText]).map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+    </div>
+  `;
+  return `
+    <article class="coach-scan">
+      <strong>Coachscan na inspreken</strong>
+      <div class="coach-scan__grid">
+        ${group('is-good', 'Groen · benoemd', good, 'Nog niets overtuigend benoemd.')}
+        ${group('is-missing', 'Rood · mist nog', missing, 'Geen harde gaten meer.')}
+        ${group('is-vague', 'Geel · maak scherper', vague, 'Nu vooral korter en vloeiender oefenen.')}
+      </div>
     </article>
   `;
 }

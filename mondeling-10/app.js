@@ -403,6 +403,9 @@ function strictFeedback() {
     ? ['methode', 'verantwoord', 'vorm', 'therapievorm', 'waarom'].some(word => clean.includes(word))
     : ['fout', 'zelfcorrectie', 'verantwoord', 'betrouwbaar', 'validiteit'].some(word => clean.includes(word));
   if (!hasCritical && points > 2) points = 2;
+  const targetWords = targetWordsForMode(mode);
+  const targetHits = targetWords.filter(word => hits.includes(word));
+  const targetMissing = targetWords.filter(word => !hits.includes(word));
   state.scores[mode] = Math.max(state.scores[mode], points * 10);
   saveScores();
 
@@ -410,6 +413,11 @@ function strictFeedback() {
   feedbackHeading.textContent = labelFor(points);
   feedbackPoints.textContent = `${points}/4 · ${scoreCode(points)}`;
   feedbackBody.innerHTML = `
+    ${coachScanHtml({
+      good: [...targetHits, ...structure.map(word => `structuurwoord: ${word}`)],
+      missing: targetMissing,
+      vague: hasCritical ? [] : [mode === 'therapy' ? 'criterium 15/17: motiveer methode en therapievorm' : 'criterium 10: benoem fout en betrouwbaarheid/validiteit']
+    })}
     ${block('Goed', hits.length ? `Je gebruikt toetswoorden: ${hits.slice(0, 6).join(', ')}.` : 'Je durft te antwoorden, maar vaktaal ontbreekt nog.')}
     ${block('Mist', missingLine(hits, mode))}
     ${block('Kost punten', criticalFeedback(mode, hasCritical, points))}
@@ -421,11 +429,14 @@ function strictFeedback() {
 }
 
 function missingLine(hits, mode) {
-  const target = mode === 'therapy'
+  const missing = targetWordsForMode(mode).filter(word => !hits.includes(word)).slice(0, 4);
+  return missing.length ? `Voeg expliciet toe: ${missing.join(', ')}.` : 'De kern zit erin; maak je formulering strakker.';
+}
+
+function targetWordsForMode(mode) {
+  return mode === 'therapy'
     ? ['beginsituatie', 'doel', 'methode', 'samenwerking', 'prognose']
     : ['testsituatie', 'neutraal', 'intonatie', 'score', 'afbreekregel', 'fout'];
-  const missing = target.filter(word => !hits.includes(word)).slice(0, 4);
-  return missing.length ? `Voeg expliciet toe: ${missing.join(', ')}.` : 'De kern zit erin; maak je formulering strakker.';
 }
 
 function renderDashboard() {
@@ -581,6 +592,25 @@ function saveCriteriaScores() {
 
 function block(title, body) {
   return `<article><h4>${escapeHtml(title)}</h4><p>${escapeHtml(body)}</p></article>`;
+}
+
+function coachScanHtml({ good = [], missing = [], vague = [] }) {
+  const group = (className, label, items, emptyText) => `
+    <div class="coach-scan__group ${className}">
+      <span>${label}</span>
+      <ul>${(items.length ? items : [emptyText]).map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+    </div>
+  `;
+  return `
+    <article class="coach-scan">
+      <strong>Coachscan na inspreken</strong>
+      <div class="coach-scan__grid">
+        ${group('is-good', 'Groen · benoemd', good, 'Nog niets uit de kernlijst benoemd.')}
+        ${group('is-missing', 'Rood · mist nog', missing, 'Geen harde gaten meer.')}
+        ${group('is-vague', 'Geel · kritiek punt', vague, 'Kritische criteria lijken geborgd.')}
+      </div>
+    </article>
+  `;
 }
 
 function labelFor(points) {

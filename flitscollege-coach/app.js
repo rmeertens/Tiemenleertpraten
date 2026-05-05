@@ -242,6 +242,11 @@ function checkAnswer() {
       <h3>${score >= 4 ? '4/4 · toetswaardig' : score === 3 ? '3/4 · bijna ZG' : 'Nog aanvullen'}</h3>
       <strong>${score}/4</strong>
     </div>
+    ${coachScanHtml({
+      good: explainedHits,
+      missing: [...missing.map(explainTerm), ...(!hasCase ? ['casuskoppeling: kind, onderzoek, behandeling of schoolcontext'] : [])],
+      vague: score >= 4 ? [] : ['Maak één toetszin: begrip -> casusbewijs -> vervolgstap.']
+    })}
     ${block('Sterk', explainedHits.length ? `Je noemt al: ${explainedHits.join(' ')}` : 'Je antwoord heeft nog te weinig herkenbare vaktaal. Noem eerst het probleem en één voorbeeld uit de casus.')}
     ${block('Feedback', feedbackText(score, missing, hasCase))}
     ${score === 3 ? block('Van 3/4 naar 4/4', upgradeText(missing, hasCase)) : ''}
@@ -342,6 +347,15 @@ function checkMicroAnswer() {
       <h3>${score >= 3 ? '3/3 · beheerst' : score === 2 ? '2/3 · bijna' : 'Nog scherper'}</h3>
       <strong>${score}/3</strong>
     </div>
+    ${coachScanHtml({
+      good: [
+        ...(hasTopic ? [`begrip genoemd: ${explainTerm(topic)}`] : []),
+        ...(hasExplanation ? ['uitleg gegeven'] : []),
+        ...(hasApplication ? ['toegepast op kind/casus/onderzoek/behandeling'] : [])
+      ],
+      missing,
+      vague: score >= 3 ? [] : ['Hou het kort, maar maak het klinisch toepasbaar.']
+    })}
     ${block('Goed', hasTopic ? `Je raakt het onderwerp: ${explainTerm(topic)}` : 'Je probeert het kort te houden. Nu nog het begrip expliciet noemen.')}
     ${score < 3 ? block('Mist nog', missing.join(' · ')) : block('Coach', 'Ik heb dit onderwerp gemarkeerd als beheerst. Zeg het nu nog één keer hardop zonder te lezen.')}
     ${score < 3 ? block('Maak ZG door', `Gebruik dit stramien: “${explainTerm(topic)} Bij deze casus betekent dit dat... Daarom kies/onderzoek/oefen ik...”`) : ''}
@@ -635,6 +649,25 @@ function block(label, text) {
     <article>
       <strong>${escapeHtml(label)}</strong>
       <p>${escapeHtml(text)}</p>
+    </article>
+  `;
+}
+
+function coachScanHtml({ good = [], missing = [], vague = [] }) {
+  const group = (className, label, items, emptyText) => `
+    <div class="coach-scan__group ${className}">
+      <span>${label}</span>
+      <ul>${(items.length ? items : [emptyText]).map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+    </div>
+  `;
+  return `
+    <article class="coach-scan">
+      <strong>Coachscan na inspreken</strong>
+      <div class="coach-scan__grid">
+        ${group('is-good', 'Groen · benoemd', good, 'Nog niets overtuigend benoemd.')}
+        ${group('is-missing', 'Rood · mist nog', missing, 'Geen harde gaten meer.')}
+        ${group('is-vague', 'Geel · maak scherper', vague, 'Nu vooral korter en vloeiender oefenen.')}
+      </div>
     </article>
   `;
 }

@@ -164,6 +164,7 @@ function checkSimulation() {
       <h3>${escapeHtml(result.label)}</h3>
       <strong>${result.score}/4</strong>
     </div>
+    ${result.scan}
     ${block('Wat is sterk', result.good)}
     ${block('Wat kost punten', result.missing)}
     ${result.score === 3 ? zgCoachBlock(result) : ''}
@@ -188,6 +189,11 @@ function scoreAnswer(answer) {
     label: labelForScore(score),
     good: passed.length ? `Je raakt: ${passed.map(check => check.label).join(', ')}.` : 'Je antwoord is nog te algemeen voor deze simulatie.',
     missing: score >= 4 && !warnings.length ? 'Geen grote inhoudelijke gaten; train nu vooral timing, stemkwaliteit en zichtbare beweging.' : missingForSimulation(missing, warnings, wordCount, profile.minimumWords),
+    scan: coachScanHtml({
+      good: passed.map(check => check.label),
+      missing: missing.slice(0, 6).map(check => check.missing),
+      vague: warnings.map(warning => warning.message)
+    }),
     zgSteps: zgStepsForSimulation(profile, missing, warnings, score),
     next: score >= 4 ? profile.nextStrong : profile.next
   };
@@ -654,6 +660,25 @@ function block(label, text) {
     <article>
       <strong>${escapeHtml(label)}</strong>
       <span>${escapeHtml(text)}</span>
+    </article>
+  `;
+}
+
+function coachScanHtml({ good = [], missing = [], vague = [] }) {
+  const group = (className, label, items, emptyText) => `
+    <div class="coach-scan__group ${className}">
+      <span>${label}</span>
+      <ul>${(items.length ? items : [emptyText]).map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+    </div>
+  `;
+  return `
+    <article class="coach-scan">
+      <strong>Coachscan na inspreken</strong>
+      <div class="coach-scan__grid">
+        ${group('is-good', 'Groen · zichtbaar', good, 'Nog niets toetsbaar zichtbaar.')}
+        ${group('is-missing', 'Rood · mist nog', missing, 'Geen harde gaten meer.')}
+        ${group('is-vague', 'Geel · let op', vague, 'Nu vooral uitvoering, timing en stemkwaliteit trainen.')}
+      </div>
     </article>
   `;
 }
