@@ -372,7 +372,9 @@ function renderWietzeTrainLayer() {
         ${layer.drills.map(item => wietzeDrillCard(item)).join('')}
       </div>
     </details>
+    ${renderMdoCoach(layer.mdoCoach)}
   `;
+  bindMdoCoach(layer.mdoCoach);
 }
 
 function wietzeLensCard(item) {
@@ -415,6 +417,134 @@ function wietzeDrillCard(item) {
       </details>
     </article>
   `;
+}
+
+function renderMdoCoach(coach) {
+  if (!coach) return '';
+  return `
+    <details class="ten-coach-accordion ten-mdo-coach" open>
+      <summary>4. MDO Wietze: volledige regietraining</summary>
+      <article class="ten-card ten-mdo-hero">
+        <p class="ten-card__label">MDO-simulator</p>
+        <h3>${escapeHtml(coach.title)}</h3>
+        <p>${escapeHtml(coach.intro)}</p>
+      </article>
+      <div class="ten-mdo-grid">
+        <article class="ten-card">
+          <p class="ten-card__label">MDO-agenda</p>
+          <h3>Volg deze volgorde</h3>
+          <ol class="ten-mdo-agenda">
+            ${coach.agenda.map(([title, body]) => `<li><strong>${escapeHtml(title)}</strong><span>${escapeHtml(body)}</span></li>`).join('')}
+          </ol>
+        </article>
+        <article class="ten-card">
+          <p class="ten-card__label">Regiezinnen</p>
+          <h3>Zinnen waarmee je overleg leidt</h3>
+          <ul class="ten-mdo-lines">
+            ${coach.regieZinnen.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
+          </ul>
+        </article>
+      </div>
+      <article class="ten-card">
+        <p class="ten-card__label">Rollen in het MDO</p>
+        <h3>Vraag niet “wat vindt u?”, maar “wat verandert mijn plan?”</h3>
+        <div class="ten-mdo-role-grid">
+          ${coach.roles.map(([role, question, action]) => `
+            <section>
+              <strong>${escapeHtml(role)}</strong>
+              <p><b>Vraag:</b> ${escapeHtml(question)}</p>
+              <p><b>Afspraak:</b> ${escapeHtml(action)}</p>
+            </section>
+          `).join('')}
+        </div>
+      </article>
+      <article class="ten-card">
+        <p class="ten-card__label">Simulatie</p>
+        <h3>Voer het MDO in 5-7 minuten</h3>
+        <p class="ten-note">Schrijf of spreek je overlegbijdrage. De coach checkt op regie, rollen, ICF, behandeling, samenwerking en prognose.</p>
+        <textarea id="mdo-answer" class="ten-answer" rows="8" placeholder="Start met: Ik vat Wietze eerst kort samen..."></textarea>
+        <div class="ten-actions">
+          <button class="btn btn--primary" type="button" id="check-mdo-answer">MDO-feedback</button>
+          <button class="btn btn--ghost" type="button" id="fill-mdo-model">Toon model in tekstvak</button>
+          <button class="btn btn--ghost" type="button" id="clear-mdo-answer">Wis</button>
+        </div>
+        <div class="ten-feedback-grid ten-mdo-feedback" id="mdo-feedback">
+          <article><p class="ten-note">Nog geen MDO-feedback. Eerst zelf formuleren; model pas daarna. Streng doch rechtvaardig, zoals koffie zonder suiker.</p></article>
+        </div>
+      </article>
+    </details>
+  `;
+}
+
+function bindMdoCoach(coach) {
+  if (!coach) return;
+  const checkButton = document.getElementById('check-mdo-answer');
+  const fillButton = document.getElementById('fill-mdo-model');
+  const clearButton = document.getElementById('clear-mdo-answer');
+  if (!checkButton || !fillButton || !clearButton) return;
+
+  checkButton.addEventListener('click', () => checkMdoAnswer(coach));
+  fillButton.addEventListener('click', () => {
+    document.getElementById('mdo-answer').value = coach.model;
+    checkMdoAnswer(coach);
+  });
+  clearButton.addEventListener('click', () => {
+    document.getElementById('mdo-answer').value = '';
+    document.getElementById('mdo-feedback').innerHTML = '<article><p class="ten-note">Gewist. Probeer opnieuw met agenda → rollen → besluit.</p></article>';
+  });
+}
+
+function checkMdoAnswer(coach) {
+  const input = document.getElementById('mdo-answer');
+  const output = document.getElementById('mdo-feedback');
+  const answer = input.value.trim();
+  if (!answer) {
+    output.innerHTML = '<article><p class="ten-note">Geef eerst je MDO-bijdrage. Begin desnoods met één kernzin over Wietze.</p></article>';
+    return;
+  }
+
+  const clean = normalize(answer);
+  const checks = [
+    ['Kernformulering', ['wietze', '7', 'tiq', 'verstaanbaarheid', 'vod', 'morfosyntaxis', 'klas'], 'Noem Wietze, leeftijd/belastbaarheid, spraak, taal en klasimpact in één lijn.'],
+    ['Differentiaal', ['fonolog', 'planning', 'vod', 'wisselende', 'zoekgedrag', 'spraakmotor'], 'Weeg fonologie en spraakmotorische planning apart.'],
+    ['ICF-brug', ['functie', 'activiteit', 'participatie', 'terugtrek', 'klas', 'omgeving'], 'Vertaal stoornis naar activiteit, participatie en omgeving.'],
+    ['Behandelregie', ['lt', 'kt', 'doel', 'methode', 'motorisch', 'scaffolding', 'cue', 'frequentie'], 'Verdedig doel, methode, vorm/frequentie en cueing.'],
+    ['MDO-rollen', ['ouder', 'ouders', 'leerkracht', 'ib', 'psycholoog', 'audiolog', 'kno', 'fysio', 'ergo'], 'Betrek minimaal ouders, school en één aanvullende discipline.'],
+    ['Transferafspraken', ['afspraak', 'thuis', 'school', 'visuele steun', 'picto', 'herstelstrategie', 'pre-teaching'], 'Maak concreet wat thuis/school morgen doen.'],
+    ['Evaluatie/prognose', ['evaluatie', 'prognose', 'voorzichtig', 'functioneel positief', '8', '12', 'weken'], 'Sluit af met meetmoment en realistische prognose.']
+  ];
+  const good = [];
+  const missing = [];
+  checks.forEach(([label, words, tip]) => {
+    if (words.some(word => clean.includes(normalize(word)))) good.push(label);
+    else missing.push(`${label}: ${tip}`);
+  });
+  const roleHits = coach.roles
+    .map(([role]) => role)
+    .filter(role => clean.includes(normalize(role.split('/')[0])) || clean.includes(normalize(role)));
+  const score = Math.min(10, Math.round((good.length / checks.length) * 10));
+
+  output.innerHTML = `
+    <article class="ten-mdo-score">
+      <h4>${score >= 9 ? 'MDO-klaar' : score >= 7 ? 'Sterk, nog regie aanscherpen' : 'Nog geen overlegregie'}</h4>
+      <strong>${score}/10</strong>
+      <p>${escapeHtml(mdoNextStep(score, missing))}</p>
+    </article>
+    ${coachScanHtml({
+      good: [...good, ...roleHits.map(role => `rol genoemd: ${role}`)],
+      missing,
+      vague: score >= 9 ? [] : ['Gebruik volgorde: kern → differentiaal → ICF → behandelbesluit → taakverdeling → evaluatie.']
+    })}
+    ${feedbackBlock('Coach zegt', score >= 9
+      ? 'Je leidt het overleg: je vat samen, vraagt gericht uit, neemt besluit en borgt transfer.'
+      : 'Je antwoord bevat losse goede onderdelen, maar moet klinken als MDO-regie. Maak per discipline concreet wat je vraagt en wat je ermee doet.')}
+  `;
+}
+
+function mdoNextStep(score, missing) {
+  if (score >= 9) return 'Train nu op snelheid: dezelfde inhoud in maximaal 90 seconden samenvatten.';
+  if (missing.length) return `Werk eerst dit rood weg: ${missing[0]}`;
+  return 'Maak je bijdrage compacter en sluit af met een expliciet besluit.';
 }
 
 function treatmentFact(label, text) {

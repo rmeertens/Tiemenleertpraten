@@ -1938,6 +1938,86 @@ a { color: inherit; }
   margin: 0;
 }
 
+.ten-mdo-coach {
+  border-color: rgba(217, 74, 31, 0.24);
+}
+
+.ten-mdo-hero {
+  background: var(--accent-soft);
+}
+
+.ten-mdo-grid,
+.ten-mdo-role-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.ten-mdo-agenda,
+.ten-mdo-lines {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding-left: 22px;
+}
+
+.ten-mdo-agenda li,
+.ten-mdo-lines li {
+  color: var(--ink-soft);
+}
+
+.ten-mdo-agenda strong {
+  color: var(--ink);
+  display: block;
+}
+
+.ten-mdo-agenda span {
+  display: block;
+}
+
+.ten-mdo-role-grid section {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.ten-mdo-role-grid strong {
+  color: var(--accent);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.ten-mdo-role-grid p {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 6px 0 0;
+}
+
+.ten-mdo-feedback {
+  margin-top: 14px;
+}
+
+.ten-mdo-score {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.ten-mdo-score h4,
+.ten-mdo-score p {
+  margin: 0;
+}
+
+.ten-mdo-score strong {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 500;
+}
+
 .ten-writer {
   max-width: 1180px;
 }
@@ -2713,7 +2793,9 @@ a { color: inherit; }
   .flits-coach-steps,
   .flits-mastery-list,
   .lesson-exam-grid,
-  .lesson-criteria-grid {
+  .lesson-criteria-grid,
+  .ten-mdo-grid,
+  .ten-mdo-role-grid {
     grid-template-columns: 1fr;
   }
 

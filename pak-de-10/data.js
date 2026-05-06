@@ -543,7 +543,35 @@ window.PAK_DE_10_DATA = {
           assignment: 'Wees concreet: geen vage “zal verbeteren”, maar functie en participatie.',
           answer: 'Voorzichtig maar functioneel positief: door TIQ 62 en VOD verwacht ik geen snelle normalisatie, maar wel betere verstaanbaarheid, korte functionele uitingen en meer deelname in de klas als behandeling intensief en contextgeborgd is.'
         }
-      ]
+      ],
+      mdoCoach: {
+        title: 'MDO Wietze: voer regie, niet alleen antwoord geven',
+        intro: 'Doel van het MDO: de casus zo samenvatten dat ouders, school en disciplines begrijpen wat Wietze nodig heeft, welke informatie nog ontbreekt en welke afspraken de behandeling laten generaliseren.',
+        agenda: [
+          ['1. Opening', 'Ik vat de hulpvraag en het doel van dit overleg kort samen.'],
+          ['2. Kernformulering', 'Wietze is 7;0 jaar met lage belastbaarheid, zwakke verstaanbaarheid, VOD-kenmerken, zwakke morfosyntaxis en terugtrekken in de klas.'],
+          ['3. Diagnostische duiding', 'Ik weeg fonologie, spraakmotorische planning, taal en cognitie apart en koppel dit aan functioneren.'],
+          ['4. ICF-brug', 'Ik vertaal functieproblemen naar activiteit, participatie en omgevingsfactoren.'],
+          ['5. Behandelbesluit', 'Ik verdedig LT/KT-doelen, methode, vorm/frequentie, transfer en evaluatie.'],
+          ['6. Taakverdeling', 'Ik maak per betrokkene concreet wat diegene morgen anders doet.'],
+          ['7. Prognose en evaluatie', 'Ik sluit af met realistische verwachting en meetmoment.']
+        ],
+        roles: [
+          ['Ouders', 'Welke situaties thuis lukken of mislukken communicatief?', 'Dagelijks 3 minuten oefenen met dezelfde doelwoorden, vaste hulpzin en herstelstrategie.'],
+          ['Leerkracht/IB', 'In welke klassituaties trekt Wietze zich terug en welke visuele steun werkt al?', 'Pictosteun, pre-teaching van doelwoorden en vaste herstelzin tijdens kring/taakmomenten.'],
+          ['Psycholoog/orthopedagoog', 'Hoe verhouden TIQ 62, belastbaarheid, aandacht en leerbaarheid zich tot de therapiedoelen?', 'Doelen klein houden, één focus per oefening en overvraging voorkomen.'],
+          ['Audiologie/KNO', 'Is gehoor actueel voldoende uitgesloten als extra belemmering voor spraak-taalverwerking?', 'Recente gehoorstatus controleren als input onbetrouwbaar lijkt.'],
+          ['Fysio/ergo', 'Zijn er bredere motorische plannings- of prikkelverwerkingsproblemen die VOD-aanpak beïnvloeden?', 'Afstemming op cueing, motorische planning en belastbaarheid.'],
+          ['Logopedist', 'Welke logopedische prioriteit levert de meeste participatiewinst op?', 'Regie op spraakmotoriek, kleine morfosyntaxisdoelen, transfer en evaluatie.']
+        ],
+        regieZinnen: [
+          'Ik vat eerst de logopedische kern samen en vertaal die daarna naar school en thuis.',
+          'Mijn hoofdvraag aan dit MDO is welke contextinformatie mijn doel, methode of vorm verandert.',
+          'Voor Wietze is transfer geen extraatje; zonder klas- en thuissteun blijft de therapie in de behandelkamer hangen.',
+          'Ik stel voor om over 8-12 weken zowel functiewinst als participatie in de klas te evalueren.'
+        ],
+        model: 'Ik open het MDO met de kern dat Wietze 7;0 jaar is en door lage cognitieve belastbaarheid, zwakke verstaanbaarheid, VOD-kenmerken en zwakke morfosyntaxis communicatief vastloopt in de klas. Diagnostisch weeg ik fonologische processen apart van spraakmotorische planning; wisselende fouten en zoekgedrag maken een puur fonologische aanpak te smal. In ICF-termen zie ik functieproblemen in spraakplanning, fonologie en zinsbouw, activiteitproblemen in verstaanbare uitingen en participatieproblemen doordat hij zich terugtrekt. Mijn behandelprioriteit is functionele communicatie in de klas. Ik kies korte individuele sessies met motorisch-planningsgericht oefenen, concrete zinssteun en transfer via ouders en leerkracht. Aan school vraag ik welke klassituaties mislukken en welke visuele steun werkt; aan ouders vraag ik welke routines thuis haalbaar zijn; aan psychologie vraag ik naar belastbaarheid en leerbaarheid; zo nodig check ik gehoor en bredere motoriek. De prognose is voorzichtig maar functioneel positief: geen snelle normalisatie, wel groei in verstaanbaarheid, korte uitingen en deelname als we intensief, visueel en contextgeborgd werken.'
+      }
     }
   },
   caseTreatment: {
