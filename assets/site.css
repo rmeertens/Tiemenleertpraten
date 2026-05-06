@@ -4468,7 +4468,7 @@ body[data-split-mode="sounds"] .split-block--pattern {
   }
 }
 
-/* ============ Stotter Alfa ============ */
+/* ============ Stotter Alpha ============ */
 
 .stutter-app {
   max-width: 1180px;
@@ -4707,6 +4707,328 @@ body[data-split-mode="sounds"] .split-block--pattern {
 
   .stutter-question,
   .stutter-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+/* ============ Lesnotitie Alpha ============ */
+
+.note-app {
+  max-width: 1180px;
+}
+
+.note-hero {
+  align-items: stretch;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  margin: 34px 0 18px;
+}
+
+.note-hero > div,
+.note-score,
+.note-card,
+.note-privacy {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.note-hero > div {
+  padding: 34px;
+}
+
+.note-hero h2,
+.note-card h3,
+.note-privacy h3 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.08;
+  margin: 0 0 12px;
+}
+
+.note-hero p,
+.note-card p,
+.note-privacy p {
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.note-score {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 26px 20px;
+  text-align: center;
+}
+
+.note-score span,
+.note-label {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+
+.note-score strong {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1;
+  margin: 12px 0;
+}
+
+.note-privacy,
+.note-card {
+  margin-top: 18px;
+  padding: 24px;
+}
+
+.note-privacy {
+  align-items: center;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 340px);
+}
+
+.note-toggle,
+.note-fields label {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.note-toggle {
+  align-items: flex-start;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+}
+
+.note-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.note-fields {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.note-fields--stack {
+  grid-template-columns: 1fr;
+}
+
+.note-fields label {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+}
+
+.note-fields span {
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.note-fields input,
+.note-fields textarea,
+.note-textarea {
+  appearance: none;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.55;
+  padding: 12px 13px;
+  resize: vertical;
+  width: 100%;
+}
+
+.note-fields label input,
+.note-fields label textarea {
+  background: var(--bg-elevated);
+}
+
+.note-fields input:focus,
+.note-fields textarea:focus,
+.note-textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.note-textarea {
+  margin-top: 14px;
+}
+
+.note-actions,
+.note-card-head {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.note-card-head {
+  justify-content: space-between;
+}
+
+.note-small,
+.note-status {
+  color: var(--ink-faint);
+  font-size: 14px;
+}
+
+.note-status {
+  margin-top: 10px;
+}
+
+.note-review,
+.note-feedback {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.note-review article,
+.note-feedback article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.note-flag {
+  align-items: flex-start;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.note-flag strong {
+  color: var(--bad);
+}
+
+.note-ok strong {
+  color: var(--good);
+}
+
+.note-feedback-head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.note-feedback-head strong {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 500;
+}
+
+.note-feedback ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.note-radar-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.note-radar-grid article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.note-radar-grid span {
+  color: var(--accent);
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.note-radar-grid strong {
+  display: block;
+  margin-top: 3px;
+}
+
+.note-radar-grid ul {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+
+.note-radar-grid li {
+  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: 3px;
+  padding-top: 10px;
+}
+
+.note-radar-grid li span {
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.note-radar-drill {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  color: var(--ink) !important;
+  font-weight: 700;
+  margin-top: 14px !important;
+  padding: 12px;
+}
+
+.note-eco {
+  align-items: flex-start;
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  display: flex;
+  gap: 8px;
+  margin-top: 12px !important;
+  padding: 14px;
+}
+
+.note-eco a {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .note-hero,
+  .note-privacy,
+  .note-grid,
+  .note-fields,
+  .note-radar-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .note-actions,
+  .note-card-head {
     align-items: stretch;
     flex-direction: column;
   }

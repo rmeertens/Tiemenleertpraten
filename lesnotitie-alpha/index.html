@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Lesnotitie Alpha — privacybewuste lesnotitie-tool met transcriptie, kernvelden, AVG-scan en export." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Lesnotitie Alpha &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="../assets/site.css?v=27" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; Lesnotitie Alpha</div>
+  <main class="studio note-app">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Lesnotitie Alpha</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <header class="note-hero">
+      <div>
+        <p class="eyebrow">Les opnemen &middot; kritisch opschonen &middot; toetsklaar maken</p>
+        <h2>Niet alles bewaren. Alleen wat je later punten oplevert.</h2>
+        <p>
+          Neem de lesstof op via spraakherkenning, markeer toetsankers en maak daarna
+          een nette notitie of AI-prompt. Alles blijft lokaal in je browser.
+        </p>
+      </div>
+      <aside class="note-score">
+        <span>Notitie</span>
+        <strong id="note-score">0%</strong>
+        <p id="note-hint">Vul eerst les en leerdoel in.</p>
+      </aside>
+    </header>
+
+    <section class="note-privacy" aria-labelledby="privacy-title">
+      <div>
+        <p class="note-label">AVG en klasveiligheid</p>
+        <h3 id="privacy-title">Gebruik dit voor lesstof, niet voor klasgenoten.</h3>
+        <p>
+          Vraag toestemming waar nodig. Loop de transcriptie kritisch na en verwijder persoonlijke,
+          herleidbare of niet-lesinhoudelijke informatie van klasgenoten. De scan helpt, maar jij blijft de eindredacteur.
+        </p>
+      </div>
+      <label class="note-toggle">
+        <input id="privacy-check" type="checkbox" />
+        <strong>Ik let actief op AVG en lesrelevantie</strong>
+      </label>
+    </section>
+
+    <section class="note-grid">
+      <article class="note-card">
+        <p class="note-label">1. Leskader</p>
+        <h3>Waar gaat deze les over?</h3>
+        <div class="note-fields">
+          <label>
+            <span>Les / week</span>
+            <input id="lesson-title" type="text" placeholder="Bijv. W6 diagnostiek fonetiek-fonologie" />
+          </label>
+          <label>
+            <span>Datum</span>
+            <input id="lesson-date" type="date" />
+          </label>
+          <label>
+            <span>Hoofdthema</span>
+            <input id="lesson-theme" type="text" placeholder="Bijv. contrast, stimulabiliteit, minimale paren" />
+          </label>
+          <label>
+            <span>Toetsdoel</span>
+            <input id="lesson-goal" type="text" placeholder="Wat moet ik hierover kunnen uitleggen of toepassen?" />
+          </label>
+        </div>
+      </article>
+
+      <article class="note-card">
+        <p class="note-label">2. Opnemen</p>
+        <h3>Transcriptie van de lesstof</h3>
+        <p class="note-small">Spraakherkenning werkt vooral in Chrome/Edge. Werkt het niet, typ of plak je tekst.</p>
+        <div class="note-actions">
+          <button class="btn btn--primary" type="button" id="record-toggle">Start opname</button>
+          <button class="btn btn--ghost" type="button" id="scan-transcript">Scan op ruis/AVG</button>
+          <button class="btn btn--ghost" type="button" id="clear-transcript">Wis transcript</button>
+        </div>
+        <p class="note-status" id="record-status">Nog niet aan het opnemen.</p>
+        <label class="sr-only" for="transcript">Transcriptie</label>
+        <textarea id="transcript" class="note-textarea" rows="12" placeholder="Transcriptie verschijnt hier. Je mag ook bestaande tekst plakken."></textarea>
+      </article>
+    </section>
+
+    <section class="note-card" id="review-card">
+      <div class="note-card-head">
+        <div>
+          <p class="note-label">3. Kritische scan</p>
+          <h3>Wat hoort niet in je lesnotitie?</h3>
+        </div>
+        <button class="btn btn--ghost" type="button" id="apply-clean">Maak schone versie</button>
+      </div>
+      <div id="privacy-results" class="note-review">
+        <p class="note-small">Klik op “Scan op ruis/AVG”. Verdachte zinnen kun je behouden of verwijderen.</p>
+      </div>
+    </section>
+
+    <section class="note-card note-exam-radar" aria-labelledby="exam-radar-title">
+      <div class="note-card-head">
+        <div>
+          <p class="note-label">4. Toetsradar</p>
+          <h3 id="exam-radar-title">Wat is belangrijk voor mondeling en schriftelijk?</h3>
+        </div>
+        <button class="btn btn--primary" type="button" id="build-radar">Maak toetsradar</button>
+      </div>
+      <p class="note-small">
+        De coach splitst je transcriptie in twee routes: hardop verantwoorden voor het mondeling
+        en puntscorend formuleren voor het schriftelijk. Zelfde lesstof, andere bewijsvorm.
+      </p>
+      <div class="note-radar-grid">
+        <article>
+          <span>Mondeling</span>
+          <strong>Praatroute</strong>
+          <ul id="oral-radar"></ul>
+          <p id="oral-drill" class="note-radar-drill"></p>
+        </article>
+        <article>
+          <span>Schriftelijk</span>
+          <strong>Puntenroute</strong>
+          <ul id="written-radar"></ul>
+          <p id="written-drill" class="note-radar-drill"></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="note-grid">
+      <article class="note-card">
+        <p class="note-label">5. Kernnotitie</p>
+        <h3>Maak er studievoer van</h3>
+        <div class="note-fields note-fields--stack">
+          <label>
+            <span>3 kernbegrippen</span>
+            <textarea id="core-concepts" rows="3" placeholder="Begrip + korte betekenis."></textarea>
+          </label>
+          <label>
+            <span>Toetsankers</span>
+            <textarea id="exam-anchors" rows="4" placeholder="Wat kan de docent vragen? Wat moet je kunnen bewijzen?"></textarea>
+          </label>
+          <label>
+            <span>Casus of toepassing</span>
+            <textarea id="case-application" rows="4" placeholder="Koppel de stof aan kind, cliënt, onderzoek, behandeling of klascontext."></textarea>
+          </label>
+          <label>
+            <span>Vragen die ik nog heb</span>
+            <textarea id="open-questions" rows="3" placeholder="Wat snap ik nog niet?"></textarea>
+          </label>
+        </div>
+      </article>
+
+      <article class="note-card">
+        <p class="note-label">6. Coachcheck</p>
+        <h3>Is dit toetsklaar?</h3>
+        <p class="note-small">De coach controleert op structuur, toepassing en toetswaarde. Geen lange samenvatting zonder oefenvraag. Zo hoort het.</p>
+        <div class="note-actions">
+          <button class="btn btn--primary" type="button" id="check-note">Check notitie</button>
+          <button class="btn btn--ghost" type="button" id="save-note">Bewaar lokaal</button>
+        </div>
+        <div id="coach-feedback" class="note-feedback">
+          <p class="note-small">Nog geen feedback.</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="note-card">
+      <div class="note-card-head">
+        <div>
+          <p class="note-label">7. AI-prompt</p>
+          <h3>Laat AI er later een samenvatting van maken</h3>
+        </div>
+        <button class="btn btn--primary" type="button" id="copy-prompt">Kopieer prompt</button>
+      </div>
+      <p class="note-eco">
+        <span aria-hidden="true">🌱</span>
+        Plak alleen wat je nodig hebt en kies waar mogelijk een milieuvriendelijke AI-tool zoals
+        <a href="https://chat.mistral.ai/chat" target="_blank" rel="noreferrer">deze</a>.
+        De planeet luistert stilletjes mee. ;)
+      </p>
+      <textarea id="ai-prompt" class="note-textarea" rows="10" readonly></textarea>
+      <p class="note-status" id="copy-status"></p>
+    </section>
+
+    <section class="note-card">
+      <p class="note-label">8. Export</p>
+      <h3>Neem je notitie mee</h3>
+      <div class="note-actions">
+        <button class="btn btn--primary" type="button" id="download-md">Download Markdown</button>
+        <button class="btn btn--ghost" type="button" id="download-txt">Download tekst</button>
+        <button class="btn btn--ghost" type="button" id="download-html">Download HTML</button>
+        <button class="btn btn--ghost" type="button" id="download-docx">Download Word</button>
+        <button class="btn btn--ghost" type="button" id="print-pdf">Print / PDF</button>
+      </div>
+      <p class="note-small">Pages kan geen betrouwbaar webexportbestand krijgen zonder Apple-software. Open de Word- of HTML-export in Pages als je daarin verder wilt werken.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

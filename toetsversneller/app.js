@@ -67,14 +67,24 @@ const tracks = [
     boss: 'Pak-de-10 boss: casus verdedigen zonder modelantwoord.'
   },
   {
-    id: 'stotter-alfa',
-    title: 'Stotter Alfa',
-    href: '/stotter-alfa/',
+    id: 'lesnotitie-alpha',
+    title: 'Lesnotitie Alpha',
+    href: '/lesnotitie-alpha/',
+    storage: () => lessonNoteProgress(),
+    max: 100,
+    red: 'Maak van transcriptie een toetsnotitie: leerdoel, begrippen, toetsankers en toepassing.',
+    quick: 'Werk één lesnotitie op: scan ruis/AVG en formuleer één oefenvraag.',
+    boss: 'Lesnotitie boss: ruwe lesstof omzetten naar 5 bullets, casuslink en toetsvraag.'
+  },
+  {
+    id: 'stotter-alpha',
+    title: 'Stotter Alpha',
+    href: '/stotter-alpha/',
     storage: () => stutterProgress(),
     max: 100,
     red: 'Maak van controle weer communicatie: analyseer één moment met de zeshoek.',
     quick: 'Doe de 12-minuten dagroute en bewaar één log.',
-    boss: 'Alfa boss: spreekmoment beschrijven, dam vinden en één mini-exposure kiezen.'
+    boss: 'Alpha boss: spreekmoment beschrijven, dam vinden en één mini-exposure kiezen.'
   }
 ];
 
@@ -238,11 +248,28 @@ function averageObjectScore(key, maxScore) {
 }
 
 function stutterProgress() {
-  const daily = readJson(`stotter_alfa_daily_${todayKey}`, {});
-  const logs = readJson('stotter_alfa_logs', []);
+  const daily = readJson(`stotter_alpha_daily_${todayKey}`, {});
+  const logs = readJson('stotter_alpha_logs', []);
   const dailyScore = Object.values(daily).filter(Boolean).length * 14;
   const logScore = Math.min(30, logs.length * 6);
   return Math.min(100, dailyScore + logScore);
+}
+
+function lessonNoteProgress() {
+  const notes = readJson('lesnotitie_alpha_notes', []);
+  const draft = readJson('lesnotitie_alpha_draft', {});
+  const savedScore = notes.length ? Number(notes[0].score || 0) : 0;
+  const draftScore = [
+    draft.title,
+    draft.theme,
+    draft.goal,
+    String(draft.transcript || '').split(/\s+/).filter(Boolean).length >= 30,
+    draft.concepts,
+    draft.anchors,
+    draft.application,
+    draft.privacy
+  ].filter(Boolean).length * 12;
+  return Math.min(100, Math.max(savedScore, draftScore));
 }
 
 function readJson(key, fallback) {

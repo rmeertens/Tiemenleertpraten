@@ -1,7 +1,7 @@
 'use strict';
 
-const storageKey = 'stotter_alfa_logs';
-const dailyKey = `stotter_alfa_daily_${localDateKey(new Date())}`;
+const storageKey = 'stotter_alpha_logs';
+const dailyKey = `stotter_alpha_daily_${localDateKey(new Date())}`;
 
 const dailySteps = [
   ['Vrij schrijven', '2 minuten zonder rem. Schrijf wat je denkt voordat je het netjes maakt. Netjes is later, misschien nooit.'],
@@ -106,8 +106,8 @@ function bindEvents() {
 function renderDaily() {
   const done = readJson(dailyKey, {});
   const complete = dailySteps.filter((_, index) => done[index]).length;
-  document.getElementById('alfa-ready').textContent = `${complete}/5`;
-  document.getElementById('alfa-hint').textContent = complete >= 5
+  document.getElementById('alpha-ready').textContent = `${complete}/5`;
+  document.getElementById('alpha-hint').textContent = complete >= 5
     ? 'Dagroute rond. Morgen weer klein beginnen.'
     : `${5 - complete} stappen open. Rustig. Niet heroisch doen.`;
 
@@ -133,7 +133,7 @@ function renderDaily() {
 function answerCoach() {
   const question = coachInput.value.trim();
   if (!question) {
-    coachAnswer.innerHTML = '<p>Stel eerst een vraag. Stotter Alfa is goed, maar helderziendheid stond niet in het pakket.</p>';
+    coachAnswer.innerHTML = '<p>Stel eerst een vraag. Stotter Alpha is goed, maar helderziendheid stond niet in het pakket.</p>';
     return;
   }
 
@@ -220,7 +220,7 @@ function checkDrill() {
 
   drillFeedback.innerHTML = `
     <div class="stutter-feedback-head">
-      <h3>${score >= 4 ? 'Alfa-waardig' : score >= 3 ? 'Bijna raak' : 'Nog te vaag'}</h3>
+      <h3>${score >= 4 ? 'Alpha-waardig' : score >= 3 ? 'Bijna raak' : 'Nog te vaag'}</h3>
       <strong>${score}/4</strong>
     </div>
     ${scanHtml({
@@ -348,7 +348,7 @@ function scanHtml({ good = [], missing = [], vague = [] }) {
   `;
   return `
     <article class="coach-scan">
-      <strong>Alfa-scan</strong>
+      <strong>Alpha-scan</strong>
       <div class="coach-scan__grid">
         ${group('is-good', 'Groen · gezien', good, 'Nog niets scherp gezien.')}
         ${group('is-missing', 'Rood · onderzoek dit', missing, 'Geen groot rood punt.')}
