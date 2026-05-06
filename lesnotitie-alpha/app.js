@@ -25,6 +25,80 @@ const writtenSignals = [
   ['Advies', ['advies', 'aanpak', 'behandel', 'vervolg', 'ouder', 'school'], 'Sluit af met een concrete vervolgstap of handelingsadvies.'],
   ['Nuance', ['meertaligheid', 'ses', 'gehoor', 'comorbiditeit', 'differentiaal'], 'Laat zien dat je alternatieve verklaringen niet platwalst. Keurig menselijk, ook handig voor punten.']
 ];
+const contextTerms = [
+  ['icf', 'ICF'],
+  ['tos', 'TOS'],
+  ['omft', 'OMFT'],
+  ['v o d', 'VOD'],
+  ['verbale ontwikkelings dyspraxie', 'verbale ontwikkelingsdyspraxie'],
+  ['verbale ontwikkelingspraxis', 'verbale ontwikkelingsdyspraxie'],
+  ['fonologie', 'fonologie'],
+  ['fonologische', 'fonologische'],
+  ['fonetiek', 'fonetiek'],
+  ['morfos syntaxis', 'morfosyntaxis'],
+  ['morfosyntax is', 'morfosyntaxis'],
+  ['morfo syntaxis', 'morfosyntaxis'],
+  ['semantiek', 'semantiek'],
+  ['pragmatiek', 'pragmatiek'],
+  ['stimulabiliteit', 'stimulabiliteit'],
+  ['stimulatie biliteit', 'stimulabiliteit'],
+  ['minimale paren', 'minimale paren'],
+  ['contrast therapie', 'contrasttherapie'],
+  ['metaphon', 'Metaphon'],
+  ['hodson en paden', 'Hodson & Paden'],
+  ['hodson paden', 'Hodson & Paden'],
+  ['scaffolding', 'scaffolding'],
+  ['zone van naaste ontwikkeling', 'Zone van Naaste Ontwikkeling'],
+  ['z p d', 'ZPD'],
+  ['fast mapping', 'fast mapping'],
+  ['joint attention', 'joint attention'],
+  ['theory of mind', 'Theory of Mind'],
+  ['sally anne', 'Sally-Anne'],
+  ['schlichting', 'Schlichting'],
+  ['zinsontwikkeling', 'Zinsontwikkeling'],
+  ['taalbegrip', 'Taalbegrip'],
+  ['ontwikkelings perspectief', 'ontwikkelingsperspectief'],
+  ['ontwikkelingsperspectiefplan', 'ontwikkelingsperspectiefplan']
+];
+const contextConfusions = [
+  ['tops', 'TOS'],
+  ['tosse', 'TOS'],
+  ['tos problematiek', 'TOS-problematiek'],
+  ['vod', 'VOD'],
+  ['voet', 'VOD'],
+  ['f o d', 'VOD'],
+  ['fonologische stoornis', 'fonologische stoornis'],
+  ['fonologische proces', 'fonologisch proces'],
+  ['fone logie', 'fonologie'],
+  ['foneetiek', 'fonetiek'],
+  ['morfo syntactisch', 'morfosyntactisch'],
+  ['pragmatische stoornis', 'pragmatische stoornis'],
+  ['stimulatie kwaliteit', 'stimulabiliteit'],
+  ['minimale paarden', 'minimale paren'],
+  ['minimale parels', 'minimale paren'],
+  ['contrastieve therapie', 'contrastieve therapie'],
+  ['metafoon', 'Metaphon'],
+  ['hodson en paarden', 'Hodson & Paden'],
+  ['hossen en paden', 'Hodson & Paden'],
+  ['om ft', 'OMFT'],
+  ['open beet', 'open beet'],
+  ['interdentale sigmatismus', 'interdentaal sigmatisme'],
+  ['sigmatisme', 'sigmatisme'],
+  ['scaffold ding', 'scaffolding'],
+  ['fast met ping', 'fast mapping'],
+  ['gezamenlijke aandacht', 'joint attention'],
+  ['theorie of mind', 'Theory of Mind'],
+  ['sally en', 'Sally-Anne'],
+  ['schlichting drie', 'Schlichting-3'],
+  ['schlichting 3', 'Schlichting-3'],
+  ['taal begrip', 'Taalbegrip'],
+  ['zin ontwikkeling', 'Zinsontwikkeling'],
+  ['v v e', 'VVE'],
+  ['i c f', 'ICF'],
+  ['ses', 'SES'],
+  ['k n o', 'KNO'],
+  ['audioloog', 'audioloog']
+];
 
 const fields = {
   title: document.getElementById('lesson-title'),
@@ -47,6 +121,7 @@ const audioButton = document.getElementById('audio-backup-toggle');
 const audioStatus = document.getElementById('audio-backup-status');
 const audioDownload = document.getElementById('audio-download');
 const privacyResults = document.getElementById('privacy-results');
+const contextResults = document.getElementById('context-results');
 const coachFeedback = document.getElementById('coach-feedback');
 const aiPrompt = document.getElementById('ai-prompt');
 const copyStatus = document.getElementById('copy-status');
@@ -66,6 +141,7 @@ let mediaRecorder = null;
 let audioChunks = [];
 let audioStream = null;
 let flaggedSentences = [];
+let contextSuggestions = [];
 
 boot();
 
@@ -81,6 +157,8 @@ function bindEvents() {
   document.getElementById('record-toggle').addEventListener('click', toggleRecording);
   document.getElementById('checkpoint-transcript').addEventListener('click', checkpointTranscript);
   document.getElementById('audio-backup-toggle').addEventListener('click', toggleAudioBackup);
+  document.getElementById('context-correct').addEventListener('click', buildContextSuggestions);
+  document.getElementById('apply-context').addEventListener('click', applyContextSuggestions);
   document.getElementById('scan-transcript').addEventListener('click', scanTranscript);
   document.getElementById('clear-transcript').addEventListener('click', () => {
     fields.transcript.value = '';
@@ -115,6 +193,60 @@ function bindEvents() {
       updateScore();
     });
   });
+}
+
+function buildContextSuggestions() {
+  const text = fields.transcript.value.trim();
+  if (!text) {
+    contextResults.innerHTML = '<p class="note-small">Geen transcriptie om te corrigeren.</p>';
+    return;
+  }
+  contextSuggestions = [...contextConfusions, ...themeBasedSuggestions()]
+    .map(([from, to]) => ({ from, to, count: countOccurrences(text, from) }))
+    .filter(item => item.count > 0 && normalize(item.from) !== normalize(item.to));
+
+  if (!contextSuggestions.length) {
+    contextResults.innerHTML = `
+      <article class="note-ok">
+        <strong>Geen duidelijke vakterm-missers gevonden</strong>
+        <p>Mooi. Lees alsnog even op termen als TOS, ICF, VOD, OMFT en morfosyntaxis.</p>
+      </article>
+    `;
+    return;
+  }
+
+  contextResults.innerHTML = contextSuggestions.map((item, index) => `
+    <article class="note-context-item">
+      <label>
+        <input type="checkbox" data-context="${index}" checked />
+        <span><strong>${escapeHtml(item.from)}</strong> → <strong>${escapeHtml(item.to)}</strong></span>
+      </label>
+      <small>${item.count}x gevonden</small>
+    </article>
+  `).join('');
+}
+
+function applyContextSuggestions() {
+  if (!contextSuggestions.length) {
+    buildContextSuggestions();
+    return;
+  }
+  const selected = Array.from(document.querySelectorAll('[data-context]:checked')).map(input => contextSuggestions[Number(input.dataset.context)]);
+  fields.transcript.value = selected.reduce((text, item) => replacePhrase(text, item.from, item.to), fields.transcript.value);
+  contextResults.innerHTML = `<p class="note-small">${selected.length} correctie(s) toegepast. Lees de zinnen nog even hardop na.</p>`;
+  contextSuggestions = [];
+  persistDraft();
+  updatePrompt();
+  updateScore();
+}
+
+function themeBasedSuggestions() {
+  const theme = normalize(`${fields.theme.value} ${fields.goal.value}`);
+  const suggestions = [];
+  contextTerms.forEach(([from, to]) => {
+    if (theme.includes(normalize(to)) || theme.includes(normalize(from))) suggestions.push([from, to]);
+  });
+  return suggestions;
 }
 
 async function toggleAudioBackup() {
@@ -782,6 +914,31 @@ function splitSentences(text) {
 
 function splitLines(text) {
   return String(text || '').split(/\n+/).map(line => line.trim()).filter(Boolean);
+}
+
+function countOccurrences(text, phrase) {
+  const matches = text.match(phraseRegex(phrase));
+  return matches ? matches.length : 0;
+}
+
+function replacePhrase(text, from, to) {
+  return text.replace(phraseRegex(from), match => preserveCase(match, to));
+}
+
+function phraseRegex(phrase) {
+  const escaped = String(phrase)
+    .trim()
+    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    .replace(/\s+/g, '\\s+');
+  return new RegExp(`\\b${escaped}\\b`, 'gi');
+}
+
+function preserveCase(original, replacement) {
+  if (original.toUpperCase() === original) return replacement.toUpperCase();
+  if (original[0] && original[0].toUpperCase() === original[0]) {
+    return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+  }
+  return replacement;
 }
 
 function lineCount(text) {

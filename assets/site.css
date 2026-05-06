@@ -4922,18 +4922,39 @@ body[data-split-mode="sounds"] .split-block--pattern {
 }
 
 .note-review,
-.note-feedback {
+.note-feedback,
+.note-context-results {
   display: grid;
   gap: 12px;
   margin-top: 14px;
 }
 
 .note-review article,
-.note-feedback article {
+.note-feedback article,
+.note-context-results article {
   background: var(--bg);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   padding: 16px;
+}
+
+.note-context-item {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.note-context-item label {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+
+.note-context-item small {
+  color: var(--ink-faint);
+  white-space: nowrap;
 }
 
 .note-flag {

@@ -90,6 +90,7 @@
           <button class="btn btn--primary" type="button" id="record-toggle">Start opname</button>
           <button class="btn btn--ghost" type="button" id="checkpoint-transcript">Checkpoint</button>
           <button class="btn btn--ghost" type="button" id="audio-backup-toggle">Start audio-backup</button>
+          <button class="btn btn--ghost" type="button" id="context-correct">Contextcorrectie</button>
           <button class="btn btn--ghost" type="button" id="scan-transcript">Scan op ruis/AVG</button>
           <button class="btn btn--ghost" type="button" id="clear-transcript">Wis transcript</button>
         </div>
@@ -99,6 +100,23 @@
         <label class="sr-only" for="transcript">Transcriptie</label>
         <textarea id="transcript" class="note-textarea" rows="12" placeholder="Transcriptie verschijnt hier. Je mag ook bestaande tekst plakken."></textarea>
       </article>
+    </section>
+
+    <section class="note-card" aria-labelledby="context-title">
+      <div class="note-card-head">
+        <div>
+          <p class="note-label">2b. Logopedische contextcorrectie</p>
+          <h3 id="context-title">Maak van browser-Nederlands weer vaktaal.</h3>
+        </div>
+        <button class="btn btn--primary" type="button" id="apply-context">Pas suggesties toe</button>
+      </div>
+      <p class="note-small">
+        De browser kent geen Hanze-logopediebrein. Deze laag zoekt veelgemaakte herkenningsfouten
+        en stelt vaktermen voor. Controleer altijd zelf: contextcorrectie is slim, niet heilig.
+      </p>
+      <div id="context-results" class="note-context-results">
+        <p class="note-small">Klik op Contextcorrectie na het opnemen of plakken van tekst.</p>
+      </div>
     </section>
 
     <section class="note-card" id="review-card">
@@ -189,10 +207,11 @@
         <button class="btn btn--primary" type="button" id="copy-prompt">Kopieer prompt</button>
       </div>
       <p class="note-eco">
-        <span aria-hidden="true">🌱</span>
-        Plak alleen wat je nodig hebt en kies waar mogelijk een milieuvriendelijke AI-tool zoals
-        <a href="https://chat.mistral.ai/chat" target="_blank" rel="noreferrer">deze</a>.
-        De planeet luistert stilletjes mee. ;)
+        <span aria-hidden="true">🐧</span>
+        Zorg dat de pinguïns minder snel door het ijs zakken: plak alleen wat je nodig hebt
+        en kies waar mogelijk een
+        <a href="https://chat.mistral.ai/chat" target="_blank" rel="noreferrer">milieuvriendelijkere AI-tool</a>
+        om transcripties mee te verwerken.
       </p>
       <textarea id="ai-prompt" class="note-textarea" rows="10" readonly></textarea>
       <p class="note-status" id="copy-status"></p>
