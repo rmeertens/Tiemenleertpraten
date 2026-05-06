@@ -43,6 +43,9 @@ const noteScore = document.getElementById('note-score');
 const noteHint = document.getElementById('note-hint');
 const recordButton = document.getElementById('record-toggle');
 const recordStatus = document.getElementById('record-status');
+const audioButton = document.getElementById('audio-backup-toggle');
+const audioStatus = document.getElementById('audio-backup-status');
+const audioDownload = document.getElementById('audio-download');
 const privacyResults = document.getElementById('privacy-results');
 const coachFeedback = document.getElementById('coach-feedback');
 const aiPrompt = document.getElementById('ai-prompt');
@@ -55,6 +58,13 @@ const writtenDrill = document.getElementById('written-drill');
 let recognition = null;
 let recording = false;
 let recordingBase = '';
+let sessionFinal = '';
+let sessionInterim = '';
+let recordingStartedAt = 0;
+let checkpointTimer = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let audioStream = null;
 let flaggedSentences = [];
 
 boot();
@@ -69,9 +79,14 @@ function boot() {
 
 function bindEvents() {
   document.getElementById('record-toggle').addEventListener('click', toggleRecording);
+  document.getElementById('checkpoint-transcript').addEventListener('click', checkpointTranscript);
+  document.getElementById('audio-backup-toggle').addEventListener('click', toggleAudioBackup);
   document.getElementById('scan-transcript').addEventListener('click', scanTranscript);
   document.getElementById('clear-transcript').addEventListener('click', () => {
     fields.transcript.value = '';
+    recordingBase = '';
+    sessionFinal = '';
+    sessionInterim = '';
     flaggedSentences = [];
     privacyResults.innerHTML = '<p class="note-small">Transcript gewist. Minder ruis, letterlijk.</p>';
     persistDraft();
@@ -102,6 +117,47 @@ function bindEvents() {
   });
 }
 
+async function toggleAudioBackup() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    audioButton.textContent = 'Start audio-backup';
+    audioStatus.textContent = 'Audio-backup wordt klaargezet.';
+    return;
+  }
+  if (!privacyCheck.checked) {
+    audioStatus.textContent = 'Vink eerst aan dat je actief op AVG en lesrelevantie let.';
+    return;
+  }
+  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+    audioStatus.textContent = 'Audio-backup wordt niet ondersteund in deze browser.';
+    return;
+  }
+  try {
+    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioChunks = [];
+    mediaRecorder = new MediaRecorder(audioStream);
+    mediaRecorder.ondataavailable = event => {
+      if (event.data.size) audioChunks.push(event.data);
+    };
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+      const url = URL.createObjectURL(blob);
+      audioDownload.href = url;
+      audioDownload.download = `${slugify(fields.title.value || 'lesnotitie-alpha')}-audio.webm`;
+      audioDownload.hidden = false;
+      audioStatus.textContent = 'Audio-backup klaar. Download hem en bewaar hem bewust/privacyveilig.';
+      audioStream?.getTracks().forEach(track => track.stop());
+      audioStream = null;
+    };
+    mediaRecorder.start(30000);
+    audioDownload.hidden = true;
+    audioButton.textContent = 'Stop audio-backup';
+    audioStatus.textContent = 'Audio-backup loopt lokaal. Er wordt niets geupload.';
+  } catch {
+    audioStatus.textContent = 'Audio-backup kon niet starten. Controleer microfoontoegang.';
+  }
+}
+
 function toggleRecording() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -118,26 +174,36 @@ function toggleRecording() {
     recognition.interimResults = true;
     recognition.continuous = true;
     recognition.onresult = event => {
-      const text = Array.from(event.results)
-        .map(result => result[0].transcript)
-        .join(' ')
-        .trim();
-      fields.transcript.value = [recordingBase, text].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+      let interim = '';
+      for (let index = event.resultIndex; index < event.results.length; index++) {
+        const result = event.results[index];
+        const transcript = result[0].transcript.trim();
+        if (!transcript) continue;
+        if (result.isFinal) sessionFinal = joinText(sessionFinal, punctuate(transcript));
+        else interim = joinText(interim, transcript);
+      }
+      sessionInterim = interim;
+      renderTranscript();
       persistDraft();
       updatePrompt();
       updateScore();
     };
     recognition.onerror = event => {
+      commitSession();
       recording = false;
+      stopCheckpointTimer();
       recordButton.textContent = 'Start opname';
       recordStatus.textContent = recognitionErrorMessage(event.error);
     };
     recognition.onend = () => {
       if (!recording) return;
+      commitSession();
       try {
         recognition.start();
+        recordStatus.textContent = `Opname loopt verder na automatische herstart. ${recordingStatusText()}`;
       } catch {
         recording = false;
+        stopCheckpointTimer();
         recordButton.textContent = 'Start opname';
         recordStatus.textContent = 'Opname gestopt. Start opnieuw als je verder wilt.';
       }
@@ -146,23 +212,87 @@ function toggleRecording() {
 
   if (recording) {
     recording = false;
+    commitSession();
+    stopCheckpointTimer();
     recognition.stop();
     recordButton.textContent = 'Start opname';
-    recordStatus.textContent = 'Opname gestopt. Scan nu op ruis/AVG.';
+    recordStatus.textContent = `Opname gestopt. ${wordCount(fields.transcript.value)} woorden vastgelegd. Scan nu op ruis/AVG.`;
     return;
   }
 
   recording = true;
   recordingBase = fields.transcript.value.trim();
+  sessionFinal = '';
+  sessionInterim = '';
+  recordingStartedAt = Date.now();
   recordButton.textContent = 'Stop opname';
-  recordStatus.textContent = 'Opname loopt. Blijf eindredacteur: klasgenoten horen niet automatisch in je notitie.';
+  startCheckpointTimer();
+  recordStatus.textContent = `Opname loopt. ${recordingStatusText()} Blijf eindredacteur: klasgenoten horen niet automatisch in je notitie.`;
   try {
     recognition.start();
   } catch {
     recording = false;
+    stopCheckpointTimer();
     recordButton.textContent = 'Start opname';
     recordStatus.textContent = 'De opname kon niet starten. Klik nog één keer of typ/plak de tekst.';
   }
+}
+
+function checkpointTranscript() {
+  commitSession();
+  persistDraft();
+  updatePrompt();
+  updateScore();
+  recordStatus.textContent = recording
+    ? `Checkpoint bewaard. ${recordingStatusText()}`
+    : `Checkpoint bewaard. ${wordCount(fields.transcript.value)} woorden in je transcript.`;
+}
+
+function renderTranscript() {
+  fields.transcript.value = joinText(recordingBase, sessionFinal, sessionInterim);
+}
+
+function commitSession() {
+  renderTranscript();
+  recordingBase = joinText(recordingBase, sessionFinal, sessionInterim);
+  sessionFinal = '';
+  sessionInterim = '';
+  fields.transcript.value = recordingBase;
+}
+
+function startCheckpointTimer() {
+  stopCheckpointTimer();
+  checkpointTimer = window.setInterval(() => {
+    checkpointTranscript();
+  }, 30000);
+}
+
+function stopCheckpointTimer() {
+  if (!checkpointTimer) return;
+  window.clearInterval(checkpointTimer);
+  checkpointTimer = null;
+}
+
+function recordingStatusText() {
+  const seconds = Math.max(0, Math.floor((Date.now() - recordingStartedAt) / 1000));
+  const minutes = Math.floor(seconds / 60);
+  const rest = String(seconds % 60).padStart(2, '0');
+  return `${minutes}:${rest} · ${wordCount(fields.transcript.value)} woorden · neem bij voorkeur in blokken.`;
+}
+
+function joinText(...parts) {
+  return parts
+    .map(part => String(part || '').trim())
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function punctuate(text) {
+  const clean = text.trim();
+  if (!clean) return '';
+  return /[.!?]$/.test(clean) ? clean : `${clean}.`;
 }
 
 function scanTranscript() {

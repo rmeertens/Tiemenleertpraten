@@ -4813,6 +4813,25 @@ body[data-split-mode="sounds"] .split-block--pattern {
   padding: 14px;
 }
 
+.note-capture-note {
+  background: var(--accent-soft);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 4px;
+  margin: 12px 0;
+  padding: 13px 14px;
+}
+
+.note-capture-note strong {
+  color: var(--ink);
+}
+
+.note-capture-note p {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
 .note-grid {
   display: grid;
   gap: 18px;
@@ -4893,6 +4912,13 @@ body[data-split-mode="sounds"] .split-block--pattern {
 
 .note-status {
   margin-top: 10px;
+}
+
+.note-download-link {
+  color: var(--accent);
+  display: inline-block;
+  font-weight: 800;
+  margin-top: 8px;
 }
 
 .note-review,

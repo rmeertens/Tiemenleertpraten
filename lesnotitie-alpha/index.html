@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Lesnotitie Alpha — privacybewuste lesnotitie-tool met transcriptie, kernvelden, AVG-scan en export." />
   <meta name="color-scheme" content="light dark" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Lesnotitie Alpha &middot; Tiemen Leert Praten</title>
   <link rel="stylesheet" href="../assets/site.css?v=27" />
@@ -78,12 +78,24 @@
         <p class="note-label">2. Opnemen</p>
         <h3>Transcriptie van de lesstof</h3>
         <p class="note-small">Spraakherkenning werkt vooral in Chrome/Edge. Werkt het niet, typ of plak je tekst.</p>
+        <div class="note-capture-note">
+          <strong>Realistisch gebruik</strong>
+          <p>
+            Dit is geschikt voor korte lesblokken en eigen samenvattend meeschrijven.
+            Voor een uur college: werk in blokken van 5-10 minuten en klik tussendoor op Checkpoint.
+            Snel praten, rumoer of meerdere sprekers tegelijk blijft lastig.
+          </p>
+        </div>
         <div class="note-actions">
           <button class="btn btn--primary" type="button" id="record-toggle">Start opname</button>
+          <button class="btn btn--ghost" type="button" id="checkpoint-transcript">Checkpoint</button>
+          <button class="btn btn--ghost" type="button" id="audio-backup-toggle">Start audio-backup</button>
           <button class="btn btn--ghost" type="button" id="scan-transcript">Scan op ruis/AVG</button>
           <button class="btn btn--ghost" type="button" id="clear-transcript">Wis transcript</button>
         </div>
         <p class="note-status" id="record-status">Nog niet aan het opnemen.</p>
+        <p class="note-status" id="audio-backup-status">Audio-backup staat uit. Handig bij langere lessen.</p>
+        <a class="note-download-link" id="audio-download" href="#" download="lesnotitie-alpha-audio.webm" hidden>Download audio-backup</a>
         <label class="sr-only" for="transcript">Transcriptie</label>
         <textarea id="transcript" class="note-textarea" rows="12" placeholder="Transcriptie verschijnt hier. Je mag ook bestaande tekst plakken."></textarea>
       </article>
