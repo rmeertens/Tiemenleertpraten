@@ -171,15 +171,17 @@ window.ACCENT_DATA = {
     ['Teksten', 'Onnozele Hans, De duivel en de priester, De belofte. Gebruik eerst klinkerspraak en laat daarna de zin natuurlijk overbrengen.']
   ],
   simulations: [
-    ['Start Largo', 'Leg Bernard in cliënttaal doel en werkwijze uit en start Largo met /f/.'],
-    ['Corrigeer beweging', 'Bernard staat op slot en beweegt nauwelijks vanuit de knieën. Corrigeer vooral non-verbaal: doe de losse kniebeweging zichtbaar voor, gebruik oogcontact en laat hem direct opnieuw imiteren. Eventueel één ultrakorte begeleidende zin, geen uitlegcollege.'],
-    ['Zelfreflectie', 'Vraag Bernard hoe het ging en vraag daarna door op adem, keel, kaak en gemak.'],
-    ['Feedback na poging', 'Bernard doet Largo redelijk, maar sluit de vocaal hard af. Geef specifieke feedback en laat opnieuw proberen.'],
-    ['Weerstand Bernard', 'Bernard zegt: “Ik wilde een truc om weer te zingen, waarom moet ik zo raar bewegen?” Reageer non-directief en motiverend.'],
-    ['Andante gekozen door docent', 'De docent kiest Andante. Demonstreer 1/8 inademing, onbeklemtoonde inzet, drie accenten, draaiing en onderarmbeweging.'],
-    ['Allegro gekozen door docent', 'De docent kiest Allegro. Leg kort uit, demonstreer opmaat en voorkom jachtig tempo.'],
-    ['Tekstniveau', 'De docent kiest tekstniveau. Leg uit hoe je ritme, klinkerspraak en ontspannen articulatie bewaakt.'],
-    ['Huiswerk afsluiten', 'Geef concreet huiswerk inclusief materiaal, frequentie, aandachtspunten en transfer naar drukkerij/koor.']
+    ['Voorbespreking Largo', 'Leg Bernard vóór het ritme in cliënttaal uit waarom jullie Largo doen en wat hij tijdens de oefening mag ervaren. Geen huiswerk, geen lange theorie.'],
+    ['Nagesprek na Largo', 'Het ritme is uitgevoerd. Vraag Bernard wat hij merkte en vraag gericht door op adem, keel, kaak, gemak en stemdruk. Gebruik zijn antwoord voor je volgende cue.'],
+    ['Feedback na harde afsluiting', 'Na het ritme hoor je dat Bernard de vocaal hard afsluit. Geef één specifiek compliment, één verbetercue en laat hem opnieuw proberen.'],
+    ['Nagesprek na vastlopen', 'Na het ritme merk je dat Bernard stijf bleef en weinig meeging. Je kunt de beweging niet laten beoordelen door de tool: formuleer daarom hoe je dit verbaal en therapeutisch nabespreekt.'],
+    ['Weerstand na ritme', 'Na het ritme zegt Bernard: “Dit voelt raar, ik wilde gewoon een truc om weer te zingen.” Reageer non-directief en motiverend.'],
+    ['Voorbespreking Andante', 'De docent kiest Andante. Leg vóór het ritme kort uit wat Bernard gaat doen en wat jij na afloop gaat controleren.'],
+    ['Nagesprek Andante', 'Na Andante check je verbaal of Bernard de korte inademing, zachte inzet, drie accenten en buikwandrecoil heeft ervaren. Vraag door en kies één vervolgcue.'],
+    ['Voorbespreking Allegro', 'De docent kiest Allegro. Leg vóór het ritme kort uit dat het 4/4 is, dynamisch maar niet jachtig, en welke zelfcheck Bernard na afloop krijgt.'],
+    ['Nagesprek Allegro', 'Na Allegro evalueer je met Bernard of het tempo jachtig werd, of hij ging drukken en of de stem licht bleef. Geef daarna één concrete vervolgcue.'],
+    ['Tekstniveau nagesprek', 'Na tekstniveau bespreek je of Bernard eerst dacht, oogcontact maakte, de accenten behield en natuurlijk bleef spreken. Geef één verbeterpunt.'],
+    ['Huiswerk afsluiten', 'Sluit de behandeling af: geef concreet huiswerk inclusief materiaal, frequentie, aandachtspunten, zelfcheck en transfer naar drukkerij/koor.']
   ],
   homework: [
     ['Materiaal', 'Audio-opname of ritmische gids/trommel, korte huiswerkkaart en eventueel tekstmateriaal.'],

@@ -1277,6 +1277,55 @@ a { color: inherit; }
   padding: 7px 10px;
 }
 
+.accent-simulation-coach {
+  background: var(--accent-soft);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 12px;
+}
+
+.accent-simulation-coach p {
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.accent-simulation-coach p strong {
+  color: var(--ink);
+}
+
+.accent-coach-route {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.accent-coach-route article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: calc(var(--radius) - 4px);
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+}
+
+.accent-coach-route strong {
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.accent-coach-route span {
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
 .accent-answer {
   line-height: 1.55;
   margin-bottom: 12px;
@@ -2911,10 +2960,15 @@ a { color: inherit; }
   .accent-actions,
   .accent-section-head,
   .accent-feedback-head,
+  .accent-coach-route,
   .ten-practice-head,
   .ten-feedback-head,
   .ten-section-head {
     flex-direction: column;
+  }
+
+  .accent-coach-route {
+    grid-template-columns: 1fr;
   }
 
   .ten-coach-question {
