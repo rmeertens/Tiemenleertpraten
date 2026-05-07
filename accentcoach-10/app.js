@@ -54,14 +54,14 @@ function bindEvents() {
   });
 
   document.getElementById('mark-criterion').addEventListener('click', () => {
-    state.scores[`criterion:${state.criterion.id}`] = 4;
+    togglePracticeScore(`criterion:${state.criterion.id}`);
     saveScores();
     renderCriterion();
     renderEvidence();
   });
 
   document.getElementById('mark-rhythm').addEventListener('click', () => {
-    state.scores[`rhythm:${state.rhythm.id}`] = 4;
+    togglePracticeScore(`rhythm:${state.rhythm.id}`);
     saveScores();
     renderRhythm();
     renderEvidence();
@@ -251,6 +251,14 @@ function scoreAnswer(answer) {
     zgSteps: zgStepsForSimulation(profile, missing, warnings, score),
     next: score >= 4 ? profile.nextStrong : profile.next
   };
+}
+
+function togglePracticeScore(key) {
+  if ((state.scores[key] || 0) >= 4) {
+    delete state.scores[key];
+    return;
+  }
+  state.scores[key] = 4;
 }
 
 function zgCoachBlock(result) {
