@@ -56,12 +56,14 @@ function bindEvents() {
   document.getElementById('mark-criterion').addEventListener('click', () => {
     state.scores[`criterion:${state.criterion.id}`] = 4;
     saveScores();
+    renderCriterion();
     renderEvidence();
   });
 
   document.getElementById('mark-rhythm').addEventListener('click', () => {
     state.scores[`rhythm:${state.rhythm.id}`] = 4;
     saveScores();
+    renderRhythm();
     renderEvidence();
   });
 
@@ -114,6 +116,11 @@ function renderRoute() {
 
 function renderCriterion() {
   criterionSelect.value = state.criterion.id;
+  const isPracticed = (state.scores[`criterion:${state.criterion.id}`] || 0) >= 4;
+  const button = document.getElementById('mark-criterion');
+  button.textContent = isPracticed ? 'Geoefend ✓' : 'Markeer geoefend';
+  button.classList.toggle('is-complete', isPracticed);
+  button.setAttribute('aria-pressed', String(isPracticed));
   document.getElementById('criterion-title').textContent = state.criterion.title;
   document.getElementById('criterion-detail').innerHTML = `
     ${block('Moet toetsbaar zijn', state.criterion.must.join(' '))}
@@ -124,6 +131,13 @@ function renderCriterion() {
 
 function renderRhythm() {
   rhythmSelect.value = state.rhythm.id;
+  const isPracticed = (state.scores[`rhythm:${state.rhythm.id}`] || 0) >= 4;
+  const button = document.getElementById('mark-rhythm');
+  button.textContent = isPracticed ? 'Geoefend ✓' : 'Markeer geoefend';
+  button.classList.toggle('is-complete', isPracticed);
+  button.setAttribute('aria-pressed', String(isPracticed));
+  document.getElementById('rhythm-card').classList.toggle('is-practiced', isPracticed);
+  document.getElementById('rhythm-status').textContent = isPracticed ? 'Geoefend en opgeslagen voor je voortgang.' : 'Nog niet geoefend.';
   document.getElementById('rhythm-title').textContent = state.rhythm.title;
   document.getElementById('rhythm-detail').innerHTML = state.rhythm.detail.map(([label, text]) => block(label, text)).join('');
   document.getElementById('rhythm-errors').innerHTML = state.rhythm.errors.map(item => `<li>${escapeHtml(item)}</li>`).join('');

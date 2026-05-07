@@ -1028,6 +1028,11 @@ a { color: inherit; }
   padding: 24px;
 }
 
+.accent-card.is-practiced {
+  border-color: #138a45;
+  box-shadow: 0 0 0 2px rgba(19, 138, 69, 0.16), var(--shadow);
+}
+
 .accent-score {
   align-content: center;
   display: grid;
@@ -1047,6 +1052,29 @@ a { color: inherit; }
   font-family: var(--font-display);
   font-size: 54px;
   line-height: 1;
+}
+
+.accent-status {
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  margin: -4px 0 14px;
+  padding: 7px 10px;
+  width: fit-content;
+}
+
+.accent-card.is-practiced .accent-status {
+  background: rgba(19, 138, 69, 0.12);
+  color: #13723d;
+}
+
+.btn.is-complete {
+  background: #138a45;
+  border-color: #138a45;
+  color: white;
 }
 
 .accent-score p,
