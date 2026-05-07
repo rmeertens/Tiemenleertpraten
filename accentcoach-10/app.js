@@ -6,6 +6,7 @@ const state = {
   rhythm: data.rhythms[0],
   simulation: data.simulations[0],
   scores: JSON.parse(localStorage.getItem('accent_scores') || '{}'),
+  simulationLatest: JSON.parse(localStorage.getItem('accent_simulation_latest') || '{}'),
 };
 
 const views = document.querySelectorAll('.accent-view');
@@ -133,6 +134,7 @@ function renderSimulation() {
   document.getElementById('simulation-title').textContent = state.simulation[0];
   document.getElementById('simulation-prompt').textContent = state.simulation[1];
   const profile = simulationProfile(state.simulation[0]);
+  renderSimulationProgress();
   document.getElementById('simulation-focus').innerHTML = profile.focus.map(item => `<span>${escapeHtml(item)}</span>`).join('');
   document.getElementById('simulation-coach').innerHTML = simulationCoachHtml(profile);
   simulationFeedback.innerHTML = '<p class="accent-note">Nog geen simulatie nagekeken.</p>';
@@ -161,7 +163,13 @@ function checkSimulation() {
 
   const result = scoreAnswer(answer);
   state.scores[`simulation:${state.simulation[0]}`] = Math.max(state.scores[`simulation:${state.simulation[0]}`] || 0, result.score);
+  state.simulationLatest[state.simulation[0]] = {
+    score: result.score,
+    label: result.label,
+    at: new Date().toISOString()
+  };
   saveScores();
+  saveSimulationLatest();
   simulationFeedback.innerHTML = `
     <div class="accent-feedback-head">
       <h3>${escapeHtml(result.label)}</h3>
@@ -175,7 +183,34 @@ function checkSimulation() {
     ${result.score < 4 ? redRetryHtml() : ''}
   `;
   bindRedRetry(simulationFeedback, simulationAnswer, speechNote);
+  renderSimulationProgress();
   renderEvidence();
+}
+
+function renderSimulationProgress() {
+  const activeTitle = state.simulation[0];
+  document.getElementById('simulation-progress').innerHTML = data.simulations.map(([title], index) => {
+    const latest = state.simulationLatest[title];
+    const best = state.scores[`simulation:${title}`] || 0;
+    const score = latest?.score || 0;
+    const statusClass = score >= 4 ? 'is-zg' : score >= 3 ? 'is-ok' : score > 0 ? 'is-low' : 'is-empty';
+    const label = score ? `Laatst ${score}/4` : 'Nog niet';
+    const bestLabel = best && best !== score ? ` · best ${best}/4` : '';
+    return `
+      <button class="accent-progress-chip ${statusClass}${title === activeTitle ? ' is-active' : ''}" type="button" data-simulation-index="${index}" aria-label="${escapeHtml(title)}: ${escapeHtml(label)}">
+        <strong>${index + 1}</strong>
+        <span>${escapeHtml(title)}</span>
+        <em>${escapeHtml(label + bestLabel)}</em>
+      </button>
+    `;
+  }).join('');
+
+  document.querySelectorAll('[data-simulation-index]').forEach(button => {
+    button.addEventListener('click', () => {
+      state.simulation = data.simulations[Number(button.dataset.simulationIndex)] || data.simulations[0];
+      renderSimulation();
+    });
+  });
 }
 
 function scoreAnswer(answer) {
@@ -794,6 +829,10 @@ function showView(name) {
 
 function saveScores() {
   localStorage.setItem('accent_scores', JSON.stringify(state.scores));
+}
+
+function saveSimulationLatest() {
+  localStorage.setItem('accent_simulation_latest', JSON.stringify(state.simulationLatest));
 }
 
 function simulationIndex() {

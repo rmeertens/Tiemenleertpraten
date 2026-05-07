@@ -1252,6 +1252,73 @@ a { color: inherit; }
   margin: 4px 0 12px;
 }
 
+.accent-simulation-progress {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin: 0 0 12px;
+}
+
+.accent-progress-chip {
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  cursor: pointer;
+  display: grid;
+  gap: 3px 8px;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 9px 10px;
+  text-align: left;
+}
+
+.accent-progress-chip strong {
+  align-items: center;
+  background: var(--rule);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  height: 26px;
+  justify-content: center;
+  width: 26px;
+}
+
+.accent-progress-chip span {
+  font-size: 13px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accent-progress-chip em {
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-style: normal;
+  grid-column: 2;
+}
+
+.accent-progress-chip.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.accent-progress-chip.is-zg strong {
+  background: #138a45;
+  color: white;
+}
+
+.accent-progress-chip.is-ok strong {
+  background: #d99a18;
+  color: white;
+}
+
+.accent-progress-chip.is-low strong {
+  background: #b94a48;
+  color: white;
+}
+
 .accent-prompt {
   background: var(--accent-soft);
   border-radius: var(--radius);
