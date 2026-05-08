@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Stotter Alpha — holistische stottercoach voor vrijer, natuurlijker spreken." />
+  <meta name="description" content="Stotter Alpha — intensieve coach voor natuurlijker spreken vanuit proces, stem en betekenis." />
   <meta name="color-scheme" content="light dark" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Stotter Alpha &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=24" />
+  <link rel="stylesheet" href="/assets/site.css?v=27" />
 </head>
 <body>
-  <div class="version-stamp">v2 &middot; Stotter Alpha</div>
+  <div class="version-stamp">v4 &middot; Stotter Alpha</div>
   <main class="studio stutter-app">
     <nav class="studio__nav">
       <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
@@ -21,17 +21,16 @@
 
     <header class="stutter-hero">
       <div>
-        <p class="eyebrow">Holistische stottercoach &middot; spreken als stroom</p>
-        <h2>Niet harder controleren. Slimmer loslaten.</h2>
+        <p class="eyebrow">Holistische stottercoach &middot; proces boven prestatie</p>
+        <h2>Natuurlijk spreken begint bij het proces.</h2>
         <p>
-          Stotter Alpha traint aandacht, intentie, lichaam en spreekdurf. Vloeiendheid is hier
-          een bijproduct van minder bemoeienis. De interne
-          controleur mag koffie halen.
+          Train proces, systeem, spreekregie, intentie en transfer naar echte situaties.
+          Kort, intensief en dagelijks. Vrij spreken wordt gevolgd als richting, niet als examen.
         </p>
       </div>
       <aside class="stutter-score">
         <span>Vandaag</span>
-        <strong id="alpha-ready">0/5</strong>
+        <strong id="alpha-ready">0/6</strong>
         <p id="alpha-hint">Start met de dagroute.</p>
       </aside>
     </header>
@@ -52,10 +51,22 @@
       </div>
     </section>
 
+    <section class="stutter-card stutter-intensive" aria-labelledby="alpha-track-title">
+      <div class="stutter-section-head">
+        <div>
+          <p class="stutter-label">Alpha-traject</p>
+          <h3 id="alpha-track-title">8 fases naar natuurlijker spreken</h3>
+        </div>
+        <p class="stutter-note">Volg de route. Eén fase tegelijk. De coach stuurt op proces, niet op foutloos klinken.</p>
+      </div>
+      <div id="phase-track" class="stutter-phase-track"></div>
+      <div id="phase-detail" class="stutter-phase-detail"></div>
+    </section>
+
     <section class="stutter-grid">
       <article class="stutter-card">
         <p class="stutter-label">1. Dagroute</p>
-        <h3>12 minuten intensief, geen theater</h3>
+        <h3>16 minuten procestraining</h3>
         <div id="daily-route" class="stutter-route"></div>
       </article>
 
@@ -76,7 +87,45 @@
 
     <section class="stutter-grid">
       <article class="stutter-card">
-        <p class="stutter-label">3. Spreektraining</p>
+        <p class="stutter-label">3. Spreekregie</p>
+        <h3>Neem de leiding over de ervaring</h3>
+        <p id="stage-prompt" class="stutter-prompt"></p>
+        <div class="stutter-scale-grid" aria-label="Spreekregie scores">
+          <label>
+            <span>Mijn gevoel</span>
+            <input id="stage-self" type="range" min="1" max="10" value="5" />
+            <strong id="stage-self-value">5</strong>
+          </label>
+          <label>
+            <span>Anderen zagen</span>
+            <input id="stage-other" type="range" min="1" max="10" value="5" />
+            <strong id="stage-other-value">5</strong>
+          </label>
+        </div>
+        <div class="stutter-actions">
+          <button class="btn btn--primary" type="button" id="new-stage">Nieuwe challenge</button>
+          <button class="btn btn--primary" type="button" id="check-stage">Check verschil</button>
+          <button class="btn btn--ghost" type="button" id="save-stage">Bewaar ervaring</button>
+        </div>
+        <div id="stage-feedback" class="stutter-feedback"></div>
+      </article>
+
+      <article class="stutter-card">
+        <p class="stutter-label">4. Intentiecheck</p>
+        <h3>Meet moed, niet perfectie</h3>
+        <p class="stutter-note">Gebruik dit na een echte spreekactie. De hoofdvraag is niet “was ik vloeiend?”, maar “volgde ik mijn intentie?”</p>
+        <textarea id="intent-input" class="stutter-textarea" rows="7" placeholder="Mijn intentie was... Ik deed... De uitkomst was... Ik leer... Mijn beloning is..."></textarea>
+        <div class="stutter-actions">
+          <button class="btn btn--primary" type="button" id="check-intent">Beoordeel intentie</button>
+          <button class="btn btn--ghost" type="button" id="save-intent">Bewaar intentie</button>
+        </div>
+        <div id="intent-feedback" class="stutter-feedback"></div>
+      </article>
+    </section>
+
+    <section class="stutter-grid">
+      <article class="stutter-card">
+        <p class="stutter-label">5. Spreektraining</p>
         <h3>Van woordcontrole naar betekenis</h3>
         <p id="drill-prompt" class="stutter-prompt"></p>
         <textarea id="drill-input" class="stutter-textarea" rows="6" placeholder="Typ of spreek wat je deed. Focus niet op perfectie; dat is precies het punt."></textarea>
@@ -90,7 +139,21 @@
       </article>
 
       <article class="stutter-card">
-        <p class="stutter-label">4. Vrij schrijven</p>
+        <p class="stutter-label">6. Bewijsbank</p>
+        <h3>Leg vast wat wél groeit</h3>
+        <p class="stutter-note">Bewaar bewijs dat je handelde ondanks spanning. Dit voedt je nieuwe zelfbeeld.</p>
+        <textarea id="evidence-input" class="stutter-textarea" rows="6" placeholder="Vandaag deed ik... Ondanks spanning bleef ik... Het bewijs is..."></textarea>
+        <div class="stutter-actions">
+          <button class="btn btn--primary" type="button" id="save-evidence">Bewaar bewijs</button>
+          <button class="btn btn--ghost" type="button" id="show-evidence">Toon bewijsbank</button>
+        </div>
+        <div id="evidence-feedback" class="stutter-feedback"></div>
+      </article>
+    </section>
+
+    <section class="stutter-grid">
+      <article class="stutter-card">
+        <p class="stutter-label">7. Vrij schrijven</p>
         <h3>Uitbaggeren, niet redigeren</h3>
         <p class="stutter-note">Schrijf snel. Geen mooie zinnen. Geen bewijsdrang. Alleen rommel uit je hoofd halen, daar is het voor.</p>
         <textarea id="freewrite-input" class="stutter-textarea" rows="8" placeholder="Ik merk dat ik... Ik ben bang dat... Eigenlijk wil ik zeggen..."></textarea>
@@ -103,9 +166,9 @@
     </section>
 
     <section class="stutter-card">
-      <p class="stutter-label">5. Voortgangsrapport</p>
+      <p class="stutter-label">8. Voortgangsrapport</p>
       <h3>Laat Stotter Alpha je logs samenvatten</h3>
-      <p class="stutter-note">Het rapport blijft lokaal in je browser. Het is een coachspiegel, geen medisch dossier.</p>
+      <p class="stutter-note">Het rapport blijft lokaal in je browser. Het is een coachspiegel, geen diagnose of medisch dossier.</p>
       <div class="stutter-actions">
         <button class="btn btn--primary" type="button" id="build-report">Maak rapport</button>
         <button class="btn btn--ghost" type="button" id="clear-logs">Wis logs</button>
@@ -114,6 +177,6 @@
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

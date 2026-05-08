@@ -32,11 +32,11 @@ Ik ga weinig uitleggen en vooral voordoen. U hoeft het niet meteen perfect te do
     },
     {
       id: 'vielluftstimme',
-      title: '2. Start met zachte luchtige stem',
-      checks: ['zachte inzet', 'luchtstroom', 'borstregister', 'geen persen', 'reflectie'],
-      text: `We starten met een zachte, luchtige klank. Denk aan een lage zucht die vanzelf naar buiten komt. De klank mag warm en omfloerst klinken; volume is nu nog niet het doel.
+      title: '2. Start met zachte, vrije steminzet',
+      checks: ['zachte inzet', 'vrije luchtstroom', 'borstregister', 'geen persen', 'reflectie'],
+      text: `We starten met een zachte, vrije steminzet. Denk aan een lage, ontspannen zucht waarbij de adem blijft doorstromen. De klank mag warm en los klinken; volume is nu nog niet het doel.
 
-Ik doe hem eerst voor. Let vooral op dit gevoel: de lucht stroomt door, de keel hoeft niet dicht te zetten en het einde van de klank dooft zacht uit. Na afloop vraag ik waar u gemak of spanning voelde.`
+Ik doe hem eerst voor. Let vooral op dit gevoel: de adem stroomt door, de keel hoeft niet dicht te zetten en het einde van de klank dooft zacht uit. Dit is dus geen hese of gespannen luchtlekkage, maar een zachte start zonder persen. Na afloop vraag ik waar u gemak of spanning voelde.`
     },
     {
       id: 'largo',
