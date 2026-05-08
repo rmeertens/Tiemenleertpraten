@@ -316,7 +316,7 @@ function feedbackHtml(result, mode, lesson) {
 
 function feedbackTitle(score, mode) {
   if (mode === 'oral') {
-    const labels = ['0/4 · O', '1/4 · BV', '2/4 · V', '3/4 · G', '4/4 · ZG'];
+    const labels = ['(0) O', '(1) BV', '(2) V', '(3) G', '(4) ZG'];
     return labels[score] || 'Nog aanvullen';
   }
   if (score >= 4) return 'Schriftelijk · volledig casusantwoord';
@@ -600,7 +600,7 @@ function answerCoachQuestion() {
       action = 'Actie: train open casusantwoorden met definitie, casusbewijs en conclusie. Casus 2 en 4 zijn extra zwaar: 25 punten.';
     } else if (clean.includes('mondeling') || clean.includes('praktijk')) {
       title = 'Mondelinge puntentelling';
-      body = 'Mondeling werkt met 0 O, 1 BV, 2 V, 3 G en 4 ZG per criterium. Deel 1 en deel 2 hebben elk 10 criteria en minimaal 20 van de 40 punten nodig.';
+      body = 'Mondeling werkt met (0) O, (1) BV, (2) V, (3) G en (4) ZG per criterium. Deel 1 en deel 2 hebben elk 10 criteria en minimaal 20 van de 40 punten nodig.';
       action = 'Actie: score jezelf per criterium en bewaak extra criterium 10, 15 en 17: die moeten minimaal V zijn.';
     } else {
       title = 'Kies eerst de toetsvorm';

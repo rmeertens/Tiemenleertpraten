@@ -522,8 +522,8 @@ function checkAnswer() {
 
   feedbackCard.innerHTML = `
     <div class="flits-feedback-head">
-      <h3>${score >= 4 ? '4/4 · toetswaardig' : score === 3 ? '3/4 · bijna ZG' : 'Nog aanvullen'}</h3>
-      <strong>${score}/4</strong>
+      <h3>${scoreLabel04(score)}</h3>
+      <strong>${scoreBadge04(score)}</strong>
     </div>
     ${coachScanHtml({
       good: explainedHits,
@@ -537,7 +537,7 @@ function checkAnswer() {
     ${block('Sterk', explainedHits.length ? `Je noemt al: ${explainedHits.join(' ')}` : 'Je antwoord heeft nog te weinig herkenbare vaktaal. Noem eerst het probleem en één voorbeeld uit de casus.')}
     ${block('Coach onderbreekt', interruptText(missing, hasCase, hasNextStep))}
     ${block('Feedback', feedbackText(score, missing, hasCase, hasNextStep))}
-    ${score === 3 ? block('Van 3/4 naar 4/4', upgradeText(missing, hasCase, hasNextStep)) : ''}
+    ${score === 3 ? block('Van (3) G naar (4) ZG', upgradeText(missing, hasCase, hasNextStep)) : ''}
     ${score < 4 ? redRetryHtml() : ''}
   `;
   bindRedRetry(feedbackCard, answerInput, speechNote);
@@ -592,7 +592,23 @@ function upgradeText(missing, hasCase, hasNextStep) {
   if (!hasCase) return 'Voeg één concrete casuszin toe: “Bij dit kind zie ik dit doordat...” en check opnieuw.';
   if (missing.length) return `Voeg dit ene punt toe: ${explainTerm(missing[0])} Check daarna opnieuw.`;
   if (!hasNextStep) return 'Voeg één “daarom”-zin toe met onderzoek, behandeling of advies.';
-  return 'Zeg het nu korter en casusgerichter; dan is het 4/4.';
+  return 'Zeg het nu korter en casusgerichter; dan groeit het naar (4) ZG.';
+}
+
+function scoreLabel04(score) {
+  if (score >= 4) return '(4) ZG · toetswaardig';
+  if (score === 3) return '(3) G · bijna ZG';
+  if (score === 2) return '(2) V · voldoende basis';
+  if (score === 1) return '(1) BV · bijna voldoende';
+  return '(0) O · nog onvoldoende';
+}
+
+function scoreBadge04(score) {
+  if (score >= 4) return '(4) ZG';
+  if (score === 3) return '(3) G';
+  if (score === 2) return '(2) V';
+  if (score === 1) return '(1) BV';
+  return '(0) O';
 }
 
 function openMicroPanel(topic, mode) {

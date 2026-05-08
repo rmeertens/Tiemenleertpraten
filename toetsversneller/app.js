@@ -52,7 +52,7 @@ const tracks = [
     href: '/accentcoach-10/',
     storage: () => averageObjectScore('accent_scores', 4),
     max: 100,
-    red: '4/4-ritmes: Andante/Allegro niet laten terugvallen naar Largo 3/4.',
+    red: 'Vierkwartsritmes: Andante/Allegro niet laten terugvallen naar Largo driekwarts.',
     quick: 'Oefen één docentkeuze: Andante, Allegro of tekstniveau.',
     boss: 'Accentboss: jij start Largo, docent kiest onverwacht tweede onderdeel.'
   },
@@ -83,7 +83,7 @@ const tracks = [
     storage: () => stutterProgress(),
     max: 100,
     red: 'Maak van controle weer communicatie: analyseer één moment met de zeshoek.',
-    quick: 'Doe de 12-minuten dagroute en bewaar één log.',
+    quick: 'Doe de 16-minuten dagroute en bewaar één log.',
     boss: 'Alpha boss: spreekmoment beschrijven, dam vinden en één mini-exposure kiezen.'
   }
 ];

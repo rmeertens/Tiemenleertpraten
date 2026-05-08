@@ -322,7 +322,7 @@ function checksHtml(group, criteria) {
       <span>${number}. ${escapeHtml(label)} ${critical ? '<b>Kritisch · minimaal V</b>' : ''}</span>
       <select data-group="${group}" data-criterion="${id}" data-number="${number}" aria-label="Score criterium ${number}">
         ${data.scoreScale.map(([value, code, labelText]) => `
-          <option value="${value}" ${Number(saved) === value ? 'selected' : ''}>${value} · ${code} · ${escapeHtml(labelText)}</option>
+          <option value="${value}" ${Number(saved) === value ? 'selected' : ''}>(${value}) ${code} · ${escapeHtml(labelText)}</option>
         `).join('')}
       </select>
     </label>
@@ -414,7 +414,7 @@ function strictFeedback() {
 
   feedback.hidden = false;
   feedbackHeading.textContent = labelFor(points);
-  feedbackPoints.textContent = `${points}/4 · ${scoreCode(points)}`;
+  feedbackPoints.textContent = scoreBadge(points);
   feedbackBody.innerHTML = `
     ${coachScanHtml({
       good: [...targetHits, ...structure.map(word => `structuurwoord: ${word}`)],
@@ -507,6 +507,10 @@ function scoreCode(points) {
   return row ? row[1] : 'O';
 }
 
+function scoreBadge(points) {
+  return `(${points}) ${scoreCode(points)}`;
+}
+
 function isCritical(group, number) {
   return (data.criticalCriteria[group] || []).includes(number);
 }
@@ -521,7 +525,7 @@ function criticalOk(group) {
   return {
     ok: missing.length === 0,
     message: missing.length
-      ? `Kritisch criterium ${missing.map(item => item.number).join(', ')} staat onder V. Zet deze minimaal op 2 · V.`
+      ? `Kritisch criterium ${missing.map(item => item.number).join(', ')} staat onder V. Zet deze minimaal op (2) V.`
       : 'Kritische criteria op minimaal V.'
   };
 }
@@ -665,11 +669,11 @@ function coachScanHtml({ good = [], missing = [], vague = [] }) {
 }
 
 function labelFor(points) {
-  if (points >= 4) return 'ZG · zeer goed';
-  if (points === 3) return 'G · goed';
-  if (points === 2) return 'V · voldoende';
-  if (points === 1) return 'BV · bijna voldoende';
-  return 'O · onvoldoende';
+  if (points >= 4) return '(4) ZG · zeer goed';
+  if (points === 3) return '(3) G · goed';
+  if (points === 2) return '(2) V · voldoende';
+  if (points === 1) return '(1) BV · bijna voldoende';
+  return '(0) O · onvoldoende';
 }
 
 function normalize(value) {

@@ -210,7 +210,7 @@ function checkSimulation() {
   simulationFeedback.innerHTML = `
     <div class="accent-feedback-head">
       <h3>${escapeHtml(result.label)}</h3>
-      <strong>${result.score}/4</strong>
+      <strong>${scoreBadge04(result.score)}</strong>
     </div>
     ${result.scan}
     ${block('Wat is sterk', result.good)}
@@ -231,8 +231,9 @@ function renderSimulationProgress() {
     const best = state.scores[`simulation:${title}`] || 0;
     const score = latest?.score || 0;
     const statusClass = score >= 4 ? 'is-zg' : score >= 3 ? 'is-ok' : score > 0 ? 'is-low' : 'is-empty';
-    const label = score ? `Laatst ${score}/4` : 'Nog niet';
-    const bestLabel = best && best !== score ? ` · best ${best}/4` : '';
+    const hasLatest = Boolean(latest);
+    const label = hasLatest ? `Laatst ${scoreBadge04(score)}` : 'Nog niet';
+    const bestLabel = best && best !== score ? ` · best ${scoreBadge04(best)}` : '';
     return `
       <button class="accent-progress-chip ${statusClass}${title === activeTitle ? ' is-active' : ''}" type="button" data-simulation-index="${index}" aria-label="${escapeHtml(title)}: ${escapeHtml(label)}">
         <strong>${index + 1}</strong>
@@ -285,7 +286,7 @@ function togglePracticeScore(key) {
 }
 
 function zgCoachBlock(result) {
-  const title = 'Van score 3/4 naar 4/4';
+  const title = 'Van (3) G naar (4) ZG';
   const intro = 'Voeg dit kort toe en check opnieuw:';
 
   return `
@@ -326,14 +327,23 @@ function scoreFromRatio(ratio) {
   if (ratio >= 0.75) return 4;
   if (ratio >= 0.5) return 3;
   if (ratio >= 0.25) return 2;
-  return 1;
+  return 0;
 }
 
 function labelForScore(score) {
-  if (score >= 4) return 'Score 4/4 · ZG-klaar';
-  if (score === 3) return 'Score 3/4 · voldoende';
-  if (score === 2) return 'Score 2/4 · nog niet toetsvast';
-  return 'Score 1/4 · maak concreet';
+  if (score >= 4) return '(4) ZG · toetsklaar';
+  if (score === 3) return '(3) G · goed, bijna ZG';
+  if (score === 2) return '(2) V · voldoende basis';
+  if (score === 1) return '(1) BV · bijna voldoende';
+  return '(0) O · onvoldoende bewijs';
+}
+
+function scoreBadge04(score) {
+  if (score >= 4) return '(4) ZG';
+  if (score === 3) return '(3) G';
+  if (score === 2) return '(2) V';
+  if (score === 1) return '(1) BV';
+  return '(0) O';
 }
 
 function missingForSimulation(missing, warnings, wordCount, minimumWords) {
@@ -630,17 +640,17 @@ function buildAccentCoachAnswer(question) {
 
   if ((hasAny(clean, ['andante', 'allegro', 'ritme 2']) && hasAny(clean, ['3/4', 'drie kwart', 'largo', 'voor-achter', 'drie tellen'])) || (hasAny(clean, ['4/4', 'vierkwarts']) && hasAny(clean, ['ritme', 'andante', 'allegro']))) {
     return {
-      title: 'Van Largo-denken naar 4/4',
+      title: 'Van Largo-denken naar vierkwarts',
       body: 'Schrap de Largo-taal: geen 3 tellen, geen voor-achterbeweging. Zeg bij Andante: 1/8 inademing, 1/8 onbeklemtoonde inzet, drie accenten, draaiing en onderarm. Zeg bij Allegro: opmaat, vijf accenten, verende knieën en losse pols.',
-      action: 'Actie: open Simulatie en oefen Andante of Allegro met alleen deze 4/4-zin.',
+      action: 'Actie: open Simulatie en oefen Andante of Allegro met alleen deze vierkwartszin.',
       view: 'simulatie'
     };
   }
   if (hasAny(clean, ['3/4', '3 van 4', 'voldoende']) && hasAny(clean, ['4/4', '4 van 4', 'zg', 'score', 'punten'])) {
     return {
-      title: 'Van 3/4-score naar 4/4-score',
+      title: 'Van (3) G naar (4) ZG',
       body: 'Voeg niet méér theorie toe. Voeg één toetsbaar therapeutisch bewijs toe: concrete Bernard-koppeling, nacheck, cliëntreflectie of direct opnieuw proberen. De simulatiefeedback kiest er maximaal drie.',
-      action: 'Actie: plak je antwoord in Simulatie en kijk alleen naar het blok “Van score 3/4 naar 4/4”.',
+      action: 'Actie: plak je antwoord in Simulatie en kijk alleen naar het blok “Van (3) G naar (4) ZG”.',
       view: 'simulatie'
     };
   }

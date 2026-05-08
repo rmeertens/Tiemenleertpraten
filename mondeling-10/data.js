@@ -12,7 +12,7 @@ window.ORAL_10_DATA = {
     diagnostics: [10],
     therapy: [15, 17]
   },
-  criticalNote: 'Voor een voldoende moet ieder onderdeel minimaal 20 punten hebben én de kritische criteria 10, 15 en 17 moeten minimaal V (2/4) zijn.',
+  criticalNote: 'Voor een voldoende moet ieder onderdeel minimaal 20 punten hebben én de kritische criteria 10, 15 en 17 moeten minimaal V (2) zijn.',
   diagnostics: {
     label: 'Diagnostiek',
     pass: 20,
