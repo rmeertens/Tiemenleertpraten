@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="/assets/site.css?v=25" />
 </head>
 <body>
-  <div class="version-stamp">v21 &middot; Accentcoach</div>
+  <div class="version-stamp">v22 &middot; Accentcoach</div>
   <main class="studio accent-app">
     <nav class="studio__nav">
       <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
@@ -55,6 +55,7 @@
 
     <section class="accent-tabs" aria-label="Accentcoach onderdelen">
       <button class="accent-tab is-active" type="button" data-view="route">Route</button>
+      <button class="accent-tab" type="button" data-view="script">ZG-script</button>
       <button class="accent-tab" type="button" data-view="bron">Bron</button>
       <button class="accent-tab" type="button" data-view="criteria">Criteria</button>
       <button class="accent-tab" type="button" data-view="ritmes">Ritmes</button>
@@ -81,6 +82,31 @@
         <h3>3 zinnen die je altijd moet kunnen</h3>
         <div id="power-lines" class="accent-power"></div>
       </article>
+    </section>
+
+    <section class="accent-view" id="view-script">
+      <div class="accent-grid">
+        <article class="accent-card">
+          <p class="accent-label">Praattekst voorbereiden</p>
+          <h3>Van eerste uitleg tot tekstniveau</h3>
+          <p class="accent-note">Kies een fase, pas de tekst aan naar jouw stijl en bewaar lokaal. Doel: één vloeiende, toetsklare therapeutstem.</p>
+          <div class="accent-toolbar">
+            <select id="script-select" class="accent-select" aria-label="Kies ZG-scriptfase"></select>
+            <button class="btn btn--ghost" type="button" id="reset-script">Zet ZG-model terug</button>
+          </div>
+          <div id="script-checks" class="accent-micro-list"></div>
+        </article>
+        <article class="accent-card">
+          <p class="accent-label">Jouw versie</p>
+          <h3 id="script-title"></h3>
+          <textarea id="script-editor" class="accent-answer" rows="13" placeholder="Jouw ZG-praattekst staat hier. Maak hem eigen."></textarea>
+          <div class="accent-actions">
+            <button class="btn btn--primary" type="button" id="save-script">Bewaar mijn versie</button>
+            <button class="btn btn--ghost" type="button" id="copy-script">Kopieer</button>
+          </div>
+          <p class="accent-note" id="script-note">Nog niets aangepast.</p>
+        </article>
+      </div>
     </section>
 
     <section class="accent-view" id="view-bron">
@@ -201,7 +227,7 @@
     </section>
   </main>
 
-  <script src="data.js?v=21"></script>
-  <script src="app.js?v=21"></script>
+  <script src="data.js?v=22"></script>
+  <script src="app.js?v=22"></script>
 </body>
 </html>

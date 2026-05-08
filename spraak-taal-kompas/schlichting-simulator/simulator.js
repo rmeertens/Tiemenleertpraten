@@ -17,7 +17,7 @@ const scenarios = [
     target: "Bied de stimuluszin vloeiend aan en wacht daarna stil op de productie.",
     expected: "hier is een meisje dat een koekje pakt",
     instruction: "Zeg precies: “Hier is een meisje dat een koekje pakt.” Stop daarna. Geen voorzetje, geen verbetering.",
-    watch: ["geen zin alvast afmaken voor het kind", "geen grammaticale correctie tijdens het item", "wel natuurlijke maar neutrale prosodie"],
+    watch: ["zin van het kind laten afmaken", "geen grammaticale correctie tijdens het item", "natuurlijke en neutrale prosodie"],
     childGood: "Milan herhaalt de kern van de zin en maakt er zelf een kinderlijke zin van.",
     childUnsure: "Milan begint enthousiast, maar laat een deel van de zinsstructuur weg.",
   },

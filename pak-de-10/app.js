@@ -447,7 +447,7 @@ function renderMdoCoach(coach) {
       </div>
       <article class="ten-card">
         <p class="ten-card__label">Rollen in het MDO</p>
-        <h3>Vraag niet “wat vindt u?”, maar “wat verandert mijn plan?”</h3>
+        <h3>Vraag: “wat verandert mijn plan?”</h3>
         <div class="ten-mdo-role-grid">
           ${coach.roles.map(([role, question, action]) => `
             <section>

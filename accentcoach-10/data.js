@@ -19,7 +19,91 @@ window.ACCENT_DATA = {
   powerLines: [
     'We oefenen economisch stemgebruik: je stem mag draagkracht krijgen zonder extra druk op je stemplooien.',
     'Laat de beweging het ritme dragen; je hoeft de stem niet te duwen.',
-    'Ik wil dat je thuis niet zomaar herhaalt, maar gericht let op zachte inzet, zachte afsluiting, kaakruimte en passieve adem.'
+    'Thuis oefen je gericht: zachte inzet, zachte afsluiting, kaakruimte en passieve adem.'
+  ],
+  scriptBuilder: [
+    {
+      id: 'eerste-uitleg',
+      title: '1. Eerste uitleg aan Bernard',
+      checks: ['hulpvraag', 'drukkerij/koor', 'minder druk', 'non-directief', 'ervaren'],
+      text: `Bernard, u vertelde dat uw stem weinig volume heeft en later op de dag slechter wordt. Dat past bij wat u op het werk en in het koor vraagt van uw stem. We gaan vandaag oefenen met de Accentmethode. Het doel is dat adem, beweging en stem beter samenwerken, zodat u draagkracht krijgt zonder extra druk in de keel.
+
+Ik ga weinig uitleggen en vooral voordoen. U hoeft het niet meteen perfect te doen. U doet met mij mee en daarna vraag ik wat u merkt aan adem, keel, kaak en gemak. Dan kies ik één verbeterpunt voor de volgende poging.`
+    },
+    {
+      id: 'vielluftstimme',
+      title: '2. Start met zachte luchtige stem',
+      checks: ['zachte inzet', 'luchtstroom', 'borstregister', 'geen persen', 'reflectie'],
+      text: `We starten met een zachte, luchtige klank. Denk aan een lage zucht die vanzelf naar buiten komt. De klank mag warm en omfloerst klinken; volume is nu nog niet het doel.
+
+Ik doe hem eerst voor. Let vooral op dit gevoel: de lucht stroomt door, de keel hoeft niet dicht te zetten en het einde van de klank dooft zacht uit. Na afloop vraag ik waar u gemak of spanning voelde.`
+    },
+    {
+      id: 'largo',
+      title: '3. Largo uitleg en start',
+      checks: ['3/4', 'voor-achter', '/f/ start', 'weke inzet', 'zachte offset'],
+      text: `We starten met Largo, het rustige 3/4-ritme. U beweegt met mij mee: in de voorbereidende beweging ademt u in, daarna laat u de klank rustig meegaan op de uitademing.
+
+Ik begin met /f/, dus alleen hoorbare uitademing. Daarna bouwen we op naar stemhebbende klanken en klinkers. Let op een zachte inzet en een zacht einde, alsof de klank wegsmelt. Ik bewaak het ritme en u volgt mijn voorbeeld.`
+    },
+    {
+      id: 'largo-nagesprek',
+      title: '4. Nagesprek na Largo',
+      checks: ['open vraag', 'keel', 'adem', 'kaak', 'cue opnieuw'],
+      text: `Wat merkte u tijdens deze poging? Waar voelde het makkelijk: in de adem, keel of kaak? En waar voelde u nog druk?
+
+Ik hoorde dat het tempo rustiger werd. Voor de volgende poging kies ik één aandachtspunt: laat het einde van de klinker nog zachter uitdoven. Ik doe het één keer voor, daarna doet u meteen weer mee.`
+    },
+    {
+      id: 'andante',
+      title: '5. Andante als tweede ritme',
+      checks: ['4/4', '1/8 adem', 'onbeklemtoonde inzet', 'drie accenten', 'buikwand'],
+      text: `Nu gaan we naar Andante. Dit is 4/4. De inademing is kort, 1/8 tel. Daarna komt een zachte onbeklemtoonde inzet en vervolgens drie even sterke accenten.
+
+Ik wil dat u vooral merkt of de adem kort en vrij kan blijven. Na de klank laat u de buikwand direct terugveren. Ik doe het eerst voor met een stemloze klank, daarna doet u mee.`
+    },
+    {
+      id: 'andante-nagesprek',
+      title: '6. Nagesprek na Andante',
+      checks: ['korte adem', 'zachte inzet', 'drie accenten', 'buikwand los', 'opnieuw'],
+      text: `Hoe voelde de korte inademing? Lukte het om de inzet zacht te houden? En bleven de drie accenten gelijkmatig?
+
+Voor de volgende poging letten we op het loslaten van de buikwand na de reeks. Houd de stem licht; de accenten komen uit de ademimpuls, niet uit duwen in de keel. We doen dezelfde reeks nog één keer.`
+    },
+    {
+      id: 'allegro',
+      title: '7. Allegro als tweede ritme',
+      checks: ['4/4', 'opmaat', 'vijf accenten', 'niet jachtig', 'licht'],
+      text: `Allegro is ook 4/4, maar dynamischer. We houden het tempo rustig genoeg. U krijgt een korte inademing, een opmaat en daarna vijf gelijkmatige accenten.
+
+Het belangrijkste is dat het levendig wordt zonder jagen. De stem blijft licht, de kaak blijft ruim en de keel blijft vrij. Ik doe het eerst voor; daarna volgt u mijn tempo.`
+    },
+    {
+      id: 'allegro-nagesprek',
+      title: '8. Nagesprek na Allegro',
+      checks: ['tempo', 'keeldruk', 'stem licht', 'cue', 'herhalen'],
+      text: `Werd het tempo ergens jachtig? Merkte u druk in de keel of bleef de stem licht?
+
+Ik hoorde dat de energie goed op gang kwam. Voor de volgende poging houden we dezelfde energie, met iets meer rust in het tempo. Laat de kaak ruim en laat de klinker zacht eindigen. Nog één keer.`
+    },
+    {
+      id: 'tekstniveau',
+      title: '9. Tekstniveau',
+      checks: ['accentgroepen', 'klinkerspraak', 'oogcontact', 'natuurlijk spreken', 'één cue'],
+      text: `We gaan nu naar tekst. Eerst luister u naar de accenten in de zin. Daarna doen we dezelfde zin in klinkerspraak, zodat het ritme en de adem-stemkoppeling blijven zitten. Daarna zegt u de zin natuurlijk.
+
+Neem eerst de gedachte: wat wilt u overbrengen? Dan oogcontact, korte inademing en spreken. Ik geef één zin voor, u imiteert, en daarna bespreken we één aandachtspunt.`
+    },
+    {
+      id: 'huiswerk',
+      title: '10. Afsluiting en huiswerk',
+      checks: ['materiaal', '3x5 minuten', 'zelfcheck', 'drukkerij', 'koor'],
+      text: `Voor thuis krijgt u een korte oefenroute mee. Oefen drie keer per dag vijf minuten met de audio of trommel. Liever kort en precies dan lang en slordig.
+
+Let op vier punten: zachte inzet, zachte afsluiting, ruime kaak en geen druk in de keel. Gebruik de zelfcheck: voelt de stem vrijer, blijft de adem doorstromen en dooft de klank zacht uit?
+
+Op het werk en in het koor is het doel niet harder werken, maar economischer stemgeven met meer draagkracht.`
+    }
   ],
   theory: [
     ['Kern van de methode', 'De Accentmethode is een globale/totale methode. Adem, fonatie, articulatie en gedachteconcentratie worden samen getraind, niet als losse trucjes.'],
@@ -42,7 +126,7 @@ window.ACCENT_DATA = {
       id: 'uitleg',
       title: '2. Oefening correct uitleggen',
       must: ['Vooraf zeggen wat Bernard gaat doen.', 'Tijdens de uitvoering kort cueën.', 'Na afloop checken wat hij voelde.'],
-      fix: ['Niet alleen “doe mij maar na”; benoem inademing, beweging, uitademing en klank.'],
+      fix: ['Benoem kort: inademing, beweging, uitademing en klank.'],
       model: 'Ik doe het eerst voor. U beweegt met mij mee: inademen in de voorbereidende beweging, daarna laat u de klank rustig meegaan op de uitademing.'
     },
     {
@@ -50,7 +134,7 @@ window.ACCENT_DATA = {
       title: '3. Taalgebruik aanpassen',
       must: ['Korte zinnen.', 'Beeldende woorden: soepel, verend, loslaten, niet duwen.', 'Alleen vaktaal als je het meteen vertaalt.'],
       fix: ['Vervang “subglottische druk” door “minder druk onder de stem”.'],
-      model: 'Denk aan een soepele, dragende stem. Niet harder persen, maar de lucht en beweging laten helpen.'
+      model: 'Denk aan een soepele, dragende stem. Lucht en beweging helpen; de keel hoeft niet te persen.'
     },
     {
       id: 'ritmes',
@@ -78,7 +162,7 @@ window.ACCENT_DATA = {
       title: '7. Non-verbale instructies',
       must: ['Handen/armen/knieën voordoen.', 'Kaakdaling aanwijzen zonder veel woorden.', 'Tempo met lichaam bewaken.', 'Oogcontact gebruiken.'],
       fix: ['Vorige keer was non-verbaal nauwelijks zichtbaar: maak cues bewust groot genoeg.'],
-      model: 'Ik wijs niet alleen verbaal bij, maar laat met mijn handen en beweging zien waar het tempo, de kaakruimte en de ontspanning zitten.'
+      model: 'Ik stuur kort bij met handen en beweging: tempo, kaakruimte en ontspanning worden zichtbaar.'
     },
     {
       id: 'zelfreflectie',
@@ -91,7 +175,7 @@ window.ACCENT_DATA = {
       id: 'feedback',
       title: '9. Specifieke feedback',
       must: ['Eén concreet compliment.', 'Eén verbeterpunt.', 'Eén volgende poging met cue.', 'Feedback koppelen aan doel.'],
-      fix: ['Niet alleen “goed gedaan”; zeg waar hij op moet letten en waarom.'],
+      fix: ['Maak feedback specifiek: waar let hij op en waarom helpt dat?'],
       model: 'Uw tempo bleef nu rustiger, dat helpt om minder druk te zetten. Let bij de volgende keer op het zacht laten uitdoven van de klinker.'
     },
     {

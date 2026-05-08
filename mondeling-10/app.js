@@ -97,6 +97,7 @@ function bindEvents() {
   document.getElementById('draw-card').addEventListener('click', () => {
     state.simCase = randomItem(data.cases);
     renderSimulation();
+    renderPrepTools();
   });
 
   document.getElementById('new-drill').addEventListener('click', () => {
@@ -350,10 +351,11 @@ function renderSimulation() {
 }
 
 function renderPrepTools() {
+  const tools = modeForCurrentCase('') === 'therapy' ? data.therapyPrepTools : data.prepTools;
   prepTools.innerHTML = `
     <h4>Start je voorbereiding hier</h4>
     <div>
-      ${data.prepTools.map(tool => `
+      ${tools.map(tool => `
         <a href="${tool.href}">
           <strong>${escapeHtml(tool.title)}</strong>
           <span>${escapeHtml(tool.text)}</span>
@@ -393,12 +395,13 @@ function strictFeedback() {
     'lt', 'kt', 'frequentie', 'evaluatie', 'ouders', 'leerkracht', 'icf',
     'participatie', 'generalisatie', 'fonologisch', 'fonetisch', 'vod', 'tos',
     'scaffolding', 'recasting', 'metaphon', 'minimale paren', 'wietze',
-    'tiq', 'visuele steun', 'jaarhandelingsplan'
+    'tiq', 'visuele steun', 'jaarhandelingsplan', 'therapievorm', 'vorm',
+    'meertaligheid', 'thuistaal', 'blootstelling', 'nt2', 'school'
   ];
   const hits = rubricWords.filter(word => clean.includes(word));
   const structure = ['omdat', 'dus', 'daarom', 'passend', 'concreet'].filter(word => clean.includes(word));
   let points = Math.min(4, Math.round((hits.length + structure.length) / 4));
-  const mode = clean.includes('therapie') || clean.includes('doel') || clean.includes('methode') ? 'therapy' : 'diagnostics';
+  const mode = modeForCurrentCase(clean);
   const hasCritical = mode === 'therapy'
     ? ['methode', 'verantwoord', 'vorm', 'therapievorm', 'waarom'].some(word => clean.includes(word))
     : ['fout', 'zelfcorrectie', 'verantwoord', 'betrouwbaar', 'validiteit'].some(word => clean.includes(word));
@@ -418,16 +421,22 @@ function strictFeedback() {
       missing: targetMissing,
       vague: hasCritical ? [] : [mode === 'therapy' ? 'criterium 15/17: motiveer methode en therapievorm' : 'criterium 10: benoem fout en betrouwbaarheid/validiteit']
     })}
-    ${block('Goed', hits.length ? `Je gebruikt toetswoorden: ${hits.slice(0, 6).join(', ')}.` : 'Je durft te antwoorden, maar vaktaal ontbreekt nog.')}
+    ${block('Sterk', hits.length ? `Je gebruikt toetswoorden: ${hits.slice(0, 6).join(', ')}.` : 'Je start. Voeg nu vaktaal toe.')}
     ${block('Mist', missingLine(hits, mode))}
     ${block('Kost punten', criticalFeedback(mode, hasCritical, points))}
-    ${block('Volgende poging', points >= 3 ? 'Zeg hetzelfde nu in 45 seconden met één foutverantwoording of één therapiekeuze extra.' : 'Gebruik: kernzin -> criterium -> casusbewijs -> verantwoording.')}
+    ${block('Volgende poging', points >= 3 ? 'Herhaal in 45 seconden. Voeg één foutverantwoording of één therapiekeuze toe.' : 'Zeg: kernzin -> criterium -> casusbewijs -> verantwoording.')}
     ${points < 4 ? redRetryHtml() : ''}
   `;
   bindRedRetry(feedbackBody, oralAnswer, oralNote);
-  feedbackModel.textContent = mode === 'therapy' ? data.therapy.model : data.diagnostics.model;
+  feedbackModel.textContent = state.simCase.model || (mode === 'therapy' ? data.therapy.model : data.diagnostics.model);
   renderDashboard();
   feedback.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function modeForCurrentCase(clean = '') {
+  if (state.simCase.mode) return state.simCase.mode;
+  if (clean.includes('therapie') || clean.includes('doel') || clean.includes('methode')) return 'therapy';
+  return 'diagnostics';
 }
 
 function missingLine(hits, mode) {
@@ -436,8 +445,9 @@ function missingLine(hits, mode) {
 }
 
 function targetWordsForMode(mode) {
+  if (state.simCase.targetWords) return state.simCase.targetWords;
   return mode === 'therapy'
-    ? ['beginsituatie', 'doel', 'methode', 'samenwerking', 'prognose']
+    ? ['lt', 'kt', 'methode', 'therapievorm', 'samenwerking', 'prognose']
     : ['testsituatie', 'neutraal', 'intonatie', 'score', 'afbreekregel', 'fout'];
 }
 
@@ -521,7 +531,7 @@ function criticalFeedback(mode, hasCritical, points) {
     return 'Let nog op casusbewijs, maar het kritische criterium is herkenbaar aanwezig.';
   }
   if (mode === 'therapy') {
-    return 'Criterium 15 en 17 tellen zwaar: methode én therapievorm moeten niet alleen genoemd, maar gemotiveerd worden vanuit beginsituatie, doelen en generalisatie.';
+    return 'Criterium 15 en 17 tellen zwaar: motiveer methode én therapievorm vanuit beginsituatie, doelen en generalisatie.';
   }
   return 'Criterium 10 telt zwaar: benoem je eigen handelen, fout/zelfcorrectie en de invloed op betrouwbaarheid of validiteit.';
 }

@@ -5,8 +5,10 @@ const state = {
   criterion: data.criteria[0],
   rhythm: data.rhythms[0],
   simulation: data.simulations[0],
+  script: data.scriptBuilder[0],
   scores: JSON.parse(localStorage.getItem('accent_scores') || '{}'),
   simulationLatest: JSON.parse(localStorage.getItem('accent_simulation_latest') || '{}'),
+  scripts: JSON.parse(localStorage.getItem('accent_custom_scripts') || '{}'),
 };
 
 const views = document.querySelectorAll('.accent-view');
@@ -16,6 +18,9 @@ const rhythmSelect = document.getElementById('rhythm-select');
 const simulationSelect = document.getElementById('simulation-select');
 const simulationAnswer = document.getElementById('simulation-answer');
 const simulationFeedback = document.getElementById('simulation-feedback');
+const scriptSelect = document.getElementById('script-select');
+const scriptEditor = document.getElementById('script-editor');
+const scriptNote = document.getElementById('script-note');
 const speechNote = document.getElementById('speech-note');
 const accentCoachInput = document.getElementById('accent-coach-input');
 const accentCoachAnswer = document.getElementById('accent-coach-answer');
@@ -53,6 +58,11 @@ function bindEvents() {
     renderSimulation();
   });
 
+  scriptSelect.addEventListener('change', () => {
+    state.script = data.scriptBuilder.find(item => item.id === scriptSelect.value) || data.scriptBuilder[0];
+    renderScriptBuilder();
+  });
+
   document.getElementById('mark-criterion').addEventListener('click', () => {
     togglePracticeScore(`criterion:${state.criterion.id}`);
     saveScores();
@@ -79,6 +89,9 @@ function bindEvents() {
     speechNote.textContent = '';
   });
   document.getElementById('record-simulation').addEventListener('click', toggleRecording);
+  document.getElementById('save-script').addEventListener('click', saveCurrentScript);
+  document.getElementById('reset-script').addEventListener('click', resetCurrentScript);
+  document.getElementById('copy-script').addEventListener('click', copyCurrentScript);
   document.getElementById('ask-accent-coach').addEventListener('click', answerAccentCoachQuestion);
   document.getElementById('record-accent-question').addEventListener('click', toggleCoachQuestionRecording);
   accentCoachInput.addEventListener('keydown', event => {
@@ -90,11 +103,13 @@ function renderOptions() {
   criterionSelect.innerHTML = data.criteria.map(item => `<option value="${item.id}">${item.title}</option>`).join('');
   rhythmSelect.innerHTML = data.rhythms.map(item => `<option value="${item.id}">${item.title}</option>`).join('');
   simulationSelect.innerHTML = data.simulations.map((item, index) => `<option value="${index}">${index + 1}. ${item[0]}</option>`).join('');
+  scriptSelect.innerHTML = data.scriptBuilder.map(item => `<option value="${item.id}">${escapeHtml(item.title)}</option>`).join('');
 }
 
 function renderAll() {
   renderRoute();
   renderSource();
+  renderScriptBuilder();
   renderCriterion();
   renderRhythm();
   renderSimulation();
@@ -112,6 +127,14 @@ function renderRoute() {
   document.getElementById('case-profile').innerHTML = data.caseProfile.map(([label, text]) => block(label, text)).join('');
   document.getElementById('daily-route').innerHTML = data.route.map(item => `<li>${escapeHtml(item)}</li>`).join('');
   document.getElementById('power-lines').innerHTML = data.powerLines.map(line => `<p>${escapeHtml(line)}</p>`).join('');
+}
+
+function renderScriptBuilder() {
+  scriptSelect.value = state.script.id;
+  document.getElementById('script-title').textContent = state.script.title;
+  document.getElementById('script-checks').innerHTML = state.script.checks.map(item => `<span>${escapeHtml(item)}</span>`).join('');
+  scriptEditor.value = state.scripts[state.script.id] || state.script.text;
+  scriptNote.textContent = state.scripts[state.script.id] ? 'Jouw versie is geladen.' : 'ZG-model geladen. Maak hem eigen en bewaar.';
 }
 
 function renderCriterion() {
@@ -241,7 +264,7 @@ function scoreAnswer(answer) {
   return {
     score,
     label: labelForScore(score),
-    good: passed.length ? `Je raakt: ${passed.map(check => check.label).join(', ')}.` : 'Je antwoord is nog te algemeen voor deze simulatie.',
+    good: passed.length ? `Je raakt: ${passed.map(check => check.label).join(', ')}.` : 'Startpunt staat. Voeg nu vaktaal en een concrete cue toe.',
     missing: score >= 4 && !warnings.length ? 'Geen grote inhoudelijke gaten; train nu vooral timing, cliënttaal en nagesprek.' : missingForSimulation(missing, warnings, wordCount, profile.minimumWords),
     scan: coachScanHtml({
       good: passed.map(check => check.label),
@@ -310,7 +333,7 @@ function labelForScore(score) {
   if (score >= 4) return 'Score 4/4 · ZG-klaar';
   if (score === 3) return 'Score 3/4 · voldoende';
   if (score === 2) return 'Score 2/4 · nog niet toetsvast';
-  return 'Score 1/4 · te vaag';
+  return 'Score 1/4 · maak concreet';
 }
 
 function missingForSimulation(missing, warnings, wordCount, minimumWords) {
@@ -369,7 +392,7 @@ function simulationProfile(title) {
       warnings: [],
       upgrade: 'Maak het toetsbaar: observatie, reflectievraag, één cue, opnieuw proberen.',
       next: 'Voeg vooral het nagesprek toe: wat merkte Bernard en welke cue volgt daaruit?',
-      nextStrong: 'Train dit als nagesprek: niet opnieuw de oefening uitleggen, maar therapeutisch bijsturen.'
+      nextStrong: 'Train dit als nagesprek: stuur therapeutisch bij en voorkom heruitleg.'
     },
     'Feedback na harde afsluiting': {
       focus: ['Specifiek compliment', 'Harde offset corrigeren', 'Zachte afsluiting', 'Nieuwe poging'],
@@ -401,7 +424,7 @@ function simulationProfile(title) {
         check('Allegro/4-4', ['allegro', '4/4', 'vierkwarts', 'galop'], 'noem Allegro als 4/4', 'Zeg expliciet: dit is Allegro in 4/4, niet Largo.'),
         check('Opmaat', ['opmaat', '1/8', 'achtste', 'korte inademing'], 'benoem 1/8 opmaat/inademing', 'Zeg: kort in, dan inzet.'),
         check('Accentpatroon', ['vijf', '5', 'zes', '6', 'accent'], 'benoem opmaat plus accenten', 'Gebruik: één onbeklemtoonde opmaat + vijf accenten.'),
-        check('Tempo bewaken', ['niet jachtig', 'rustig', 'tempo laag', 'niet te snel'], 'voorkom jachtig tempo', 'Zeg dat het dynamisch is, maar niet gehaast.'),
+        check('Tempo bewaken', ['niet jachtig', 'rustig', 'tempo laag', 'niet te snel'], 'voorkom jachtig tempo', 'Zeg dat het dynamisch en rustig blijft.'),
         check('Klank/stem', ['zacht', 'kaak', 'borstregister', 'stem', 'open klinker'], 'bewaak stemkwaliteit en kaak', 'Ook snel blijft de stem licht, ruim en zonder drukken.'),
         check('Zelfcheck na afloop', ['na afloop', 'daarna vraag', 'voelde', 'jachtig', 'druk', 'keel'], 'kondig de nacheck aan', 'Zeg dat je na afloop checkt of het jachtig werd of druk gaf.')
       ],
@@ -420,12 +443,12 @@ function simulationProfile(title) {
       checks: [
         check('Tempo/jachtigheid', ['jachtig', 'tempo', 'te snel', 'rustiger'], 'vraag naar tempo/jachtigheid', 'Check of Bernard ging jagen.'),
         check('Druk/keel', ['druk', 'keel', 'duwen', 'persen', 'minder belast'], 'vraag naar druk in keel/stem', 'Vraag of hij druk of keelspanning merkte.'),
-        check('Stemkwaliteit', ['licht', 'zacht', 'helder', 'kaak', 'open'], 'benoem stemkwaliteit', 'Koppel aan licht/ruim blijven in plaats van persen.'),
+        check('Stemkwaliteit', ['licht', 'zacht', 'helder', 'kaak', 'open'], 'benoem stemkwaliteit', 'Koppel aan licht en ruim blijven.'),
         check('Vervolgcue', ['volgende', 'opnieuw', 'cue', 'rustiger', 'zachter'], 'geef één concrete vervolgcue', 'Laat hem opnieuw proberen met één focus.')
       ],
       warnings: [],
       upgrade: 'Maak het nagesprek concreet: tempo, keel/druk, stemkwaliteit, één cue, opnieuw.',
-      next: 'Vraag niet alleen hoe het ging; vraag door op tempo en keelspanning.',
+      next: 'Vraag door op tempo en keelspanning.',
       nextStrong: 'Oefen dit als 20 seconden nagesprek na Allegro.'
     },
     'Voorbespreking Andante': fourFourProfile({
@@ -444,7 +467,7 @@ function simulationProfile(title) {
         check('Nacheck aankondigen', ['na afloop', 'daarna vraag', 'voelde', 'buik', 'adem'], 'kondig nagesprek aan', 'Zeg dat je na afloop checkt of de adem kort en vrij bleef.')
       ],
       upgrade: 'Zeg hardop: “Andante is 4/4: 1/8 in, 1/8 zachte inzet, drie accenten; daarna checken we buikwandrecoil.”',
-      next: 'Maak het echt Andante: geen drie tellen, maar 1/8 adem, 1/8 inzet en drie accenten.',
+      next: 'Maak het Andante: 1/8 adem, 1/8 inzet en drie accenten.',
       nextStrong: 'Oefen Andante met alleen /f/ en daarna /v/, zonder uitlegdrang.'
     }),
     'Nagesprek Andante': {
@@ -529,13 +552,13 @@ function simulationProfile(title) {
       flow: [
         ['1. Erkennen', 'Maak weerstand normaal: het mag vreemd voelen.'],
         ['2. Hulpvraag', 'Koppel aan zijn wens: zingen en werken zonder druk.'],
-        ['3. Ervaren', 'Vraag om één korte poging in plaats van overtuigen met theorie.']
+        ['3. Ervaren', 'Vraag om één korte poging. Theorie komt later.']
       ],
       minimumWords: 35,
       checks: [
         check('Erkennen', ['begrijp', 'logisch', 'raar', 'snap', 'voorstellen'], 'erken zijn weerstand', 'Begin niet verdedigend; erken dat het vreemd kan voelen.'),
         check('Motiveren via hulpvraag', ['zingen', 'koor', 'drukkerij', 'draagkracht', 'truc'], 'koppel aan zijn doel', 'Verbind de oefening aan weer kunnen zingen/werken zonder druk.'),
-        check('Non-directief', ['probeer', 'ervaren', 'doet mee', 'ik doe voor', 'meedoen'], 'nodig uit om te ervaren', 'Laat hem het verschil voelen in plaats van overtuigen met theorie.'),
+        check('Non-directief', ['probeer', 'ervaren', 'doet mee', 'ik doe voor', 'meedoen'], 'nodig uit om te ervaren', 'Laat hem het verschil voelen.'),
         check('Kort houden', ['kort', 'even', 'één keer', 'daarna'], 'maak de drempel laag', 'Vraag om één korte poging.')
       ],
       warnings: [],
@@ -672,7 +695,7 @@ function buildAccentCoachAnswer(question) {
   if (matches(clean, ['huiswerk', 'thuis', 'oefenen', 'meegeven', 'transfer'])) {
     return {
       title: 'Huiswerk moet concreet zijn',
-      body: 'Noem materiaal, frequentie, duur, aandachtspunten en transfer. Dus niet “oefen dit thuis”, maar: audio/trommel, 3x per dag 5 minuten, spiegel, zachte inzet/offset, kaakruimte en toepassing bij drukkerij/koor.',
+      body: 'Noem materiaal, frequentie, duur, aandachtspunten en transfer: audio/trommel, 3x per dag 5 minuten, spiegel, zachte inzet/offset, kaakruimte en toepassing bij drukkerij/koor.',
       action: 'Actie: open Huiswerk en spreek de afsluiting alsof Bernard nu vertrekt.',
       view: 'huiswerk'
     };
@@ -696,7 +719,7 @@ function buildAccentCoachAnswer(question) {
   if (matches(clean, ['zelfreflectie', 'doorvragen', 'voelde', 'merkte', 'keel'])) {
     return {
       title: 'Laat Bernard zelf voelen en verwoorden',
-      body: 'Vraag niet alleen “hoe ging het?”, maar vraag door op keel, adem, kaak, gemak en spanning. Gebruik zijn antwoord voor je volgende cue; dat maakt je therapeutisch handelen toetsbaar.',
+      body: 'Vraag door op keel, adem, kaak, gemak en spanning. Gebruik zijn antwoord voor je volgende cue; dat maakt je therapeutisch handelen toetsbaar.',
       action: 'Actie: open Simulatie en oefen “Nagesprek na Largo”.',
       view: 'simulatie'
     };
@@ -855,6 +878,34 @@ function saveScores() {
 
 function saveSimulationLatest() {
   localStorage.setItem('accent_simulation_latest', JSON.stringify(state.simulationLatest));
+}
+
+function saveCurrentScript() {
+  state.scripts[state.script.id] = scriptEditor.value.trim() || state.script.text;
+  localStorage.setItem('accent_custom_scripts', JSON.stringify(state.scripts));
+  scriptNote.textContent = 'Bewaard. Dit is nu jouw versie.';
+}
+
+function resetCurrentScript() {
+  delete state.scripts[state.script.id];
+  localStorage.setItem('accent_custom_scripts', JSON.stringify(state.scripts));
+  renderScriptBuilder();
+  scriptNote.textContent = 'ZG-model teruggezet.';
+}
+
+async function copyCurrentScript() {
+  const text = scriptEditor.value.trim();
+  if (!text) {
+    scriptNote.textContent = 'Er staat nog geen tekst om te kopiëren.';
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    scriptNote.textContent = 'Gekopieerd.';
+  } catch {
+    scriptEditor.select();
+    scriptNote.textContent = 'Selecteer en kopieer met Cmd+C.';
+  }
 }
 
 function simulationIndex() {

@@ -139,13 +139,13 @@ function answerCoach() {
 
   const clean = normalize(question);
   let title = 'Coachantwoord';
-  let body = 'Begin bij de boodschap. Spraak loopt meestal beter als je aandacht naar betekenis gaat in plaats van naar losse woorden.';
-  let action = 'Actie: zeg één zin opnieuw en richt je op wat je wilt overbrengen, niet op hoe elk woord klinkt.';
+  let body = 'Begin bij de boodschap. Spraak loopt meestal beter als je aandacht naar betekenis gaat.';
+  let action = 'Actie: zeg één zin opnieuw en richt je op wat je wilt overbrengen.';
 
   if (matches(clean, ['blok', 'vast', 'keel', 'duw', 'pers'])) {
     title = 'Bij blokkeren';
     body = 'Een blokkade wordt vaak groter wanneer je hem met controle probeert weg te drukken. Merk de spanning op, laat de prestatie-eis zakken en keer terug naar de bedoeling van je zin.';
-    action = 'Actie: fluister niet, forceer niet. Denk: “ik deel iets”, adem normaal, start met een zachte stemstroom.';
+    action = 'Actie: denk “ik deel iets”, adem normaal en start met een zachte stemstroom.';
   } else if (matches(clean, ['angst', 'schaam', 'paniek', 'bang'])) {
     title = 'Bij spreekangst';
     body = 'Angst wil dat spreken een examen wordt. Jij maakt er weer contact van. Klein verschil, groot effect.';
@@ -160,7 +160,7 @@ function answerCoach() {
     action = 'Actie: dagroute afmaken en één log bewaren. Morgen hetzelfde, iets moeilijker.';
   } else if (matches(clean, ['rapport', 'voortgang', 'analyse'])) {
     title = 'Voortgang meten';
-    body = 'Meet niet alleen vloeiendheid. Meet ook vermijding, herstel, intentie, lichaamsrust en of je sneller terugkeert naar communicatie.';
+    body = 'Meet vloeiendheid, vermijding, herstel, intentie, lichaamsrust en terugkeer naar communicatie.';
     action = 'Actie: bewaar drie logs en maak onderaan een rapport.';
   }
 
@@ -220,7 +220,7 @@ function checkDrill() {
 
   drillFeedback.innerHTML = `
     <div class="stutter-feedback-head">
-      <h3>${score >= 4 ? 'Alpha-waardig' : score >= 3 ? 'Bijna raak' : 'Nog te vaag'}</h3>
+      <h3>${score >= 4 ? 'Alpha-waardig' : score >= 3 ? 'Bijna raak' : 'Maak concreet'}</h3>
       <strong>${score}/4</strong>
     </div>
     ${scanHtml({
@@ -315,7 +315,7 @@ function identifyDam(clean) {
   if (matches(clean, ['eerst adem', 'lucht pakken', 'diep adem'])) return 'de overtuiging dat spreken speciale ademvoorbereiding nodig heeft';
   if (matches(clean, ['duw', 'pers', 'forceer'])) return 'fysiek forceren waardoor de spreekstroom smaller wordt';
   if (matches(clean, ['vermijd', 'niet zeggen', 'ander woord'])) return 'vermijding die op korte termijn rust geeft en op lange termijn de angst voedt';
-  if (matches(clean, ['beoordeling', 'kijken', 'luisteren', 'raar'])) return 'spreken als optreden in plaats van contact';
+  if (matches(clean, ['beoordeling', 'kijken', 'luisteren', 'raar'])) return 'spreken als optreden';
   return '';
 }
 
@@ -329,7 +329,7 @@ function nextActionForHits(green, red) {
 
 function recommendExercise(clean) {
   if (matches(clean, ['adem', 'lucht'])) return 'Oefen “gewone start”: drie korte zinnen zonder speciale ademvoorbereiding.';
-  if (matches(clean, ['woord', 'klank', 'letter'])) return 'Oefen “beeld eerst”: spreek vanuit voorstelling/betekenis in plaats van woordcontrole.';
+  if (matches(clean, ['woord', 'klank', 'letter'])) return 'Oefen “beeld eerst”: spreek vanuit voorstelling en betekenis.';
   if (matches(clean, ['angst', 'schaam'])) return 'Oefen een mini-exposure: 20 seconden echte communicatie met lage inzet.';
   if (matches(clean, ['duw', 'keel', 'pers'])) return 'Oefen zachte doorlopende stemactivatie en laat de zin daaruit ontstaan.';
   return 'Oefen de rivierzin: “Wat ik eigenlijk wil zeggen is...” en blijf bij de boodschap.';

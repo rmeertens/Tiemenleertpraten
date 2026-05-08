@@ -23,7 +23,7 @@ window.LESSEN_DATA = {
         topic('toepassing op PM-er of ouder', 'Uitleg vertalen naar begrijpelijke signalering en handelingsadvies.', ['pm', 'ouder', 'voorlichting', 'advies', 'signaleren'])
       ],
       'Je moet PM-ers uitleggen waarom “hij praat weinig” geen volledige observatie is. Hoe orden je dat professioneel?',
-      'Leg uit waarom een verslag of toetsantwoord taalniveaus moet gebruiken in plaats van losse indrukken.',
+      'Leg uit waarom een verslag of toetsantwoord taalniveaus gebruikt.',
       'Ik orden “praat weinig” eerst in taalniveaus en context. Gaat het om weinig woorden, korte zinnen, beperkte beurtname of slechte verstaanbaarheid? Daarna koppel ik dat aan leeftijd en ontwikkelingsfase. Zo kan ik gericht signaleren en bepalen of observeren, screenen, ouderadvies of doorverwijzing nodig is.',
       'Een professioneel antwoord gebruikt taalniveaus om observaties precies te maken. “Praat weinig” wordt dan uitgewerkt naar semantiek, morfosyntaxis, pragmatiek of spraakverstaanbaarheid. Door dit te koppelen aan leeftijd en functioneren ontstaat een onderbouwde preventieve vervolgstap.'
     ),
@@ -34,7 +34,7 @@ window.LESSEN_DATA = {
       'Analyse',
       ['Levelt', 'fonetiek', 'fonologie'],
       'W2 verbindt taalniveaus met het model van Levelt. Je leert bepalen waar een fout ontstaat: betekenis, klankkeuze, fonetisch plan of articulatie.',
-      'De leskern is klinisch lokaliseren: niet alleen benoemen wat fout klinkt, maar uitleggen waar in het taal-spraaksysteem het misgaat.',
+      'De leskern is klinisch lokaliseren: uitleggen waar in het taal-spraaksysteem het misgaat.',
       [
         'Taal en spraak zijn verschillend: taal is systeem, spraak is uitvoering.',
         'Levelt helpt fouten plaatsen: conceptualiseerder, formulator, fonologisch coderen, fonetisch plan en articulatie.',
@@ -50,7 +50,7 @@ window.LESSEN_DATA = {
       ],
       'Een kind zegt “tat” voor “kat”. Hoe gebruik je Levelt om niet te snel één conclusie te trekken?',
       'Vergelijk fonetische en fonologische problemen en geef bij beide een behandelconsequentie.',
-      'Ik gebruik Levelt om te lokaliseren waar de fout kan ontstaan. Bij “tat” voor “kat” kan het kind de /k/ motorisch niet vormen, maar het kan ook het contrast /k/-/t/ fonologisch onvoldoende gebruiken. Daarom onderzoek ik stimulabiliteit, consistentie en contrastbegrip voordat ik kies voor articulatie-oefening of minimale paren.',
+      'Ik gebruik Levelt om te lokaliseren waar de fout kan ontstaan. Bij “tat” voor “kat” onderzoek ik motorische vorming van /k/ én fonologisch contrastgebruik /k/-/t/. Daarna kies ik gericht voor articulatie-oefening of minimale paren.',
       'Een fonetisch probleem betreft de motorische uitvoering van een klank; behandeling richt zich dan op articulatieplaats en beweging. Een fonologisch probleem betreft het klanksysteem en betekenisvolle contrasten; behandeling richt zich dan op bijvoorbeeld minimale paren en generalisatie. Diagnostisch zijn stimulabiliteit, consistentie en contrastbegrip bepalend.'
     ),
     lesson(
@@ -102,7 +102,7 @@ window.LESSEN_DATA = {
       ],
       'Een ouder vraagt of thuis alleen Nederlands spreken beter is. Hoe antwoord je toetswaardig?',
       'Onderbouw interactief voorlezen als taalstimulerende aanpak.',
-      'Ik adviseer niet om de thuistaal zomaar te stoppen. Een rijke, veilige thuistaal ondersteunt communicatie, identiteit en conceptontwikkeling. Voor Nederlands kijk ik naar hoeveelheid en kwaliteit van aanbod. Ik leg ouders concreet uit hoe zij in de taal die zij goed spreken interactief kunnen voorlezen, uitbreiden en beurtwisseling stimuleren.',
+      'Een rijke, veilige thuistaal ondersteunt communicatie, identiteit en conceptontwikkeling. Voor Nederlands kijk ik naar hoeveelheid en kwaliteit van aanbod. Ik leg ouders concreet uit hoe zij in de taal die zij goed spreken interactief kunnen voorlezen, uitbreiden en beurtwisseling stimuleren.',
       'Interactief voorlezen is taalstimulering omdat het kind actief taal verwerkt. Door voorspellen, vragen stellen, benoemen, uitbreiden en herhalen worden woordenschat, zinsbouw en pragmatiek geoefend. De aanpak is sterk wanneer ouders of PM-ers hem dagelijks en passend bij het ontwikkelingsniveau toepassen.'
     ),
     lesson(
@@ -112,7 +112,7 @@ window.LESSEN_DATA = {
       'Differentiaaldiagnostiek',
       ['TOS', 'meertaligheid', 'leerbaarheid'],
       'W5 is de differentiaaldiagnostische sleutel: lage Nederlandse taal alleen is geen TOS. Je weegt beide talen, taalaanbod, leerbaarheid en hardnekkigheid.',
-      'De leskern is misdiagnose voorkomen: normale meertalige ontwikkeling niet pathologiseren, maar TOS ook niet missen.',
+      'De leskern is misdiagnose voorkomen: normale meertalige ontwikkeling herkennen en TOS tijdig signaleren.',
       [
         'Bij TOS verwacht je problemen in alle talen van het kind.',
         'Onvoldoende blootstelling moet eerst worden meegewogen of uitgesloten.',
@@ -233,7 +233,7 @@ window.LESSEN_DATA = {
       'In een MDO moet je een kind met spraakproblemen presenteren. Hoe voorkom je dat je alleen klankfouten opsomt?',
       'Maak een ICF-redenering voor een kind met een fonologisch probleem.',
       'Ik start met de ICF-brug: welke functies zijn aangedaan, wat merkt het kind in spreken en verstaanbaar zijn, en wat betekent dat voor participatie in klas of spel? Daarna gebruik ik Levelt om te verklaren of het probleem fonetisch, fonologisch of planning betreft. Zo wordt mijn MDO-inbreng functioneel en onderbouwd.',
-      'Bij een fonologisch probleem beschrijf je niet alleen de fout op functieniveau, maar ook de gevolgen. De functie is de organisatie van klankcontrasten, de activiteit is verstaanbaar spreken en de participatie is meedoen in gesprek of klas. Externe factoren, zoals leerkrachtrespons en ouderinput, bepalen mede de transfer en het behandeladvies.'
+      'Bij een fonologisch probleem beschrijf je fout én gevolg. De functie is de organisatie van klankcontrasten, de activiteit is verstaanbaar spreken en de participatie is meedoen in gesprek of klas. Externe factoren, zoals leerkrachtrespons en ouderinput, bepalen mede de transfer en het behandeladvies.'
     )
   ]
 };
@@ -279,7 +279,7 @@ const lessonMeta = {
   },
   w6: {
     criteria: 'Je borgt preventie in dagelijkse routines, materialen en ouder/PM-er-gedrag.',
-    writtenFocus: 'Beschrijf niet alleen materiaal, maar ook wie het gebruikt, wanneer en hoe effect wordt geëvalueerd.',
+    writtenFocus: 'Beschrijf materiaal, gebruiker, moment en evaluatie.',
     pitfall: 'Een mooie voorlichting ontwerpen zonder transfer naar de groep of thuis.',
     zg: 'Je maakt concreet wie wat morgen doet, met welk materiaal, wanneer geëvalueerd wordt en hoe ouders worden meegenomen.'
   },

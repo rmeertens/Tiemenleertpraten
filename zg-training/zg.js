@@ -109,7 +109,7 @@ const modules = {
     ],
     checks: [
       ["advies", ["advies", "ik adviseer", "vervolg", "behandeling", "diagnostiek"], "Formuleer een duidelijk advies."],
-      ["testleer", ["bi", "betrouwbaarheidsinterval", "normscore", "ruwe score", "sd"], "Gebruik testleer, niet alleen losse cijfers."],
+      ["testleer", ["bi", "betrouwbaarheidsinterval", "normscore", "ruwe score", "sd"], "Gebruik testleer: normscore, BI en interpretatie."],
       ["observatie", ["observatie", "dagelijks", "ouders", "leerkracht", "klas"], "Koppel testgegevens aan dagelijks functioneren."],
       ["differentiaal", ["differentiaal", "tos", "nt2", "ass", "iq", "gehoor"], "Verdedig waarom jouw verklaring het best past."],
       ["professioneel", ["voorzichtig", "op basis van", "ik kan", "ik zou", "multidisciplinair"], "Klink professioneel en genuanceerd."]
@@ -123,7 +123,7 @@ const modules = {
           ["Spanning", "De psycholoog vindt de testscore alleen niet genoeg"],
           ["Doel", "Verdedig je diagnose professioneel"]
         ],
-        example: "Mijn advies is om TOS als meest waarschijnlijke verklaring te onderzoeken/behandelen, omdat de taalproductie duidelijk zwak is terwijl het non-verbale functioneren gemiddeld is. Ik baseer dit niet alleen op de normscore, maar ook op het betrouwbaarheidsinterval, observatie en dagelijks functioneren volgens ouders en leerkracht. Differentiaaldiagnostisch past een algemene verstandelijke beperking minder goed, maar gehoor, meertaligheid en sociaal-emotionele factoren moeten wel meegewogen blijven. Ik adviseer gerichte taalbehandeling en evaluatie van groei, met multidisciplinair overleg als vooruitgang uitblijft."
+        example: "Mijn advies is om TOS als meest waarschijnlijke verklaring te onderzoeken/behandelen, omdat de taalproductie duidelijk zwak is terwijl het non-verbale functioneren gemiddeld is. Ik onderbouw dit met normscore, betrouwbaarheidsinterval, observatie en dagelijks functioneren volgens ouders en leerkracht. Differentiaaldiagnostisch past een algemene verstandelijke beperking minder goed, maar gehoor, meertaligheid en sociaal-emotionele factoren moeten wel meegewogen blijven. Ik adviseer gerichte taalbehandeling en evaluatie van groei, met multidisciplinair overleg als vooruitgang uitblijft."
       },
       {
         title: "Manager Trudy",
@@ -219,7 +219,7 @@ function checkAnswer() {
   const title = total === max ? "ZG-materiaal" : total >= max - 1 ? "Bijna ZG" : "Nog scherper maken";
   const body = total === max
     ? "Je antwoord bevat de kerncomponenten. Oefen dit nu hardop, kort en professioneel."
-    : "Vul de ontbrekende brug aan. Een 10-antwoord is expliciet, niet alleen inhoudelijk juist.";
+    : "Vul de ontbrekende brug aan. Een 10-antwoord is expliciet en inhoudelijk juist.";
   feedback.innerHTML = `
     <h2>${title}: ${total}/${max}</h2>
     <p>${body}</p>

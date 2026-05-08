@@ -624,7 +624,7 @@ function answerCoachQuestion() {
     title = isWritten ? 'Naar meer schriftelijke punten' : 'Naar ZG';
     body = isWritten
       ? `Een sterk schriftelijk antwoord is puntenscorend: ${lesson.writtenFocus}`
-      : `Een ZG-antwoord is niet langer, maar preciezer: ${lesson.zg}`;
+      : `ZG = preciezer formuleren: ${lesson.zg}`;
     action = isWritten
       ? `Actie: schrijf ${lesson.checks[0].title} als definitie, casusbewijs en conclusie.`
       : `Actie: gebruik ${lesson.checks[0].title}, ${lesson.checks[1]?.title || lesson.domain} en een concrete vervolgstap.`;

@@ -94,8 +94,8 @@ SCORING
 - Binair: Goed (1) of Fout (0).
 - Items 1–4: specifieke regels voor deel-items (1c, 2c, 3c, 4c) beheersen.
 - Dialect-/articulatiefouten: NIET fout scoren (morfosyntaxis staat centraal).
-  Voorbeeld: "toel" i.p.v. "stoel" → 1 punt (articulatie, niet morfosyntaxis).
-  Maar: "die is van mij" i.p.v. "die heb ik in mijn hand" → 0 punt (vervanging zinsdeel).
+  Voorbeeld: "toel" voor "stoel" → 1 punt (articulatie, morfosyntaxis intact).
+  Voorbeeld: "die is van mij" voor "die heb ik in mijn hand" → 0 punt (vervanging zinsdeel).
 - Elke 0-score categoriseren als: Weglating / Vervanging / Invoeging.
 - AFBREEKREGEL: na 5 OPEENVOLGENDE 0-scores stoppen (absoluut, geen uitzonderingen).
 

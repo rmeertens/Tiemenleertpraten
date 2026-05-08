@@ -59,6 +59,28 @@ window.ORAL_10_DATA = {
       text: 'Gebruik Studiecoach voor een laatste kritische check op je Schlichting-afname.'
     }
   ],
+  therapyPrepTools: [
+    {
+      title: '1. Casus en ICF',
+      href: '/pak-de-10/',
+      text: 'Gebruik Pak de 10 om diagnose, ICF, hulpvraag en participatieprobleem scherp te krijgen.'
+    },
+    {
+      title: '2. LT- en KT-doel',
+      href: '/pak-de-10/',
+      text: 'Werk van participatie naar functie: LT-doel is redzaamheid, KT-doel is meetbare behandelstap.'
+    },
+    {
+      title: '3. Methode en therapievorm',
+      href: '/mondeling-10/',
+      text: 'Gebruik Deel 2 Behandeling om methode, vorm, duur/frequentie en evaluatie toetsgericht te formuleren.'
+    },
+    {
+      title: '4. Zware criteria check',
+      href: '/lessen-coach/',
+      text: 'Check vooral criterium 15 en 17: methodekeuze en therapievorm moeten expliciet verantwoord zijn.'
+    }
+  ],
   guideCards: [
     {
       title: 'Testsituatie',
@@ -111,7 +133,7 @@ window.ORAL_10_DATA = {
     ['Wat zeg je na een procedurefout?', 'Ik benoem de fout concreet, analyseer mogelijke invloed op respons en trek een conclusie over betrouwbaarheid.', 'Criterium 10']
   ],
   redFlags: [
-    'Recht tegenover het kind zitten in plaats van een hoekopstelling.',
+    'Recht tegenover het kind zitten; kies de hoekopstelling.',
     'Starten zonder kalenderleeftijd en startsectie te controleren.',
     'Een instapfout negeren en geen terugkeerregel toepassen.',
     'Taalbegrip sturen met nadruk, blikrichting of wijzen.',
@@ -153,7 +175,7 @@ window.ORAL_10_DATA = {
         lt: 'Het kind is in klas- en thuissituaties beter verstaanbaar en kan actief deelnemen aan gesprek en spel.',
         kt: 'Het kind onderscheidt en produceert het gekozen fonologische contrast in 80-90% van gestructureerde woord- of zinscontexten.',
         method: 'Minimale paren, Metaphon of Hodson & Paden bij meerdere processen.',
-        why: 'Ik kies een contrastieve of cyclische aanpak omdat het probleem in het fonologische systeem zit, niet alleen in losse klankmotoriek.',
+        why: 'Ik kies een contrastieve of cyclische aanpak: het probleem zit in het fonologische systeem en vraagt om contrastleren.',
         form: 'Directe individuele therapie, gecombineerd met ouder- en leerkrachtinstructie voor generalisatie.',
         duration: 'Wekelijks of intensiever bij ernstige onverstaanbaarheid; evaluatie na 8-12 sessies.',
         collaboration: 'Ouders en leerkracht oefenen auditieve discriminatie, recasting en functionele transfer.',
@@ -218,7 +240,7 @@ window.ORAL_10_DATA = {
         lt: 'Het kind neemt begrijpelijk en passend deel aan gesprekken en spel met leeftijdsgenoten.',
         kt: 'Het kind gebruikt in een gestructureerde taak begin-midden-einde, beurtgedrag of contextinformatie volgens het gekozen doel.',
         method: 'Narratieve interventie, scripts, visuele ondersteuning, rollenspel en naturalistische pragmatiektherapie.',
-        why: 'Ik kies functionele interactietraining omdat het probleem zichtbaar wordt in communicatie met anderen, niet alleen in losse taalvorm.',
+        why: 'Ik kies functionele interactietraining omdat het probleem vooral zichtbaar wordt in communicatie met anderen.',
         form: 'Individueel starten, daarna groep of klassituatie voor generalisatie.',
         duration: 'Evaluatie na 8-10 weken op gesprek, spel of verhaal in natuurlijke context.',
         collaboration: 'Ouders, leerkracht en eventueel psycholoog/orthopedagoog bij ASS of sociaal-emotionele factoren.',
@@ -233,7 +255,7 @@ window.ORAL_10_DATA = {
         method: 'Taalgerichte interventie met zorgvuldige taaldiagnostiek, thuistaalbetrokkenheid, visuele steun en schoolgerichte strategieen.',
         why: 'Ik kies voorzichtig behandelen omdat lage Nederlandse scores alleen geen TOS bewijzen; uitval in beide talen en leerbaarheid sturen mijn keuze.',
         form: 'Direct en indirect, met ouders/tolk en school.',
-        duration: 'Evaluatie op groei en leerbaarheid, niet alleen op eentalige normscore.',
+        duration: 'Evaluatie op groei, leerbaarheid en normscore in de juiste taalcontext.',
         collaboration: 'Ouders, leerkracht, tolk/NT2-expertise en eventueel audiologisch centrum.',
         prognosis: 'Positiever bij rijk taalaanbod en groei; voorzichtiger bij uitval in beide talen.'
       },
@@ -268,7 +290,7 @@ window.ORAL_10_DATA = {
       ['Hodson & Paden', 'ernstige onverstaanbaarheid met meerdere processen', 'minder passend bij een enkel fonetisch probleem', 'Ik kies cyclisch werken omdat meerdere processen tegelijk de verstaanbaarheid beperken.'],
       ['Motorische articulatie', 'fonetische klankvorming', 'niet als hoofdroute bij systeemfout', 'Ik kies motorisch werken omdat de productiebeweging zelf onvoldoende lukt.'],
       ['PROMPT-principes', 'VOD of motorische planning', 'niet inzetten als het probleem uitsluitend fonologisch is', 'Ik kies multisensorische cueing omdat planning en sequenties centraal staan.'],
-      ['Scaffolding/recasting', 'morfosyntaxis of TOS', 'te vaag zonder concreet doelstructuur', 'Ik kies recasting en scaffolding om doelstructuren net boven huidig niveau uit te lokken.'],
+      ['Scaffolding/recasting', 'morfosyntaxis of TOS', 'maak de doelstructuur concreet', 'Ik kies recasting en scaffolding om doelstructuren net boven huidig niveau uit te lokken.'],
       ['Woordenschatinterventie', 'semantische zwakte', 'niet beperken tot nazeggen', 'Ik kies rijke woordopslag: vorm, betekenis, categorie en gebruik worden gekoppeld.'],
       ['Narratieve interventie', 'verhaalopbouw en samenhang', 'niet starten zonder visuele structuur bij zwak begrip', 'Ik kies verhaalstructuur omdat narratie syntax, semantiek en pragmatiek integreert.'],
       ['Hanen/ouderbegeleiding', 'jonge kinderen en generalisatie via ouders', 'niet passend als ouders overbelast zijn zonder aanpassing', 'Ik kies oudercoaching omdat dagelijkse interactie de meeste oefenkansen geeft.'],
@@ -277,7 +299,7 @@ window.ORAL_10_DATA = {
     scripts: [
       ['Fonologisch defect met frustratie', 'Ik kies een spelenderwijze contrastieve aanpak omdat de verstaanbaarheid wordt beperkt door een fonologisch systeemprobleem. Door met minimale paren of Metaphon te werken, koppel ik functieniveau aan participatie in de klas.'],
       ['TOS met beperkt lexicon', 'Ik kies taalstimulering en woordenschatinterventie omdat het kind meer rijke woordrepresentaties nodig heeft. Ik combineer directe behandeling met ouders en school zodat de woorden in dagelijkse context terugkomen.'],
-      ['VOD', 'Ik kies een motorisch-planningsgerichte aanpak met veel herhaling en multisensorische cues. Bij VOD is niet alleen het contrast, maar vooral de planning van klanksequenties kwetsbaar.'],
+      ['VOD', 'Ik kies een motorisch-planningsgerichte aanpak met veel herhaling en multisensorische cues. Bij VOD is vooral de planning van klanksequenties kwetsbaar.'],
       ['Meertalig met TOS-vraag', 'Ik behandel voorzichtig en verzamel informatie over beide talen. Als de uitval in beide talen zichtbaar is, past dat meer bij TOS dan bij alleen blootstellingsachterstand.'],
       ['Pragmatiek/ASS', 'Ik kies functionele pragmatiek- en scripttraining omdat het probleem vooral zichtbaar is in interactie. Ouders, leerkracht en eventueel psycholoog zijn nodig voor generalisatie.'],
       ['Morfosyntaxis', 'Ik kies scaffolding en recasting binnen de zone van naaste ontwikkeling. Het KT-doel richt zich op een concrete zinsstructuur en het LT-doel op begrijpelijker communiceren.'],
@@ -373,9 +395,9 @@ window.ORAL_10_DATA = {
       ['Fysio/ergo', 'alleen betrekken bij bredere motorische planning, prikkelverwerking of belastbaarheid'],
       ['MDO-check', 'mondgewoonten/anatomie alleen meenemen als observatie of casus dit bevestigt; niet als vast Wietze-feit presenteren']
     ],
-    prognosis: 'De prognose is voorzichtig maar functioneel positief. Door TIQ 62, VOD-kenmerken en zwakke morfosyntaxis verwacht ik geen snelle normalisatie, maar wel betekenisvolle groei in verstaanbaarheid, korte functionele uitingen en participatie als behandeling intensief, klein-stappig en school/thuis-geborgd is.',
+    prognosis: 'De prognose is voorzichtig en functioneel positief. Door TIQ 62, VOD-kenmerken en zwakke morfosyntaxis verwacht ik betekenisvolle groei in verstaanbaarheid, korte functionele uitingen en participatie bij intensieve, klein-stappige behandeling met school- en thuisborging.',
     questions: [
-      ['Waarom niet alleen minimale paren?', 'Omdat Wietze naast fonologische processen ook VOD-kenmerken heeft; alleen contrasttherapie pakt de motorische planning onvoldoende aan.'],
+      ['Waarom is minimale paren onvoldoende?', 'Wietze heeft naast fonologische processen ook VOD-kenmerken. De motorische planning vraagt extra, herhaalde sturing.'],
       ['Waarom niet eerst alleen de /g/?', 'Omdat de prioriteit functionele verstaanbaarheid en klasparticipatie is; ik kies doelen op functionele last, stimulabiliteit en haalbaarheid.'],
       ['Hoe voorkom je overbelasting?', 'Een doel per sessie, visuele steun, korte herhalingen, foutarm leren en transfer in kleine routines.'],
       ['Waarom is de klas zo belangrijk?', 'Daar ligt de participatiebeperking: hij kan lessen niet volgen en trekt zich terug. Zonder klastransfer blijft therapie kamergebon­den.'],
@@ -390,34 +412,47 @@ window.ORAL_10_DATA = {
       'Methode: motorisch-planningsgericht + cyclische/contrastieve fonologie + scaffolding/recasting.',
       'Vorm: individueel direct, kort en intensief; indirect via ouders/leerkracht.',
       'Duur: 8-12 weken eerste cyclus, evalueren op functie én participatie.',
-      'ZG-zin: “Ik kies geen losse klanktraining, maar een ICF-gestuurd plan waarin spraakmotoriek, fonologie en morfosyntaxis direct gekoppeld zijn aan Wietze’s participatie in de klas.”'
+      'ZG-zin: “Ik kies een ICF-gestuurd plan waarin spraakmotoriek, fonologie en morfosyntaxis direct gekoppeld zijn aan Wietze’s participatie in de klas.”'
     ]
   },
   cases: [
     {
       title: 'Taalbegrip-afname',
+      mode: 'diagnostics',
       context: 'Kind reageert impulsief en kijkt naar de testleider voor bevestiging.',
-      task: 'Demonstreer neutraal aanbieden, professioneel begrenzen en achteraf verantwoorden.'
+      task: 'Demonstreer neutraal aanbieden, professioneel begrenzen en achteraf verantwoorden.',
+      model: 'Ik zet de testsituatie rustig en voorspelbaar neer, met alleen het noodzakelijke materiaal zichtbaar. Ik bied Taalbegrip-3 vanaf de juiste sectie neutraal aan, zonder nadruk, blikrichting of extra hulp. Als het kind impulsief reageert, begrens ik professioneel zonder de respons inhoudelijk te sturen. Achteraf benoem ik of mijn handelen de validiteit of betrouwbaarheid van de respons heeft beïnvloed.'
     },
     {
       title: 'Taalproductie-3: Zinsontwikkeling',
+      mode: 'diagnostics',
       context: 'Je merkt dat je bijna vragende intonatie gebruikt bij een stimuluszin.',
-      task: 'Leg uit wat het risico is, herstel professioneel en benoem de invloed op betrouwbaarheid.'
+      task: 'Leg uit wat het risico is, herstel professioneel en benoem de invloed op betrouwbaarheid.',
+      model: 'Bij Zinsontwikkeling bied ik de stimuluszin exact en met passende natuurlijke intonatie aan. Een bijna vragende intonatie kan de respons sturen en daarmee de standaardisatie bedreigen. Ik benoem die fout concreet, herstel volgens de handleiding waar mogelijk en verantwoord of de respons nog betrouwbaar te interpreteren is.'
     },
     {
       title: 'Therapie bij fonologische problematiek',
+      mode: 'therapy',
       context: 'Kind is slecht verstaanbaar, maakt fronting en clusterreductie en durft minder te spreken in de klas.',
-      task: 'Geef LT-doel, KT-doel, methode, therapievorm, samenwerking en prognose.'
+      task: 'Geef LT-doel, KT-doel, methode, therapievorm, samenwerking en prognose.',
+      targetWords: ['lt', 'kt', 'methode', 'therapievorm', 'samenwerking', 'prognose'],
+      model: 'Mijn LT-doel is dat het kind binnen de klas functioneel verstaanbaar deelneemt aan kring- en speelmomenten, zodat het weer spreekinitiatief durft te nemen. Mijn KT-doel is dat het kind het gekozen contrast, bijvoorbeeld /k/ tegenover /t/ bij fronting of clusters in doelwoorden, in 80% van de gestructureerde oefensituaties correct toepast. Ik kies voor een fonologische methode zoals minimale paren, Metaphon of Hodson & Paden, omdat fronting en clusterreductie wijzen op een klanksysteemprobleem. De therapievorm is directe individuele behandeling, aangevuld met ouder- en leerkrachtcoaching voor recasting, auditieve discriminatie en transfer in de klas. De prognose is gunstig tot voorzichtig positief, afhankelijk van ernst, stimulabiliteit, auditieve verwerking en consequente generalisatie.'
     },
     {
       title: 'Therapie bij taalproductiezwakte',
+      mode: 'therapy',
       context: 'Kind gebruikt korte zinnen, laat functiewoorden weg en heeft visuele steun nodig.',
-      task: 'Verdedig behandelkeuze en maak het advies concreet voor ouders en leerkracht.'
+      task: 'Verdedig behandelkeuze en maak het advies concreet voor ouders en leerkracht.',
+      targetWords: ['lt', 'kt', 'methode', 'therapievorm', 'samenwerking', 'prognose'],
+      model: 'Ik richt de behandeling op functionele taalproductie: langere, grammaticaal completere uitingen in dagelijkse situaties. Het KT-doel is bijvoorbeeld dat het kind met visuele zinssteun S-V-O-zinnen produceert in 8 van 10 oefenmomenten. Ik kies scaffolding, modeling en recasting, omdat het kind steun nodig heeft binnen de zone van naaste ontwikkeling. Ouders en leerkracht krijgen concrete routines om functiewoorden en zinsuitbreiding uit te lokken. De prognose is afhankelijk van leerbaarheid, taalbegrip, cognitieve belastbaarheid en toepassing buiten de behandelkamer.'
     },
     {
       title: 'Meertalige casus',
+      mode: 'therapy',
       context: 'Nederlandse scores zijn laag, thuistaalinformatie is nog onvolledig en school vraagt om advies.',
-      task: 'Leg uit welke vervolgstap je kiest en waarom je voorzichtig bent met norminterpretatie.'
+      task: 'Leg uit welke vervolgstap je kiest en waarom je voorzichtig bent met norminterpretatie.',
+      targetWords: ['meertaligheid', 'thuistaal', 'blootstelling', 'tos', 'ouders', 'school'],
+      model: 'Ik trek nog geen harde conclusie op basis van alleen lage Nederlandse scores. Eerst verzamel ik informatie over de thuistaal, taalblootstelling, ontwikkelingsverloop en functioneren in beide talen. Als de problemen in beide talen zichtbaar zijn, wordt TOS waarschijnlijker; als vooral het Nederlands achterblijft, kan beperkte blootstelling meespelen. Ik adviseer school om taalsteun en visuele ondersteuning te bieden en betrek ouders om de thuistaalontwikkeling goed in beeld te krijgen.'
     }
   ],
   scoreTable: [

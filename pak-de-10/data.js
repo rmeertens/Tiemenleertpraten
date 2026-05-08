@@ -17,7 +17,7 @@ window.PAK_DE_10_DATA = {
     {
       id: 'verslag',
       title: 'Onderzoeksverslag',
-      summary: 'Schrijf niet beschrijvend, maar methodisch: gegeven -> interpretatie -> consequentie -> keuze.',
+      summary: 'Schrijf methodisch: gegeven -> interpretatie -> consequentie -> keuze.',
       route: ['Hulpvraag', 'Onderzoeksgegevens', 'Interpretatie', 'ICF', 'Diagnose', 'Conclusie', 'Advies']
     }
   ],
@@ -77,7 +77,7 @@ window.PAK_DE_10_DATA = {
       title: 'Behandeling criteria 11-20',
       domain: 'ZG-coach',
       tags: ['LT-doel', 'KT-doel', 'methode', 'vorm', 'duur', 'samenwerking', 'prognose'],
-      snap: 'Een 10-waardig behandelantwoord is geen methode noemen, maar klinisch regisseren: diagnose -> ICF -> LT-doel -> KT-doel -> methode -> vorm/frequentie -> samenwerking -> prognose.',
+      snap: 'Een 10-waardig behandelantwoord regisseert klinisch: diagnose -> ICF -> LT-doel -> KT-doel -> methode -> vorm/frequentie -> samenwerking -> prognose.',
       memory: ['hoofdprobleem en behandelprioriteit bepalen', 'LT-doel op participatie formuleren', 'KT-doel SMART op functieniveau formuleren', 'methode kiezen met indicatie en contra-indicatie', 'vorm, frequentie en evaluatie noemen', 'ouders/school/MDO koppelen aan transfer', 'prognose voorzichtig en onderbouwd formuleren'],
       checks: ['behandeling', 'LT', 'KT', 'SMART', 'methode', 'therapievorm', 'frequentie', 'evaluatie', 'samenwerking', 'prognose', 'participatie'],
       model: 'Mijn behandelplan start bij de participatiebeperking en werkt terug naar haalbare functiedoelen. Ik formuleer een LT-doel op meedoen, een SMART KT-doel op spraak of taal, kies een methode die past bij het probleemmechanisme, benoem vorm/frequentie/evaluatie en borg transfer via ouders, school en MDO. De prognose is concreet, voorzichtig en gekoppeld aan leerbaarheid.'
@@ -176,7 +176,7 @@ window.PAK_DE_10_DATA = {
         lt: 'Het kind is in klas- en thuissituaties beter verstaanbaar en neemt actiever deel aan gesprek en spel.',
         kt: 'Het kind onderscheidt en produceert het gekozen contrast in 80-90% van gestructureerde woord- of zinscontexten.',
         method: 'Minimale paren, Metaphon of Hodson & Paden bij meerdere processen.',
-        why: 'Kies contrastief of cyclisch werken omdat het probleem in het fonologische systeem zit, niet alleen in losse klankmotoriek.',
+        why: 'Kies contrastief of cyclisch werken omdat het probleem in het fonologische systeem zit.',
         form: 'Direct individueel, gecombineerd met ouder- en leerkrachtinstructie.',
         duration: 'Wekelijks of intensiever bij ernstige onverstaanbaarheid; evaluatie na 8-12 sessies.',
         prognosis: 'Gunstig bij goede auditieve verwerking, stimulabiliteit en consequente oefening.'
@@ -238,7 +238,7 @@ window.PAK_DE_10_DATA = {
         method: 'Taalgerichte interventie met thuistaalbetrokkenheid, visuele steun en schoolgerichte strategieen.',
         why: 'Lage Nederlandse scores alleen bewijzen geen TOS; uitval in beide talen en leerbaarheid sturen je keuze.',
         form: 'Direct en indirect, met ouders/tolk en school.',
-        duration: 'Evaluatie op groei en leerbaarheid, niet alleen op eentalige normscore.',
+        duration: 'Evaluatie op groei, leerbaarheid en normscore in de juiste taalcontext.',
         prognosis: 'Positiever bij rijk taalaanbod en groei; voorzichtiger bij uitval in beide talen.'
       },
       {
@@ -311,15 +311,15 @@ window.PAK_DE_10_DATA = {
         ['Ik pas scaffolding toe binnen de ZPD.', 'Vygotsky/ZPD/scaffolding', 'D3 p. 285-286', 'Door steun af te stemmen op wat het kind met hulp kan, verlaag ik cognitieve belasting en bouw ik autonomie stapsgewijs op.'],
         ['De taalproblemen wijzen op TOS.', 'Neurocognitieve taalverwerking', 'D3 p. 292', 'Hardnekkige morfosyntactische en semantische problemen ondanks aanbod vragen om specifieke logopedische interventie.'],
         ['Ik ben voorzichtig bij meertaligheid.', 'SES, taalaanbod, blootstelling', 'D3 p. 290-291', 'Een lage Nederlandse score kan door blootstelling komen; ik weeg thuistaal, leerbaarheid en context voordat ik TOS concludeer.'],
-        ['Ik betrek ouders en leerkracht.', 'Geleide participatie en modeling', 'D3 p. 284, 325', 'Generalisatie ontstaat niet alleen in de behandelkamer; de omgeving moet dezelfde steun en taalmodellen bieden.'],
-        ['Ik formuleer LT-doelen op participatie.', 'ICF', 'ICF-handreiking', 'Het einddoel is niet een losse klank of zinsvorm, maar beter functioneren thuis, op school en in interactie.'],
+        ['Ik betrek ouders en leerkracht.', 'Geleide participatie en modeling', 'D3 p. 284, 325', 'Generalisatie vraagt dezelfde steun en taalmodellen in de omgeving.'],
+        ['Ik formuleer LT-doelen op participatie.', 'ICF', 'ICF-handreiking', 'Het einddoel is beter functioneren thuis, op school en in interactie.'],
         ['Ik hak instructies op en visualiseer.', 'Informatieverwerking', 'D2 p. 187', 'Bij beperkte codering of opslag maak ik input kleiner en zichtbaarder zodat het kind de taak kan verwerken.'],
-        ['Ik gebruik modeling in plaats van directe correctie.', 'Modeling/sociaal leren', 'D3 p. 325', 'Zo krijgt het kind correcte taalvormen aangeboden zonder faaldruk, waardoor oefenen functioneler en veiliger wordt.'],
+        ['Ik gebruik modeling als veilige leerroute.', 'Modeling/sociaal leren', 'D3 p. 325', 'Zo krijgt het kind correcte taalvormen aangeboden zonder faaldruk, waardoor oefenen functioneler en veiliger wordt.'],
         ['Ik noem OMFT alleen als het past bij de casus.', 'Mondmotoriek/occlusie', 'OMFT summary', 'Afwijkende mondgewoonten kunnen articulatievoorwaarden beinvloeden, maar mogen niet zonder casusbewijs als verklaring worden gepresenteerd.']
       ],
       wietze: [
         ['Beperkte informatieverwerking', 'coderen, opslaan, ophalen', 'D2 p. 187', 'Instructies opknippen, visualiseren en herhalen.', 'Wietze heeft minder auditieve belasting nodig zodat de boodschap beter verwerkt wordt.'],
-        ['Zwakke zinsbouw', 'morfosyntaxis', 'D3 p. 288-289', 'Een zinsstructuur per keer met modeling en visuele steun.', 'Ik train niet vaag taal, maar een observeerbare zinsstructuur binnen zijn ZPD.'],
+        ['Zwakke zinsbouw', 'morfosyntaxis', 'D3 p. 288-289', 'Een zinsstructuur per keer met modeling en visuele steun.', 'Ik train één observeerbare zinsstructuur binnen zijn ZPD.'],
         ['Terugtrekken in de klas', 'pragmatiek/participatie', 'D3 p. 290 + ICF', 'Doelen koppelen aan hulpvragen, kringmomenten en succeservaringen.', 'De behandeling is pas zinvol als Wietze beter kan meedoen in de klas.'],
         ['Vermoeden TOS-profiel', 'neurocognitieve taalverwerking', 'D3 p. 292', 'Langdurige, specifieke ondersteuning en voorzichtig positieve prognose.', 'Ik verwacht functionele groei, geen snelle normalisatie.'],
         ['School en ouders nodig', 'geleide participatie/modeling', 'D3 p. 284, 325', 'Leerkracht en ouders gebruiken dezelfde cues en voorbeeldzinnen.', 'Transfer is een behandelvoorwaarde, niet een extraatje.'],
@@ -356,7 +356,7 @@ window.PAK_DE_10_DATA = {
     ],
     scripts: [
       ['Fonologische route', 'Ik kies een spelenderwijze contrastieve aanpak omdat de verstaanbaarheid wordt beperkt door een fonologisch systeemprobleem. Door minimale paren, Metaphon of Hodson & Paden te koppelen aan klaswoorden verbind ik functieniveau aan participatie.'],
-      ['VOD-route', 'Ik kies een motorisch-planningsgerichte aanpak met veel herhaling en multisensorische cues. Bij VOD is niet alleen het contrast kwetsbaar, maar vooral de planning van klanksequenties.'],
+      ['VOD-route', 'Ik kies een motorisch-planningsgerichte aanpak met veel herhaling en multisensorische cues. Bij VOD is vooral de planning van klanksequenties kwetsbaar.'],
       ['TOS/morfosyntaxis', 'Ik kies scaffolding en recasting binnen de zone van naaste ontwikkeling. Het KT-doel richt zich op een concrete zinsstructuur en het LT-doel op begrijpelijker communiceren in de klas.'],
       ['Meertalige route', 'Ik behandel voorzichtig en verzamel informatie over beide talen. Als de uitval in beide talen zichtbaar is, past dat meer bij TOS dan bij alleen blootstellingsachterstand.'],
       ['Cluster 3 / ondersteunde communicatie', 'Ik kies ondersteunde communicatie en korte functionele routines. De behandeling moet aansluiten bij belastbaarheid en ontwikkelingsniveau, met ouders en school als vaste partners.']
@@ -416,7 +416,7 @@ window.PAK_DE_10_DATA = {
           source: 'Taalvorm / morfosyntaxis',
           title: 'Zinsbouw is behandelbaar, maar klein',
           core: 'Zijn zinnen en morfologie zijn zwak. Door TIQ 62 moet je één concrete structuur tegelijk behandelen, met visuele steun.',
-          action: 'Formuleer geen vaag doel zoals “langere zinnen”, maar kies één observeerbare structuur, bijvoorbeeld SVO.'
+          action: 'Kies één observeerbare structuur, bijvoorbeeld SVO.'
         },
         {
           source: 'TOS / informatieverwerking',
@@ -427,7 +427,7 @@ window.PAK_DE_10_DATA = {
         {
           source: 'ICF en participatie',
           title: 'Het eindpunt is meedoen in de klas',
-          core: 'De kern is niet een losse klank netjes maken, maar verstaanbaar en veilig kunnen deelnemen aan dagelijkse klassituaties.',
+          core: 'De kern: verstaanbaar en veilig deelnemen aan dagelijkse klassituaties.',
           action: 'Elke diagnostische en behandelzin eindigt bij activiteit/participatie: wat kan Wietze daardoor beter doen?'
         }
       ],
@@ -458,21 +458,21 @@ window.PAK_DE_10_DATA = {
           title: 'Vraag precies wat je nog mist',
           task: 'Bedenk welke informatie van school, ouders en andere disciplines je behandelplan verandert.',
           line: 'In het MDO wil ik weten welke klassituaties communicatief mislukken, welke visuele steun al werkt en of er bredere motorische/planningsproblemen zichtbaar zijn.',
-          check: 'Een sterke MDO-vraag is niet algemeen, maar verandert je doel, methode of vorm.'
+          check: 'Een sterke MDO-vraag verandert je doel, methode of vorm.'
         },
         {
           anchor: 'Stap 5 · ICF',
           title: 'Maak de brug naar functioneren',
           task: 'Vertaal functiestoornissen naar activiteit en participatie.',
           line: 'Op functieniveau zie ik spraakplanning, fonologie en morfosyntaxis; op activiteitenniveau moeite met verstaanbare uitingen; op participatieniveau terugtrekken in de klas.',
-          check: 'ICF is hier geen invultabel, maar de reden waarom behandeling naar schooltransfer moet.'
+          check: 'ICF stuurt hier de schooltransfer.'
         }
       ],
       treatment: [
         {
           anchor: 'Stap 1 · prioriteit',
           title: 'Kies functionele communicatie als hoofddoel',
-          task: 'Begin behandeling niet bij de mooiste klank, maar bij de grootste participatiewinst.',
+          task: 'Start bij de grootste participatiewinst.',
           line: 'Mijn behandelprioriteit is functionele verstaanbaarheid en communicatieve veiligheid in de klas; spraak- en taaldoelen zijn bouwstenen daarvoor.',
           check: 'Dit voorkomt losse functietraining zonder transfer.'
         },
@@ -502,7 +502,7 @@ window.PAK_DE_10_DATA = {
           title: 'Maak school onderdeel van therapie',
           task: 'Leg vast wie buiten de logopediekamer hetzelfde doel ondersteunt.',
           line: 'Ik combineer individuele korte sessies met leerkracht- en oudercoaching, zodat dezelfde woorden, zinssteun en herstelstrategie terugkomen in klas en thuis.',
-          check: 'Transfer is bij Wietze geen bonus maar behandelvoorwaarde.'
+          check: 'Transfer is bij Wietze een behandelvoorwaarde.'
         },
         {
           anchor: 'Stap 6 · prognose',
@@ -540,12 +540,12 @@ window.PAK_DE_10_DATA = {
         {
           mode: 'Prognose',
           question: 'Wat is een realistische prognose?',
-          assignment: 'Wees concreet: geen vage “zal verbeteren”, maar functie en participatie.',
-          answer: 'Voorzichtig maar functioneel positief: door TIQ 62 en VOD verwacht ik geen snelle normalisatie, maar wel betere verstaanbaarheid, korte functionele uitingen en meer deelname in de klas als behandeling intensief en contextgeborgd is.'
+          assignment: 'Wees concreet: benoem functie en participatie.',
+          answer: 'Voorzichtig en functioneel positief: door TIQ 62 en VOD verwacht ik betere verstaanbaarheid, korte functionele uitingen en meer deelname in de klas bij intensieve, contextgeborgde behandeling.'
         }
       ],
       mdoCoach: {
-        title: 'MDO Wietze: voer regie, niet alleen antwoord geven',
+        title: 'MDO Wietze: voer regie',
         intro: 'Doel van het MDO: de casus zo samenvatten dat ouders, school en disciplines begrijpen wat Wietze nodig heeft, welke informatie nog ontbreekt en welke afspraken de behandeling laten generaliseren.',
         agenda: [
           ['1. Opening', 'Ik vat de hulpvraag en het doel van dit overleg kort samen.'],
@@ -582,7 +582,7 @@ window.PAK_DE_10_DATA = {
       priorities: ['functionele verstaanbaarheid', 'communicatieve veiligheid', 'een zinsstructuur per keer', 'transfer naar klas en thuis', 'afstemming logopedisch werkplan en handelingsplan'],
       goals: ['LT: Wietze neemt binnen 6 maanden met visuele steun actief deel aan dagelijkse klassituaties.', 'KT spraak: gekozen functionele CVC-woorden met afbouwende visuele/tactiele cue in 80% van de pogingen.', 'KT taal: een vaste SVO-structuur bij actiekaarten met visuele zinssteun en maximaal een verbale cue.'],
       methods: ['motorisch-planningsgericht oefenen met korte herhalingen', 'cyclische/contrastieve fonologie concreet en visueel', 'scaffolding en recasting voor morfosyntaxis', 'leerkrachtcoaching voor transfer'],
-      scripts: ['Ik behandel Wietze niet als een puur fonologisch kind, omdat wisselende fouten en zoekgedrag wijzen op VOD-kenmerken.', 'Ik kies korte, frequente en visueel ondersteunde oefening, omdat TIQ 62 beperkte belastbaarheid en trage automatisering betekent.', 'Ik train niet alle klanken tegelijk, maar functionele woorden uit de klas zodat spraakdoelen direct bijdragen aan participatie.'],
+      scripts: ['Wietze heeft meer dan een fonologisch profiel: wisselende fouten en zoekgedrag wijzen op VOD-kenmerken.', 'Ik kies korte, frequente en visueel ondersteunde oefening, omdat TIQ 62 beperkte belastbaarheid en trage automatisering betekent.', 'Ik train functionele woorden uit de klas zodat spraakdoelen direct bijdragen aan participatie.'],
       warning: 'Mondgewoonten, open beet of OMFT alleen noemen als observatie of casus dit bevestigt; niet als vast Wietze-feit presenteren.',
       prognosis: 'Voorzichtig maar functioneel positief: geen snelle normalisatie, wel groei in verstaanbaarheid, korte functionele uitingen en participatie bij intensieve, klein-stappige en school/thuis-geborgde behandeling.'
     },
@@ -593,8 +593,8 @@ window.PAK_DE_10_DATA = {
       priorities: ['fonologisch bewustzijn', 'verstaanbaarheid', 'visuele ondersteuning', 'voorspelbaarheid', 'schoolstrategie'],
       goals: ['LT: Aaron vertelt begrijpelijker in bekende routines met visuele steun.', 'KT: hij gebruikt doelklanken of verhaalstappen in 8 van de 10 gestructureerde pogingen.'],
       methods: ['fonologische contrasten of cyclisch werken', 'narratieve scripts', 'visuele planning', 'leerkrachtcoaching'],
-      scripts: ['Ik kies geen losse klanktraining, maar een voorspelbare aanpak waarin verstaanbaarheid, verhaalopbouw en ASS-structuur samenkomen.'],
-      warning: 'Verklaar spraakproblemen niet alleen mondmotorisch; koppel altijd aan fonologie, taal en prikkelverwerking.',
+      scripts: ['Ik kies een voorspelbare aanpak waarin verstaanbaarheid, verhaalopbouw en ASS-structuur samenkomen.'],
+      warning: 'Koppel spraakproblemen aan fonologie, taal en prikkelverwerking.',
       prognosis: 'Redelijk gunstig bij consequente routines, visuele steun en transfer naar school.'
     },
     erik: {
@@ -611,7 +611,7 @@ window.PAK_DE_10_DATA = {
     isa: {
       route: 'cluster3',
       title: 'Isa: totale communicatie en functionele winst',
-      pitch: 'Bij Isa is spreken belangrijk, maar functionele communicatie is leidend. Gebaren, pictogrammen en routines zijn geen noodoplossing maar de brug naar participatie.',
+      pitch: 'Bij Isa is functionele communicatie leidend. Gebaren, pictogrammen en routines vormen de brug naar participatie.',
       priorities: ['totale communicatie', 'voorzichtige testinterpretatie', 'gebaren/NmG', 'minder frustratie', 'cluster 3 context'],
       goals: ['LT: Isa maakt behoeften duidelijker in dagelijkse routines.', 'KT: ze gebruikt een woord, gebaar of pictogram in drie vaste routines.'],
       methods: ['ondersteunde communicatie', 'Hanen-principes', 'korte directe oefening', 'ouder- en leerkrachtcoaching'],
@@ -622,7 +622,7 @@ window.PAK_DE_10_DATA = {
     tarik: {
       route: 'meertalig',
       title: 'Tarik: meertaligheid, leerbaarheid en schoolkeuze',
-      pitch: 'Bij Tarik is de behandelvraag niet alleen Nederlands verbeteren. Je moet thuistaal, leerbaarheid, auditieve vaardigheden en schoolcontext wegen voordat je TOS of schoolkeuze verdedigt.',
+      pitch: 'Bij Tarik weeg je thuistaal, leerbaarheid, auditieve vaardigheden en schoolcontext voordat je TOS of schoolkeuze verdedigt.',
       priorities: ['thuistaalinformatie', 'leerbaarheid', 'Nederlandse normscore voorzichtig gebruiken', 'auditieve vaardigheden', 'ouder- en schoolvragen'],
       goals: ['LT: Tarik volgt onderwijs beter met taalsteun in relevante contexten.', 'KT: hij leert en gebruikt themawoorden of zinsstructuren met visuele steun en transfer naar de klas.'],
       methods: ['meertalige anamnese', 'woordenschat in schoolthema’s', 'visuele steun', 'ouder/school/tolk betrekken'],

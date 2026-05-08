@@ -239,7 +239,7 @@ function teacherProbeFor(lesson, selected) {
   if (clean.includes('behandeling')) return 'Waarom kies je deze methode en wat ziet school morgen anders?';
   if (clean.includes('diagnostiek') || clean.includes('test')) return 'Waarom is één score onvoldoende voor je conclusie?';
   if (clean.includes('fonet') || clean.includes('fonolog') || clean.includes('spraak')) return 'Hoe weet je of dit fonetisch, fonologisch of planning is?';
-  if (clean.includes('pragmat')) return 'Waar zie je dit terug in echte interactie, niet alleen in een test?';
+  if (clean.includes('pragmat')) return 'Waar zie je dit terug in echte interactie?';
   if (clean.includes('meertal')) return 'Waarom is lage Nederlandse score nog geen TOS-bewijs?';
   if (clean.includes('omft') || clean.includes('tand') || clean.includes('mond')) return 'Welke structuur- of functiefactor onderhoudt het probleem?';
   return 'Wat betekent dit concreet voor onderzoek, behandeling of klascontext?';
@@ -751,7 +751,7 @@ function explainTerm(term) {
     leeftijd: 'leeftijd (waarom dit op deze leeftijd normaal of juist zorgelijk is).',
     fase: 'ontwikkelingsfase (waar het kind zit in de taalontwikkeling).',
     ontwikkeling: 'ontwikkeling (wat je verwacht op deze leeftijd vergeleken met wat het kind doet).',
-    begrip: 'taalbegrip (wat het kind begrijpt, niet alleen wat het zegt).',
+    begrip: 'taalbegrip (wat het kind begrijpt).',
     productie: 'taalproductie (wat het kind zelf kan zeggen of uitspreken).',
     gehoor: 'gehoor (het kind moet taal en klanken goed kunnen horen om ze te leren).',
     cognitie: 'cognitie (of het kind de taak kan begrijpen en leren).',
@@ -765,7 +765,7 @@ function explainTerm(term) {
     consistentie: 'consistentie (of hetzelfde woord steeds hetzelfde of wisselend fout gaat).',
     hulpvraag: 'hulpvraag (wat kind, ouders of school willen verbeteren).',
     gegevens: 'gegevens (welke test, observatie of anamnese je gebruikt).',
-    interpretatie: 'interpretatie (wat het gegeven betekent, niet alleen wat je hebt gezien).',
+    interpretatie: 'interpretatie (wat het gegeven betekent).',
     conclusie: 'logopedische conclusie (de kernverklaring uit de gegevens).',
     doel: 'doel (welk concreet gedrag je wilt bereiken).',
     evaluatie: 'evaluatie (wanneer en hoe je controleert of het beter gaat).',
@@ -874,7 +874,7 @@ function answerCoachQuestion() {
     action = 'Actie: schrijf deze drie punten uit je hoofd op en maak daarna de casusvraag.';
   } else if (clean.includes('zg') || clean.includes('10') || clean.includes('toets')) {
     title = 'Naar ZG';
-    body = 'Een ZG-antwoord is niet langer, maar klinischer: je noemt het begrip, bewijst het met de casus en kiest één vervolgactie.';
+    body = 'ZG = klinischer: begrip noemen, bewijzen met de casus, één vervolgactie kiezen.';
     action = `Actie: maak één zin met ${explainTerm(lesson.checks[0])} + casusbewijs + “daarom onderzoek/behandel ik...”.`;
   }
 
