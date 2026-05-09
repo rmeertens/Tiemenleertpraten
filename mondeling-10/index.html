@@ -8,10 +8,10 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Mondeling 10 &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=28" />
+  <link rel="stylesheet" href="/assets/site.css?v=29" />
 </head>
 <body>
-  <div class="version-stamp">v4 &middot; Mondeling 10</div>
+  <div class="version-stamp">v7 &middot; Mondeling 10</div>
   <main class="studio oral-app">
     <nav class="studio__nav">
       <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
@@ -41,7 +41,7 @@
     <section class="oral-tabs" aria-label="Mondelinge trainingsonderdelen">
       <button class="oral-tab is-active" type="button" data-view="diagnostics">Deel 1 · Schlichting 1-10</button>
       <button class="oral-tab" type="button" data-view="therapy">Deel 2 · Behandeling 11-20</button>
-      <button class="oral-tab" type="button" data-view="simulation">Toetssimulatie</button>
+      <button class="oral-tab" type="button" data-view="simulation">Examenmodus</button>
       <button class="oral-tab" type="button" data-view="dashboard">Bewijs</button>
     </section>
 
@@ -195,6 +195,28 @@
     </section>
 
     <section class="oral-view" id="view-simulation">
+      <article class="oral-card oral-exam-coach">
+        <div class="oral-section-head">
+          <div>
+            <p class="oral-label">Behandeling 11-20 · echte toetsflow</p>
+            <h3>15 minuten coaching, daarna kale simulatie.</h3>
+            <p>Kies één van de 5 geparafraseerde toetscasussen. Bouw eerst je ZG-script per criterium. Zet daarna de steun uit en scoor elk onderdeel van (0) O tot (4) ZG.</p>
+          </div>
+          <select class="oral-select" id="exam-case-select" aria-label="Kies toetscasus"></select>
+        </div>
+        <div class="oral-exam-actions">
+          <button class="btn btn--primary" type="button" id="exam-start-prep">15-minuten prep</button>
+          <button class="btn btn--ghost" type="button" id="exam-start-clean">Kale toets</button>
+          <button class="btn btn--ghost" type="button" id="exam-save-script">Bewaar script</button>
+          <button class="btn btn--ghost" type="button" id="exam-reset">Reset scores</button>
+        </div>
+        <div class="oral-exam-status" id="exam-status"></div>
+        <div class="oral-exam-case" id="exam-case-panel"></div>
+        <div class="oral-exam-prep" id="exam-prep-panel"></div>
+        <div class="oral-exam-script" id="exam-script-steps"></div>
+        <div class="oral-exam-history" id="exam-history"></div>
+      </article>
+
       <div class="oral-sim">
         <article class="oral-card">
           <p class="oral-label">15 minuten voorbereiding</p>
@@ -248,7 +270,7 @@
     </section>
   </main>
 
-  <script src="data.js?v=4"></script>
-  <script src="app.js?v=4"></script>
+  <script src="data.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

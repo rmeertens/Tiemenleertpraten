@@ -6,8 +6,12 @@ const state = {
   diagnosticPrompt: data.diagnostics.prompts[0],
   therapyPrompt: data.therapy.prompts[0],
   simCase: data.cases[0],
+  examCase: data.examCoach.cases[0],
+  examMode: 'prep',
   scores: JSON.parse(localStorage.getItem('oral10_scores') || '{"diagnostics":0,"therapy":0}'),
   criteriaScores: JSON.parse(localStorage.getItem('oral10_criteria_scores') || '{"diagnostics":{},"therapy":{}}'),
+  examScores: JSON.parse(localStorage.getItem('oral10_exam_scores') || '{}'),
+  examScripts: JSON.parse(localStorage.getItem('oral10_exam_scripts') || '{}'),
 };
 
 const timerEl = document.getElementById('oral-timer');
@@ -40,6 +44,12 @@ const feedbackBody = document.getElementById('feedback-body');
 const feedbackModel = document.getElementById('feedback-model');
 const oralBars = document.getElementById('oral-bars');
 const oralPlan = document.getElementById('oral-plan');
+const examCaseSelect = document.getElementById('exam-case-select');
+const examStatus = document.getElementById('exam-status');
+const examCasePanel = document.getElementById('exam-case-panel');
+const examPrepPanel = document.getElementById('exam-prep-panel');
+const examScriptSteps = document.getElementById('exam-script-steps');
+const examHistory = document.getElementById('exam-history');
 
 let secondsLeft = 15 * 60;
 let timerId = null;
@@ -62,6 +72,7 @@ function boot() {
   renderDrill();
   renderRedFlags();
   renderSimulation();
+  renderExamCoach();
   renderPrepTools();
   renderDashboard();
   bindEvents();
@@ -90,6 +101,12 @@ function bindEvents() {
     renderTherapyRoute();
   });
 
+  examCaseSelect.addEventListener('change', () => {
+    state.examCase = data.examCoach.cases.find(item => item.id === examCaseSelect.value) || data.examCoach.cases[0];
+    state.examMode = 'prep';
+    renderExamCoach();
+  });
+
   document.querySelectorAll('[data-record]').forEach(btn => {
     btn.addEventListener('click', () => toggleRecording(`${btn.dataset.record}-prompt`));
   });
@@ -99,6 +116,23 @@ function bindEvents() {
     renderSimulation();
     renderPrepTools();
   });
+
+  document.getElementById('exam-start-prep').addEventListener('click', () => {
+    state.examMode = 'prep';
+    secondsLeft = 15 * 60;
+    renderTimer();
+    renderExamCoach();
+  });
+
+  document.getElementById('exam-start-clean').addEventListener('click', () => {
+    state.examMode = 'clean';
+    secondsLeft = 15 * 60;
+    renderTimer();
+    renderExamCoach();
+  });
+
+  document.getElementById('exam-save-script').addEventListener('click', saveExamScript);
+  document.getElementById('exam-reset').addEventListener('click', resetExamScores);
 
   document.getElementById('new-drill').addEventListener('click', () => {
     activeDrill = randomItem(data.drills);
@@ -350,6 +384,111 @@ function renderSimulation() {
   `;
 }
 
+function renderExamCoach() {
+  const active = state.examCase;
+  examCaseSelect.innerHTML = data.examCoach.cases.map(item => `
+    <option value="${item.id}" ${item.id === active.id ? 'selected' : ''}>${escapeHtml(item.title)}</option>
+  `).join('');
+
+  const caseScores = examCaseScores(active.id);
+  const values = Object.values(caseScores);
+  const best = values.length ? Math.max(...values) : 0;
+  const low = values.length ? Math.min(...values) : 0;
+  const total = active.steps.reduce((sum, step) => sum + Number(caseScores[criterionNumber(step)] || 0), 0);
+  const grade = gradeFor(total);
+  const modeLabel = state.examMode === 'clean' ? 'Kale toets: steun staat uit' : 'Prepmodus: intensieve coaching staat aan';
+
+  examStatus.innerHTML = `
+    <div>
+      <strong>${escapeHtml(modeLabel)}</strong>
+      <span>${total}/40 · ${formatGrade(grade)} · laagste ${scoreBadge(low)} · hoogste ${scoreBadge(best)}</span>
+    </div>
+    <meter min="0" max="40" value="${total}">${total}/40</meter>
+  `;
+
+  examCasePanel.innerHTML = `
+    <div>
+      <strong>Toetsbeschrijving</strong>
+      <p>${escapeHtml(data.examCoach.intro)}</p>
+    </div>
+    <div>
+      <strong>Casus</strong>
+      <p>${escapeHtml(active.profile)}</p>
+    </div>
+    <div>
+      <strong>Valkuil</strong>
+      <p>${escapeHtml(active.trap)}</p>
+    </div>
+    <div>
+      <strong>Wat moet je raken?</strong>
+      <p>${active.focus.map(item => escapeHtml(item)).join(' · ')}</p>
+    </div>
+    <div>
+      <strong>Toetsflow</strong>
+      <p>${data.examCoach.toetsFlow.map(item => escapeHtml(item)).join(' · ')}</p>
+    </div>
+  `;
+
+  examPrepPanel.hidden = state.examMode === 'clean';
+  examPrepPanel.innerHTML = state.examMode === 'clean' ? '' : examPrepHtml(active);
+  examScriptSteps.innerHTML = active.steps.map(step => examStepHtml(active, step, caseScores)).join('');
+  bindExamStepEvents();
+  renderExamHistory();
+}
+
+function examPrepHtml(active) {
+  return `
+    <section class="oral-prep-timeline">
+      ${[
+        ['0-3 min', 'Lees de casus en zeg hardop de diagnosehypothese plus participatieprobleem.'],
+        ['3-6 min', 'Schrijf LT en KT. LT is functioneren; KT is meetbaar gedrag in behandelperiode.'],
+        ['6-10 min', 'Kies methode en therapievorm. Dit zijn kritische punten: altijd “omdat” zeggen.'],
+        ['10-13 min', 'Vul duur/frequentie, samenwerking en prognose aan. Maak rollen concreet.'],
+        ['13-15 min', 'Spreek je volledige script één keer zonder te lezen. Kort, klinisch, zeker.']
+      ].map(([time, text]) => `
+        <article>
+          <strong>${escapeHtml(time)}</strong>
+          <span>${escapeHtml(text)}</span>
+        </article>
+      `).join('')}
+    </section>
+    <section class="oral-zg-script">
+      <h4>ZG-script in één adem</h4>
+      <p>${escapeHtml(examModelScript(active))}</p>
+    </section>
+  `;
+}
+
+function examStepHtml(active, step, caseScores) {
+  const [title, coach, script] = step;
+  const number = criterionNumber(step);
+  const savedScript = state.examScripts[scriptKey(active.id, number)] || script;
+  const savedScore = caseScores[number];
+  const current = savedScore === undefined ? null : Number(savedScore);
+  const visibleScore = current ?? autoScoreExamStep(active, number, savedScript);
+  const clean = state.examMode === 'clean';
+  return `
+    <article class="oral-exam-step" data-exam-step="${number}">
+      <div class="oral-exam-step__head">
+        <div>
+          <span>${escapeHtml(title)}</span>
+          <strong>${escapeHtml(clean ? 'Toetsantwoord zonder steun' : coach)}</strong>
+        </div>
+        <em>${scoreBadge(visibleScore)}</em>
+      </div>
+      ${clean ? '' : `<p>${escapeHtml(coach)}</p>`}
+      ${clean ? '<p class="oral-clean-note">Spreek dit onderdeel uit je hoofd. Vul na afloop alleen je kernzin in en score hem.</p>' : `<label>Jouw ZG-zin<textarea rows="3" data-exam-script="${number}">${escapeHtml(savedScript)}</textarea></label>`}
+      ${clean ? `<textarea rows="3" data-exam-script="${number}" placeholder="Typ na je mondeling kort wat je zei bij criterium ${number}."></textarea>` : ''}
+      <div class="oral-score-buttons" role="group" aria-label="Score criterium ${number}">
+        ${data.scoreScale.map(([value, code]) => `
+          <button type="button" class="${value === current ? 'is-active' : ''}" data-exam-score="${number}" data-value="${value}">(${value}) ${code}</button>
+        `).join('')}
+      </div>
+      <div class="oral-step-feedback" data-exam-feedback="${number}">${examCriterionFeedback(active, step, current)}</div>
+    </article>
+  `;
+}
+
 function renderPrepTools() {
   const tools = modeForCurrentCase('') === 'therapy' ? data.therapyPrepTools : data.prepTools;
   prepTools.innerHTML = `
@@ -379,6 +518,155 @@ function scoreChecklist(group) {
   showView('dashboard');
 }
 
+function bindExamStepEvents() {
+  examScriptSteps.querySelectorAll('[data-exam-script]').forEach(input => {
+    input.addEventListener('input', () => {
+      const number = input.dataset.examScript;
+      state.examScripts[scriptKey(state.examCase.id, number)] = input.value;
+      saveExamScripts();
+      const feedbackBox = examScriptSteps.querySelector(`[data-exam-feedback="${number}"]`);
+      if (feedbackBox) feedbackBox.innerHTML = examLiveFeedback(state.examCase, number, input.value);
+    });
+  });
+
+  examScriptSteps.querySelectorAll('[data-exam-score]').forEach(button => {
+    button.addEventListener('click', () => {
+      const number = button.dataset.examScore;
+      const value = Number(button.dataset.value);
+      saveExamScore(state.examCase.id, number, value);
+      renderExamCoach();
+    });
+  });
+}
+
+function saveExamScript() {
+  state.examCase.steps.forEach(step => {
+    const number = criterionNumber(step);
+    const input = examScriptSteps.querySelector(`[data-exam-script="${number}"]`);
+    if (input) state.examScripts[scriptKey(state.examCase.id, number)] = input.value;
+  });
+  saveExamScripts();
+  examStatus.querySelector('strong').textContent = 'Script bewaard. Nu kaal oefenen.';
+}
+
+function resetExamScores() {
+  delete state.examScores[state.examCase.id];
+  saveExamScores();
+  renderExamCoach();
+}
+
+function saveExamScore(caseId, number, value) {
+  if (!state.examScores[caseId]) state.examScores[caseId] = {};
+  state.examScores[caseId][number] = value;
+  state.criteriaScores.therapy = state.criteriaScores.therapy || {};
+  const criterion = data.therapy.criteria[number - 11];
+  if (criterion) state.criteriaScores.therapy[criterion[0]] = Math.max(Number(state.criteriaScores.therapy[criterion[0]] || 0), value);
+  state.scores.therapy = Math.max(state.scores.therapy || 0, examTotal(caseId));
+  saveExamScores();
+  saveCriteriaScores();
+  saveScores();
+  renderDashboard();
+}
+
+function examCaseScores(caseId) {
+  return state.examScores[caseId] || {};
+}
+
+function examTotal(caseId) {
+  const active = data.examCoach.cases.find(item => item.id === caseId) || state.examCase;
+  const scores = examCaseScores(caseId);
+  return active.steps.reduce((sum, step) => sum + Number(scores[criterionNumber(step)] || 0), 0);
+}
+
+function criterionNumber(step) {
+  return Number(step[0].split('.')[0]);
+}
+
+function scriptKey(caseId, number) {
+  return `${caseId}:${number}`;
+}
+
+function examModelScript(active) {
+  return active.steps.map(step => step[2]).join(' ');
+}
+
+function autoScoreExamStep(active, number, text) {
+  const step = active.steps.find(item => criterionNumber(item) === Number(number));
+  if (!step) return 0;
+  const clean = normalize(text);
+  const keywords = step[3] || [];
+  const hits = keywords.filter(word => clean.includes(normalize(word))).length;
+  const hasReason = ['omdat', 'daarom', 'past', 'passend', 'waardoor'].some(word => clean.includes(word));
+  const hasMeasure = /\b(80|8 van de 10|8\/10|wekelijks|dagelijks|8 tot 12|8-12|evalu)/.test(clean);
+
+  let score = 0;
+  if (hits >= 1) score = 1;
+  if (hits >= 2) score = 2;
+  if (hits >= 3 && (hasReason || ![15, 17].includes(Number(number)))) score = 3;
+  if (hits >= Math.min(4, keywords.length) && (hasReason || ![15, 17].includes(Number(number))) && (hasMeasure || ![13, 18].includes(Number(number)))) score = 4;
+  if ([15, 17].includes(Number(number)) && !hasReason) score = Math.min(score, 2);
+  return score;
+}
+
+function examCriterionFeedback(active, step, current) {
+  const number = criterionNumber(step);
+  const text = state.examScripts[scriptKey(active.id, number)] || step[2];
+  return examLiveFeedback(active, number, text, current);
+}
+
+function examLiveFeedback(active, number, text, manualScore = null) {
+  const step = active.steps.find(item => criterionNumber(item) === Number(number));
+  if (!step) return '';
+  const auto = autoScoreExamStep(active, number, text);
+  const score = manualScore ?? auto;
+  const clean = normalize(text);
+  const keywords = step[3] || [];
+  const missing = keywords.filter(word => !clean.includes(normalize(word)));
+  const critical = [15, 17].includes(Number(number));
+  const reasonMissing = critical && !['omdat', 'daarom', 'past', 'passend', 'waardoor'].some(word => clean.includes(word));
+  const next = reasonMissing
+    ? 'Voeg “omdat...” toe. Dit is kritisch: zonder verantwoording blijft dit maximaal (2) V.'
+    : missing.length
+      ? `Voeg nog toe: ${missing.slice(0, 3).join(', ')}.`
+      : 'Toetsklaar. Spreek nu zonder lezen, met rustige volgorde.';
+  return `
+    <strong>${scoreBadge(score)} · ${score >= 4 ? 'ZG-proof' : 'nog niet dichtgetimmerd'}</strong>
+    <p>${escapeHtml(next)}</p>
+  `;
+}
+
+function renderExamHistory() {
+  const rows = data.examCoach.cases.map(item => {
+    const total = examTotal(item.id);
+    const values = Object.values(examCaseScores(item.id));
+    const low = values.length ? Math.min(...values) : 0;
+    const high = values.length ? Math.max(...values) : 0;
+    return { item, total, low, high, grade: gradeFor(total) };
+  });
+  const best = rows.reduce((winner, row) => row.total > winner.total ? row : winner, rows[0]);
+  const weakest = rows.reduce((loser, row) => row.total < loser.total ? row : loser, rows[0]);
+  examHistory.innerHTML = `
+    <div class="oral-history-head">
+      <span>Beste casus: ${escapeHtml(best.item.title)} · ${best.total}/40</span>
+      <span>Laagste casus: ${escapeHtml(weakest.item.title)} · ${weakest.total}/40</span>
+    </div>
+    <div class="oral-history-grid">
+      ${rows.map(row => `
+        <button type="button" data-history-case="${row.item.id}" class="${row.item.id === state.examCase.id ? 'is-active' : ''}">
+          <strong>${escapeHtml(row.item.title)}</strong>
+          <span>${row.total}/40 · ${formatGrade(row.grade)} · laag ${scoreBadge(row.low)} · hoog ${scoreBadge(row.high)}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+  examHistory.querySelectorAll('[data-history-case]').forEach(button => {
+    button.addEventListener('click', () => {
+      state.examCase = data.examCoach.cases.find(item => item.id === button.dataset.historyCase) || state.examCase;
+      renderExamCoach();
+    });
+  });
+}
+
 function strictFeedback() {
   const text = oralAnswer.value.trim();
   if (!text) {
@@ -402,13 +690,39 @@ function strictFeedback() {
   const structure = ['omdat', 'dus', 'daarom', 'passend', 'concreet'].filter(word => clean.includes(word));
   let points = Math.min(4, Math.round((hits.length + structure.length) / 4));
   const mode = modeForCurrentCase(clean);
-  const hasCritical = mode === 'therapy'
-    ? ['methode', 'verantwoord', 'vorm', 'therapievorm', 'waarom'].some(word => clean.includes(word))
-    : ['fout', 'zelfcorrectie', 'verantwoord', 'betrouwbaar', 'validiteit'].some(word => clean.includes(word));
-  if (!hasCritical && points > 2) points = 2;
   const targetWords = targetWordsForMode(mode);
   const targetHits = targetWords.filter(word => hits.includes(word));
   const targetMissing = targetWords.filter(word => !hits.includes(word));
+  const hasCritical = criticalEvidence(mode, clean, structure);
+  const scoreCaps = [];
+
+  if (hits.length === 0) {
+    points = 0;
+    scoreCaps.push('Score blijft op (0) O: er staat nog geen herkenbare vaktaal of criteriumbewijs in je antwoord.');
+  } else if (hits.length < 2 && points > 1) {
+    points = 1;
+    scoreCaps.push('Scoreplafond (1) BV: je noemt te weinig rubricwoorden om een voldoende te dragen.');
+  }
+
+  if (!hasCritical && points > 2) {
+    points = 2;
+    scoreCaps.push(criticalCapLine(mode));
+  }
+
+  if (structure.length === 0 && points > 2) {
+    points = 2;
+    scoreCaps.push('Scoreplafond (2) V: je noemt termen, maar je redeneert nog niet hardop met omdat, daarom, passend of concreet.');
+  }
+
+  if (targetMissing.length >= 4 && points > 2) {
+    points = 2;
+    scoreCaps.push(`Scoreplafond (2) V: te veel kerncriteria ontbreken (${targetMissing.slice(0, 4).join(', ')}).`);
+  }
+
+  if (points === 2 && scoreCaps.length === 0) {
+    scoreCaps.push('Dit is (2) V: de basis is herkenbaar, maar voor (3) G moet je explicieter koppelen aan criterium, casusbewijs en verantwoording.');
+  }
+
   state.scores[mode] = Math.max(state.scores[mode], points * 10);
   saveScores();
 
@@ -418,13 +732,14 @@ function strictFeedback() {
   feedbackBody.innerHTML = `
     ${coachScanHtml({
       good: [...targetHits, ...structure.map(word => `structuurwoord: ${word}`)],
-      missing: targetMissing,
-      vague: hasCritical ? [] : [mode === 'therapy' ? 'criterium 15/17: motiveer methode en therapievorm' : 'criterium 10: benoem fout en betrouwbaarheid/validiteit']
+      missing: [...targetMissing, ...scoreCaps],
+      vague: hasCritical ? [] : [criticalVagueLine(mode)]
     })}
     ${block('Sterk', hits.length ? `Je gebruikt toetswoorden: ${hits.slice(0, 6).join(', ')}.` : 'Je start. Voeg nu vaktaal toe.')}
-    ${block('Mist', missingLine(hits, mode))}
-    ${block('Kost punten', criticalFeedback(mode, hasCritical, points))}
-    ${block('Volgende poging', points >= 3 ? 'Herhaal in 45 seconden. Voeg één foutverantwoording of één therapiekeuze toe.' : 'Zeg: kernzin -> criterium -> casusbewijs -> verantwoording.')}
+    ${block('Waarom deze score', scoreReason(points, scoreCaps))}
+    ${block('Mist', missingLine(targetMissing, scoreCaps))}
+    ${block('Kost punten', criticalFeedback(mode, hasCritical, points, scoreCaps))}
+    ${block('Volgende poging', nextAttemptLine(points, mode, targetMissing, scoreCaps))}
     ${points < 4 ? redRetryHtml() : ''}
   `;
   bindRedRetry(feedbackBody, oralAnswer, oralNote);
@@ -439,9 +754,9 @@ function modeForCurrentCase(clean = '') {
   return 'diagnostics';
 }
 
-function missingLine(hits, mode) {
-  const missing = targetWordsForMode(mode).filter(word => !hits.includes(word)).slice(0, 4);
-  return missing.length ? `Voeg expliciet toe: ${missing.join(', ')}.` : 'De kern zit erin; maak je formulering strakker.';
+function missingLine(targetMissing, scoreCaps = []) {
+  if (scoreCaps.length) return scoreCaps[0];
+  return targetMissing.length ? `Voeg expliciet toe: ${targetMissing.slice(0, 4).join(', ')}.` : 'Geen harde gaten meer; maak je formulering strakker en toetsgerichter.';
 }
 
 function targetWordsForMode(mode) {
@@ -449,6 +764,25 @@ function targetWordsForMode(mode) {
   return mode === 'therapy'
     ? ['lt', 'kt', 'methode', 'therapievorm', 'samenwerking', 'prognose']
     : ['testsituatie', 'neutraal', 'intonatie', 'score', 'afbreekregel', 'fout'];
+}
+
+function criticalEvidence(mode, clean, structure) {
+  if (mode === 'therapy') {
+    const hasMethod = [
+      'methode', 'metaphon', 'minimale paren', 'hodson', 'prompt',
+      'scaffolding', 'recasting', 'motorisch', 'fonologisch',
+      'oudercoaching', 'interventie', 'taalsteun', 'visuele steun'
+    ].some(word => clean.includes(word));
+    const hasForm = [
+      'therapievorm', 'vorm', 'individueel', 'groep', 'direct',
+      'indirect', 'ouders', 'school', 'leerkracht', 'thuis'
+    ].some(word => clean.includes(word));
+    return hasMethod && hasForm && structure.length > 0;
+  }
+
+  const hasFault = ['fout', 'zelfcorrectie', 'verspreking', 'risico', 'verantwoord'].some(word => clean.includes(word));
+  const hasValidity = ['betrouwbaar', 'betrouwbaarheid', 'validiteit', 'standaardisatie', 'beinvloed'].some(word => clean.includes(word));
+  return hasFault && hasValidity;
 }
 
 function renderDashboard() {
@@ -530,7 +864,38 @@ function criticalOk(group) {
   };
 }
 
-function criticalFeedback(mode, hasCritical, points) {
+function criticalCapLine(mode) {
+  return mode === 'therapy'
+    ? 'Scoreplafond (2) V: criterium 15/17 ontbreekt of is te vaag. Motiveer methode én therapievorm vanuit beginsituatie, doelen en generalisatie.'
+    : 'Scoreplafond (2) V: criterium 10 ontbreekt of is te vaag. Benoem eigen handelen, fout/zelfcorrectie en invloed op betrouwbaarheid of validiteit.';
+}
+
+function criticalVagueLine(mode) {
+  return mode === 'therapy'
+    ? 'criterium 15/17: methode en therapievorm zijn nog niet toetsveilig verantwoord'
+    : 'criterium 10: fout/zelfcorrectie en betrouwbaarheid/validiteit zijn nog niet toetsveilig verantwoord';
+}
+
+function scoreReason(points, scoreCaps) {
+  if (scoreCaps.length) return scoreCaps.join(' ');
+  if (points >= 4) return 'Je antwoord bevat kerncriteria, redeneerwoorden en voldoende casuskoppeling voor (4) ZG.';
+  if (points === 3) return 'Je antwoord is goed, maar mist nog één scherpe koppeling of één volledig uitgewerkte verantwoording voor (4) ZG.';
+  if (points === 1) return 'Je antwoord raakt het onderwerp, maar bevat nog te weinig toetsbewijs voor een voldoende.';
+  return 'Je antwoord is nog niet beoordelbaar op rubricniveau.';
+}
+
+function nextAttemptLine(points, mode, targetMissing, scoreCaps) {
+  if (scoreCaps.length) {
+    return mode === 'therapy'
+      ? 'Zeg opnieuw: beginsituatie -> LT/KT -> methode omdat... -> therapievorm omdat... -> transfer/prognose.'
+      : 'Zeg opnieuw: wat deed ik -> wat ging fout of was risicovol -> invloed op respons -> betrouwbaarheid/validiteit.';
+  }
+  if (targetMissing.length) return `Herhaal in 45 seconden en verwerk: ${targetMissing.slice(0, 3).join(', ')}.`;
+  return points >= 3 ? 'Herhaal in 45 seconden. Voeg één foutverantwoording of één therapiekeuze toe.' : 'Zeg: kernzin -> criterium -> casusbewijs -> verantwoording.';
+}
+
+function criticalFeedback(mode, hasCritical, points, scoreCaps = []) {
+  if (scoreCaps.length) return scoreCaps.join(' ');
   if (hasCritical && points >= 3) {
     return 'Let nog op casusbewijs, maar het kritische criterium is herkenbaar aanwezig.';
   }
@@ -624,6 +989,14 @@ function saveScores() {
 
 function saveCriteriaScores() {
   localStorage.setItem('oral10_criteria_scores', JSON.stringify(state.criteriaScores));
+}
+
+function saveExamScores() {
+  localStorage.setItem('oral10_exam_scores', JSON.stringify(state.examScores));
+}
+
+function saveExamScripts() {
+  localStorage.setItem('oral10_exam_scripts', JSON.stringify(state.examScripts));
 }
 
 function block(title, body) {

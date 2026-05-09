@@ -2833,6 +2833,223 @@ a { color: inherit; }
   font-size: 13px;
 }
 
+.oral-exam-coach {
+  margin-bottom: 16px;
+}
+
+.oral-exam-actions,
+.oral-score-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.oral-exam-status {
+  background: var(--ink);
+  border-radius: var(--radius);
+  color: var(--bg);
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 14px;
+}
+
+.oral-exam-status div {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.oral-exam-status span {
+  color: color-mix(in srgb, var(--bg) 76%, transparent);
+  font-weight: 800;
+}
+
+.oral-exam-status meter {
+  width: 100%;
+}
+
+.oral-exam-case,
+.oral-prep-timeline,
+.oral-exam-script,
+.oral-history-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.oral-exam-case {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 14px;
+}
+
+.oral-exam-case div,
+.oral-prep-timeline article,
+.oral-zg-script,
+.oral-exam-step,
+.oral-history-grid button {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.oral-exam-case strong,
+.oral-prep-timeline strong,
+.oral-zg-script h4,
+.oral-exam-step__head span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.oral-exam-case p,
+.oral-prep-timeline span,
+.oral-zg-script p,
+.oral-exam-step p,
+.oral-clean-note,
+.oral-step-feedback p,
+.oral-history-grid span {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0;
+}
+
+.oral-prep-timeline {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.oral-prep-timeline article {
+  display: grid;
+  gap: 6px;
+}
+
+.oral-zg-script {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--rule));
+  margin-bottom: 14px;
+}
+
+.oral-exam-step {
+  display: grid;
+  gap: 10px;
+}
+
+.oral-exam-step__head {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.oral-exam-step__head div {
+  display: grid;
+  gap: 4px;
+}
+
+.oral-exam-step__head strong {
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.oral-exam-step__head em,
+.oral-step-feedback strong {
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 900;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+.oral-exam-step label {
+  color: var(--ink-soft);
+  display: grid;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 6px;
+}
+
+.oral-exam-step textarea {
+  appearance: none;
+  background: var(--bg-elevated);
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.5;
+  padding: 10px 12px;
+  resize: vertical;
+  width: 100%;
+}
+
+.oral-score-buttons button {
+  appearance: none;
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 8px 10px;
+}
+
+.oral-score-buttons button.is-active,
+.oral-score-buttons button:hover,
+.oral-score-buttons button:focus {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+
+.oral-step-feedback {
+  align-items: center;
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+
+.oral-history-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+  margin: 16px 0 10px;
+}
+
+.oral-history-head span {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.oral-history-grid {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.oral-history-grid button {
+  cursor: pointer;
+  text-align: left;
+}
+
+.oral-history-grid button.is-active {
+  border-color: var(--accent);
+}
+
+.oral-history-grid strong {
+  color: var(--ink);
+  display: block;
+  margin-bottom: 4px;
+}
+
 .oral-answer {
   appearance: none;
   background: var(--bg);
@@ -2968,7 +3185,9 @@ a { color: inherit; }
   .oral-sim,
   .oral-feedback-grid,
   .oral-route-grid,
-  .oral-wietze-grid {
+  .oral-wietze-grid,
+  .oral-exam-case,
+  .oral-prep-timeline {
     grid-template-columns: 1fr;
   }
 }
