@@ -234,6 +234,33 @@ window.LESSEN_DATA = {
       'Maak een ICF-redenering voor een kind met een fonologisch probleem.',
       'Ik start met de ICF-brug: welke functies zijn aangedaan, wat merkt het kind in spreken en verstaanbaar zijn, en wat betekent dat voor participatie in klas of spel? Daarna gebruik ik Levelt om te verklaren of het probleem fonetisch, fonologisch of planning betreft. Zo wordt mijn MDO-inbreng functioneel en onderbouwd.',
       'Bij een fonologisch probleem beschrijf je fout én gevolg. De functie is de organisatie van klankcontrasten, de activiteit is verstaanbaar spreken en de participatie is meedoen in gesprek of klas. Externe factoren, zoals leerkrachtrespons en ouderinput, bepalen mede de transfer en het behandeladvies.'
+    ),
+    lesson(
+      'w10',
+      'W10 · Complexe casussen, testafname en werkveld',
+      '8 mei 2026',
+      'Toetsintegratie',
+      ['complexe casussen', 'testafname', 'onderzoek', 'werkveld'],
+      'W10 is de integratieles: je combineert complexe casussen, protocolvaste testafname, onderzoeksmethoden, orofaciaal kijken en professioneel handelen in stage en werkveld.',
+      'De leskern: trek niet te snel één conclusie. Orden eerst je bronnen, bewaak protocol, benoem ontbrekende informatie en vertaal alles naar kind, ouders, school en samenwerking.',
+      [
+        'Complexe casussen vragen differentiaaldiagnostiek: TOS, taalaanbod, meertaligheid, gehoor, cognitie, motoriek en syndroomkenmerken.',
+        'Gestandaardiseerde testafname vraagt protocoltrouw: tempo, intonatie, materiaal, instructie, start/stop en scoring.',
+        'Onderzoek krijgt gewicht door de bron: anamnese, eigen observatie/stimulatie, testgegevens en informatie van andere disciplines.',
+        'Professioneel handelen betekent: ouders en school meenemen, MDO inzetten, doorverwijzen waar nodig en je keuzes EBP onderbouwen.'
+      ],
+      [
+        topic('complexe casus ordenen', 'Profiel, differentiaaldiagnose, ontbrekende gegevens en vervolgstap kunnen noemen.', ['profiel', 'differentiaal', 'tos', 'gehoor', 'meertaligheid', 'cognitie', 'motoriek', 'mdo']),
+        topic('testafname protocolvast uitvoeren', 'Tempo, intonatie, materiaal, script, scoring en afbreekregels bewaken.', ['protocol', 'gestandaardiseerd', 'tempo', 'intonatie', 'materiaal', 'scoring', 'afbreekregel']),
+        topic('testleiderfout verantwoorden', 'Eigen sturing of afwijking benoemen en koppelen aan betrouwbaarheid/validiteit.', ['testleiderfout', 'validiteit', 'betrouwbaarheid', 'verantwoorden', 'sturen']),
+        topic('onderzoeksmethoden wegen', 'Anamnese, observatie/stimulatie, genormeerde test en andere disciplines onderscheiden.', ['anamnese', 'observatie', 'stimulatie', 'genormeerd', 'discipline', 'bron']),
+        topic('orofaciale observatie koppelen', 'Neus, lippen, tong, kaak/gebit koppelen aan ademhaling, slikken, articulatie of vervolgonderzoek.', ['orofaciaal', 'neus', 'lippen', 'tong', 'kaak', 'ademhaling', 'slikken']),
+        topic('werkveld en EBP', 'Client, omgeving, evidence, eigen deskundigheid en doorverwijzen samen meenemen.', ['ebp', 'ouders', 'school', 'omgeving', 'samenwerking', 'doorverwijzen', 'stage'])
+      ],
+      'Je krijgt een complexe casus met lage taalscores, wisselende verstaanbaarheid, mogelijke gehoor- of meertaligheidsfactoren en ouders/school die iets anders zien. Hoe bouw je je mondelinge antwoord?',
+      'Schrijf een toetsantwoord bij een protocolfout tijdens taaltestafname: wat is er gebeurd, waarom maakt het uit en wat doe je met de score?',
+      'Ik begin met het profiel: welke taal- en spraakproblemen zijn zichtbaar en wat betekent dat voor activiteit en participatie? Daarna differentieer ik tussen TOS, beperkt taalaanbod, meertaligheid, gehoor, cognitie, motoriek en context. Ik benoem welke gegevens nog ontbreken, zoals actuele gehoorstatus, thuistaalinformatie, cognitieve gegevens of eerdere begeleiding. Vervolgens kies ik passend vervolgonderzoek, bespreek ik dit in MDO en vertaal ik mijn advies naar behandeling, ouders en school.',
+      'Bij een protocolfout benoem ik eerst concreet wat er gebeurde, bijvoorbeeld dat ik extra nadruk, bevestiging of hulp gaf. Dat kan de respons sturen en raakt dus de betrouwbaarheid en validiteit van dat item of onderdeel. Ik noteer de afwijking, beoordeel of de score nog interpreteerbaar is en trek geen harde conclusie uit twijfelachtige data. Daarna combineer ik de testuitslag met observatie, anamnese en eventueel aanvullend onderzoek.'
     )
   ]
 };
@@ -300,6 +327,12 @@ const lessonMeta = {
     writtenFocus: 'Maak een casusantwoord met ICF-brug: functie, activiteit, participatie, externe factor en advies.',
     pitfall: 'Alleen klankfouten opsommen zonder functie, activiteit, participatie of behandelconsequentie.',
     zg: 'Je maakt een ICF-brug, lokaliseert met Levelt en vertaalt diagnostiek naar samenwerking en advies.'
+  },
+  w10: {
+    criteria: 'Je integreert complexe casusdiagnostiek, protocolvaste afname, onderzoeksmethoden en professioneel handelen.',
+    writtenFocus: 'Bouw schriftelijk in drie stappen: gebeurtenis/gegeven, betekenis voor betrouwbaarheid of differentiaaldiagnose, en vervolgstap.',
+    pitfall: 'Te snel TOS concluderen, een testscore hard interpreteren na protocolafwijking, of ouders/school/MDO vergeten.',
+    zg: 'Je zegt hardop wat je zeker weet, wat je nog mist, waarom dat toetskundig uitmaakt en welke concrete vervolgstap logisch is.'
   }
 };
 

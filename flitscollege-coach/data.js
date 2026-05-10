@@ -250,6 +250,58 @@ window.FLITS_DATA = {
       ['richtlijn', 'tos', 'icf', 'participatie', 'ouders', 'school', 'evaluatie', 'prognose']
     ),
     lesson(
+      'w10-complexe-casussen',
+      'W10 · Complexe casussen',
+      'Differentiaaldiagnostiek',
+      ['TOS', 'gehoor', 'meertaligheid', 'cognitie', 'MDO'],
+      'Week 10 traint klinisch redeneren bij kinderen waarbij één label te snel is. Je weegt taal, spraak, gehoor, meertaligheid, cognitie, motoriek en omgeving.',
+      'Een sterk antwoord benoemt eerst wat je zeker weet, daarna wat je nog moet uitzoeken, en pas daarna je voorlopige hypothese.',
+      ['TOS versus taalachterstand', 'actuele gehoorinformatie', 'thuistaal en taalaanbod', 'cognitief profiel', 'spraakmotoriek', 'schoolse participatie', 'MDO en vervolgdiagnostiek'],
+      'Een kind heeft lage Nederlandse taalscores, frustratie in contact en onduidelijke spraak. Welke gegevens mis je voordat je TOS, onderwijsadvies of behandelprioriteit formuleert?',
+      'Orden een complexe casus in 60 seconden: profiel, differentiaaldiagnose, ontbrekende gegevens en vervolgactie.',
+      'Ik begin met het profiel: welke taal- en spraakonderdelen vallen uit en wat betekent dat voor activiteit en participatie? Daarna differentieer ik tussen TOS, beperkt taalaanbod, meertaligheid, gehoorverlies, cognitieve factoren en motorische problemen. Ik vraag ontbrekende gegevens op, zoals actuele gehoorstatus, thuistaalontwikkeling, cognitieve informatie en eerdere begeleiding. Op basis daarvan formuleer ik een voorlopige hypothese en plan ik MDO, aanvullend onderzoek en een behandeladvies dat ouders en school meeneemt.',
+      ['profiel', 'differentiaal', 'tos', 'gehoor', 'meertaligheid', 'cognitie', 'motoriek', 'participatie', 'mdo']
+    ),
+    lesson(
+      'w10-testafname-protocol',
+      'W10 · Testafname en scoring',
+      'Diagnostiek',
+      ['Schlichting', 'CELF', 'protocol', 'scoring'],
+      'Bij gestandaardiseerde testafname is je gedrag onderdeel van de betrouwbaarheid. Tempo, intonatie, materiaal, script en scoring moeten kloppen.',
+      'Je helpt niet, stuurt niet met je stem of blik, en verantwoordt achteraf elke afwijking die de validiteit kan raken.',
+      ['rustig spreektempo', 'neutrale of voorgeschreven intonatie', 'script letterlijk volgen', 'materiaalvolgorde', 'start- en afbreekregels', 'spontane correcte respons scoren', 'testleiderfout verantwoorden'],
+      'Tijdens een test kijkt een kind steeds naar jou voor bevestiging. Jij zegt per ongeluk “goed zo” en merkt dat het kind daarna anders reageert. Wat benoem je in je verantwoording?',
+      'Leg uit hoe je een Schlichting- of CELF-afname toetswaardig uitvoert.',
+      'Ik voer de test gestandaardiseerd uit: ik zet alleen het benodigde materiaal klaar, volg de instructie letterlijk, spreek rustig en houd mijn intonatie neutraal of precies zoals het protocol voorschrijft. Ik geef geen inhoudelijke hulp via woorden, blikrichting of bevestiging. Bij scoring pas ik start-, terugkeer- en afbreekregels toe en tel ik alleen wat volgens de handleiding mag meetellen. Als ik als testleider toch stuur of een fout maak, noteer ik dat en bespreek ik de invloed op betrouwbaarheid en validiteit.',
+      ['gestandaardiseerd', 'protocol', 'tempo', 'intonatie', 'materiaal', 'scoring', 'afbreekregel', 'betrouwbaarheid', 'validiteit']
+    ),
+    lesson(
+      'w10-onderzoek-orofaciaal',
+      'W10 · Onderzoek en orofaciaal',
+      'Onderzoeksmethoden',
+      ['SFO', 'VAI', 'Token Test', 'PPVT', 'orofaciaal'],
+      'W10 koppelt onderzoeksmethoden aan professioneel bewijs: anamnese, observatie/stimulatie, informatie van anderen en genormeerde tests hebben elk een andere status.',
+      'Noem altijd de bron van je informatie en kies daarna het onderzoek dat je hypothese echt toetst.',
+      ['VAI als cliëntinformatie', 'SFO als eigen observatie', 'informatie van andere disciplines', 'genormeerd en gestandaardiseerd testen', 'niet helpen bij tests', 'neus-lip-tong-observatie', 'Token Test en PPVT'],
+      'Je ziet mondademing, een open mondhouding en lage woordbegripsscores. Hoe combineer je observatie, testgegevens en vervolgonderzoek zonder te snel te concluderen?',
+      'Leg uit hoe je onderzoeksmethoden rangschikt van signalering naar onderbouwde conclusie.',
+      'Ik onderscheid drie informatiebronnen: cliëntinformatie uit anamnese of vragenlijst, mijn eigen observatie en stimulatie, en gegevens van andere disciplines. Voor een harde conclusie gebruik ik waar mogelijk genormeerde, valide, betrouwbare en gestandaardiseerde tests. Tijdens zo’n test help ik niet en volg ik het protocol. Bij orofaciaal onderzoek observeer ik neus, lippen, tong, kaak en gebit, maar ik koppel dat pas aan functioneren als het past bij ademhaling, slikken, articulatie of verdere diagnostiek.',
+      ['anamnese', 'observatie', 'stimulatie', 'discipline', 'genormeerd', 'gestandaardiseerd', 'orofaciaal', 'ppvt', 'token']
+    ),
+    lesson(
+      'w10-werkveld-stage-ebp',
+      'W10 · Werkveld, stage en EBP',
+      'Professioneel handelen',
+      ['stage', 'werkveld', 'ouders', 'EBP'],
+      'Het werkveld vraagt dat je niet alleen een stoornis ziet, maar ook setting, ouderrol, behandelbaarheid, specialisatie en je eigen professionele handelen.',
+      'Een toetswaardig antwoord laat zien dat je de cliënt, omgeving, evidentie en therapeutische fit tegelijk meeneemt.',
+      ['stage-opbouw', 'vrije vestiging', 'ziekenhuis en revalidatie', 'preventieve logopedie', 'doorverwijzen bij complexiteit', 'ouders en omgeving', 'evidence based practice'],
+      'Een behandeling loopt stroef: ouders zijn gespannen, school ziet ander gedrag dan thuis en jij twijfelt of jouw aanpak past. Hoe redeneer je professioneel verder?',
+      'Leg uit hoe EBP en werkveldkennis je behandelkeuze sturen.',
+      'Ik kijk niet alleen naar de logopedische klacht, maar naar de hele behandelcontext. Binnen EBP verbind ik wetenschappelijke onderbouwing met cliëntkenmerken, hulpvraag, omgeving en mijn eigen deskundigheid. Als ouderstress, schoolcontext of gezinsdynamiek de transfer beïnvloedt, neem ik die mee in doelen en coaching. Bij complexiteit of een vraag buiten mijn expertise verwijs ik door of werk ik samen, bijvoorbeeld met school, arts, specialist of multidisciplinair team.',
+      ['ebp', 'cliënt', 'omgeving', 'ouders', 'school', 'therapeut', 'doorverwijzen', 'samenwerking', 'stage']
+    ),
+    lesson(
       'plagiaat-apa',
       'Plagiaat en APA',
       'Studievaardigheid',
