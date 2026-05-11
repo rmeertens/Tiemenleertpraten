@@ -2,7 +2,7 @@
 
 const data = window.LESSEN_DATA;
 const state = {
-  index: Number(localStorage.getItem('lessen_index') || 0),
+  index: initialLessonIndex(),
   mode: localStorage.getItem('lessen_mode') || 'oral',
   done: JSON.parse(localStorage.getItem('lessen_done') || '{}'),
   mastery: JSON.parse(localStorage.getItem('lessen_mastery') || '{}'),
@@ -32,6 +32,21 @@ let microRecognition = null;
 let microRecording = false;
 
 boot();
+
+function initialLessonIndex() {
+  const requested = new URLSearchParams(window.location.search).get('lesson');
+  if (requested) {
+    const cleanRequested = normalize(requested);
+    const queryIndex = data.lessons.findIndex(lesson =>
+      normalize(lesson.id) === cleanRequested || normalize(lesson.title) === cleanRequested
+    );
+    if (queryIndex >= 0) {
+      localStorage.setItem('lessen_index', String(queryIndex));
+      return queryIndex;
+    }
+  }
+  return Number(localStorage.getItem('lessen_index') || 0);
+}
 
 function boot() {
   migrateDoneToMastery();

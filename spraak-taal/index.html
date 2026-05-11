@@ -8,7 +8,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Spraak-Taal &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=30" />
+  <link rel="stylesheet" href="/assets/site.css?v=31" />
 </head>
 <body>
   <div class="version-stamp">v1 &middot; spraak-taal</div>
@@ -20,6 +20,24 @@
         De hoofdroute voor module Spraak-Taal: eerst college, dan casus, dan toets.
       </p>
     </header>
+
+    <section class="site-question" data-site-search aria-labelledby="site-question-title">
+      <div>
+        <p class="route-cta__label">Vraag de bronzoeker</p>
+        <h2 id="site-question-title" class="site-question__title">Waar staat dit in de stof?</h2>
+        <p class="site-question__body">
+          Zoek tegelijk in Collegecoach en Flitscollege Coach.
+        </p>
+      </div>
+      <div class="site-question__bar">
+        <label class="sr-only" for="spraak-taal-question-input">Stel een vraag over de stof</label>
+        <input id="spraak-taal-question-input" data-site-search-input type="text" placeholder="Bijv. morfosyntaxis, TOS, pragmatiek, afbreekregel" />
+        <button class="btn btn--primary" data-site-search-button type="button">Zoek bronnen</button>
+      </div>
+      <div class="site-question__results" data-site-search-results>
+        <p class="flits-note">Ik verwijs naar Collegecoach-lessen en bestaande flitscolleges.</p>
+      </div>
+    </section>
 
     <section class="route-cta" aria-labelledby="route-heading">
       <div>
@@ -44,5 +62,8 @@
       </ul>
     </section>
   </main>
+  <script src="/lessen-coach/data.js"></script>
+  <script src="/flitscollege-coach/data.js"></script>
+  <script src="/assets/site-search.js"></script>
 </body>
 </html>
