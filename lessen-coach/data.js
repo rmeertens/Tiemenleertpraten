@@ -3,6 +3,31 @@
 window.LESSEN_DATA = {
   lessons: [
     lesson(
+      'alle-lessen',
+      'Alle lessen · moduleoverzicht',
+      'W1-W15',
+      'Modulekaart',
+      ['overzicht', 'leerroute', 'toetsstrategie'],
+      'Dit algemene onderdeel verbindt alle lessen: preventie, normale ontwikkeling, diagnostiek, MDO, behandeling en tentamenvoorbereiding.',
+      'De modulelijn is: eerst signaleren en ontwikkeling begrijpen, daarna diagnostiek en ICF/MDO, daarna behandeling en toetsverantwoording.',
+      [
+        'W1-W6: preventie, taalontwikkeling, spraakontwikkeling, meertaligheid en projectmatig voorlichten.',
+        'W7-W10: pathologie en diagnostiek, TOS, testleer, ICF, MDO en complexe casussen.',
+        'W11-W14: behandeling kiezen, methoden vergelijken, pragmatiek en behandelplan presenteren.',
+        'W15: hiaten dichten en mondeling/schriftelijk toetsgedrag trainen.'
+      ],
+      [
+        topic('modulelijn uitleggen', 'De volgorde preventie -> diagnostiek -> behandeling -> toets kunnen uitleggen.', ['modulelijn', 'preventie', 'diagnostiek', 'behandeling', 'toets']),
+        topic('mondeling en schriftelijk scheiden', 'Rubric 0-4 en schriftelijke punten/casusstructuur apart trainen.', ['mondeling', 'schriftelijk', 'rubric', 'punten', 'casus']),
+        topic('zwakste les kiezen', 'Niet alles opnieuw lezen maar gericht laagste score of rood punt aanpakken.', ['zwakste', 'score', 'rood', 'prioriteit', 'oefenen']),
+        topic('flitscolleges koppelen', 'Flitscolleges gebruiken als verdieping bij lessen, niet als losse bibliotheek.', ['flitscollege', 'koppelen', 'verdieping', 'les'])
+      ],
+      'Je hebt nog weinig tijd voor de toets. Hoe kies je vanuit de hele module wat je nu moet oefenen?',
+      'Maak een modulebreed toetsplan: welke drie onderdelen leveren nu de meeste punten op en waarom?',
+      'Ik start modulebreed: eerst kijk ik of mijn basisbegrippen en ontwikkelingslijn kloppen, daarna of ik diagnostiek en ICF/MDO kan verdedigen, en daarna of mijn behandelkeuzes toetswaardig zijn. Ik kies mijn laagste scoregebied en train dat met een les, een gekoppeld flitscollege en een mondelinge of schriftelijke oefening. Zo oefen ik niet breed, maar gericht op toetswinst.',
+      'Mijn toetsplan heeft drie prioriteiten: één kennisgat, één casusredenering en één mondelinge verantwoording. Per prioriteit kies ik de bijbehorende les, noteer ik het kernbegrip, maak ik een casusantwoord en controleer ik of ik kan afsluiten met een conclusie of advies.'
+    ),
+    lesson(
       'w1',
       'W1 · Module, preventie en taalniveaus',
       '13 februari 2026',
@@ -399,6 +424,12 @@ function topic(title, hint, terms) {
 }
 
 const lessonMeta = {
+  'alle-lessen': {
+    criteria: 'Je overziet de modulelijn en kiest gericht wat je moet trainen voor toetswinst.',
+    writtenFocus: 'Maak een modulebreed plan met prioriteit, bron, oefenvorm en bewijs.',
+    pitfall: 'Alles opnieuw willen lezen zonder te kiezen waar je punten verliest.',
+    zg: 'Je koppelt les, flitscollege, casus en toetsvorm tot één korte leerroute.'
+  },
   w1: {
     criteria: 'Je ordent observaties professioneel: taalniveau, leeftijd, context en preventieve vervolgstap.',
     writtenFocus: 'Definieer kernbegrippen kort en pas ze toe op een observatie of preventieve vervolgstap.',
@@ -492,6 +523,15 @@ const lessonMeta = {
 };
 
 const lessonFlits = {
+  'alle-lessen': [
+    flits('Taal-inleiding', 'Basis voor taalniveaus en taalprofielen.'),
+    flits('Spraak - Inleiding', 'Basis voor spraak, fonetiek/fonologie en planning.'),
+    flits('Testleer', 'Basis voor betrouwbare diagnostiek en score-interpretatie.'),
+    flits('Model van Levelt', 'Overkoepelend model voor foutlokalisatie.'),
+    flits('Richtlijn Logopedie bij TOS tbv', 'Richtlijnmatige brug naar behandeling en samenwerking.'),
+    flits('Behandeling Fonetiek - fonologie', 'Startpunt voor behandelkeuze bij spraakproblemen.'),
+    flits('Behandeling - pragmatiek', 'Startpunt voor functionele pragmatische behandeling.')
+  ],
   w1: [
     flits('Taal-inleiding', 'Studietaak taal: taal, taalsysteem, taalontwikkeling, kritische periode en nature-nurture.'),
     flits('Taalontwikkeling - inleiding', 'Studietaak taal: normale taalverwerving en leeftijdsgebonden interpretatie.'),
