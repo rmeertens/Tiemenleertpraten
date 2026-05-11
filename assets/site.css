@@ -5680,7 +5680,28 @@ body[data-split-mode="sounds"] .split-block--pattern {
   background: var(--bg);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
+  color: inherit;
+  display: block;
   padding: 12px;
+  text-decoration: none;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.lesson-flits-link:hover,
+.lesson-flits-link:focus {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.lesson-flits-link.is-muted {
+  border-style: dashed;
+  opacity: 0.72;
+}
+
+.lesson-flits-link.is-muted:hover,
+.lesson-flits-link.is-muted:focus {
+  border-color: var(--rule);
+  transform: none;
 }
 
 .lesson-flits-link span {

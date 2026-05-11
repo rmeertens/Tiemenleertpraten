@@ -2,7 +2,7 @@
 
 const data = window.FLITS_DATA;
 const state = {
-  index: Number(localStorage.getItem('flits_index') || 0),
+  index: initialFlitsIndex(),
   caseVariant: localStorage.getItem('flits_case_variant') || 'apply',
   done: JSON.parse(localStorage.getItem('flits_done') || '{}'),
   mastery: JSON.parse(localStorage.getItem('flits_mastery') || '{}'),
@@ -40,6 +40,21 @@ let microRecognition = null;
 let microRecording = false;
 
 boot();
+
+function initialFlitsIndex() {
+  const requested = new URLSearchParams(window.location.search).get('flits');
+  if (requested) {
+    const cleanRequested = normalize(requested);
+    const queryIndex = data.lessons.findIndex(lesson =>
+      normalize(lesson.id) === cleanRequested || normalize(lesson.title) === cleanRequested
+    );
+    if (queryIndex >= 0) {
+      localStorage.setItem('flits_index', String(queryIndex));
+      return queryIndex;
+    }
+  }
+  return Number(localStorage.getItem('flits_index') || 0);
+}
 
 function boot() {
   migrateDoneToMastery();

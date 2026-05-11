@@ -495,7 +495,7 @@ const lessonFlits = {
   w1: [
     flits('Taal-inleiding', 'Studietaak taal: taal, taalsysteem, taalontwikkeling, kritische periode en nature-nurture.'),
     flits('Taalontwikkeling - inleiding', 'Studietaak taal: normale taalverwerving en leeftijdsgebonden interpretatie.'),
-    flits('Preventieve logopedie', 'Studietaak preventie: taken, soorten preventie, vroegsignalering en GGD-werkveld.')
+    flits('Preventieve logopedie', 'Studietaak preventie: taken, soorten preventie, vroegsignalering en GGD-werkveld.', null)
   ],
   w2: [
     flits('Spraak - Inleiding', 'Studietaak spraak: taal versus spraak, fonetisch/fonologisch en casus Esther.'),
@@ -524,17 +524,17 @@ const lessonFlits = {
   ],
   w8: [
     flits('Testleer', 'Voorbereiding les 8: testdoel, normering, validiteit, betrouwbaarheid en interpretatie.'),
-    flits('(Multidisciplinaire) Diagnostiek spraak- en taalproblemen', 'Kindcasuïstiek diagnostiek: onderzoekskeuze, scores, valkuilen en MDO.'),
-    flits('Schisis', 'Medisch-logopedisch college: teamzorg, gehoor, resonantie en spraak-taalimpact.')
+    flits('(Multidisciplinaire) Diagnostiek spraak- en taalproblemen', 'Kindcasuïstiek diagnostiek: onderzoekskeuze, scores, valkuilen en MDO.', null),
+    flits('Schisis', 'Medisch-logopedisch college: teamzorg, gehoor, resonantie en spraak-taalimpact.', null)
   ],
   w9: [
     flits('Diagnostiek Fonetiek - fonologie', 'Voorbereiding les 9: fonetisch/fonologisch onderzoek en methodekeuze onderbouwen.'),
-    flits('Diagnostiek: semantiek/syntaxis/morfologie', 'Voorbereiding les 9: taalniveaus onderzoeken en koppelen aan ICF.'),
-    flits('Co-morbiditeit', 'Voorbereiding les 9: bijkomende problematiek meenemen in diagnostiek en advies.'),
+    flits('Diagnostiek: semantiek/syntaxis/morfologie', 'Voorbereiding les 9: taalniveaus onderzoeken en koppelen aan ICF.', null),
+    flits('Co-morbiditeit', 'Voorbereiding les 9: bijkomende problematiek meenemen in diagnostiek en advies.', null),
     flits('Behandeling Fonetiek - fonologie', 'Aanwezige behandelstof alvast koppelen aan diagnostische conclusie.')
   ],
   w10: [
-    flits('Diagnostiek bij meertaligheid', 'Voorbereiding les 10: meertaligheid, taalachterstand versus TOS en ontbrekende gegevens.'),
+    flits('Diagnostiek bij meertaligheid', 'Voorbereiding les 10: meertaligheid, taalachterstand versus TOS en ontbrekende gegevens.', null),
     flits('Diagnostiek pragmatiek', 'Voorbereiding les 10: taalgebruik in context, observatie en school/oudersignalen.'),
     flits('W10 · Complexe casussen', 'MDO: profiel, differentiaaldiagnose, ontbrekende informatie en advies.'),
     flits('W10 · Testafname en scoring', 'MDO en toets: protocolfouten, validiteit, betrouwbaarheid en scoreverantwoording.'),
@@ -545,7 +545,7 @@ const lessonFlits = {
   ],
   w11: [
     flits('Behandeling Fonetiek - fonologie', 'Voorbereiding behandeling: fonetisch/fonologisch behandelen, contrast, generalisatie en methodekeuze.'),
-    flits('Behandeling: Semantiek/ syntaxis/ morfologie', 'Voorbereiding behandeling: taaltherapie koppelen aan beginsituatie en doelen.')
+    flits('Behandeling: Semantiek/ syntaxis/ morfologie', 'Voorbereiding behandeling: taaltherapie koppelen aan beginsituatie en doelen.', null)
   ],
   w13: [
     flits('Behandeling - pragmatiek', 'Voorbereiding les 13: pragmatische behandeling, transfer, ouders en school.')
@@ -566,6 +566,6 @@ window.LESSEN_DATA.lessons.forEach(lesson => {
   });
 });
 
-function flits(title, focus) {
-  return { title, focus };
+function flits(title, focus, id = title) {
+  return { title, focus, id };
 }

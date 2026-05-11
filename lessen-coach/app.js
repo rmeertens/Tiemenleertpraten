@@ -134,12 +134,14 @@ function renderFlitsLinks(lesson) {
     target.innerHTML = '<p class="flits-note">Nog geen flitscolleges gekoppeld aan deze les.</p>';
     return;
   }
-  target.innerHTML = links.map(item => `
-    <article class="lesson-flits-link">
+  target.innerHTML = links.map(item => {
+    const body = `
       <span>${escapeHtml(item.title)}</span>
       <p>${escapeHtml(item.focus)}</p>
-    </article>
-  `).join('');
+    `;
+    if (item.id === null) return `<article class="lesson-flits-link is-muted">${body}</article>`;
+    return `<a class="lesson-flits-link" href="/flitscollege-coach/?flits=${encodeURIComponent(item.id || item.title)}">${body}</a>`;
+  }).join('');
 }
 
 function renderMode() {
