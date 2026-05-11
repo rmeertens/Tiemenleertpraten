@@ -78,7 +78,7 @@ window.ORAL_10_DATA = {
     {
       title: '4. Zware criteria check',
       href: '/lessen-coach/',
-      text: 'Check vooral criterium 15 en 17: methodekeuze en therapievorm moeten expliciet verantwoord zijn.'
+      text: 'Gebruik Collegecoach om criterium 15 en 17 te checken: methodekeuze en therapievorm moeten expliciet verantwoord zijn.'
     }
   ],
   guideCards: [

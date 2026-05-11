@@ -110,6 +110,7 @@ function renderLesson() {
   document.getElementById('lesson-title').textContent = lesson.title;
   document.getElementById('lesson-summary').textContent = lesson.summary;
   document.getElementById('lesson-tags').innerHTML = lesson.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
+  renderFlitsLinks(lesson);
   document.getElementById('lesson-criteria').textContent = lesson.criteria;
   document.getElementById('lesson-written-focus').textContent = lesson.writtenFocus;
   document.getElementById('lesson-pitfall').textContent = lesson.pitfall;
@@ -123,6 +124,22 @@ function renderLesson() {
   renderMode();
   renderMastery();
   renderLessonList();
+}
+
+function renderFlitsLinks(lesson) {
+  const target = document.getElementById('lesson-flits-links');
+  if (!target) return;
+  const links = lesson.flits || [];
+  if (!links.length) {
+    target.innerHTML = '<p class="flits-note">Nog geen flitscolleges gekoppeld aan deze les.</p>';
+    return;
+  }
+  target.innerHTML = links.map(item => `
+    <article class="lesson-flits-link">
+      <span>${escapeHtml(item.title)}</span>
+      <p>${escapeHtml(item.focus)}</p>
+    </article>
+  `).join('');
 }
 
 function renderMode() {

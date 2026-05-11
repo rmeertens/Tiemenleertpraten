@@ -193,6 +193,16 @@ a { color: inherit; }
   box-shadow: var(--shadow);
 }
 
+.tool--disabled {
+  opacity: 0.72;
+}
+
+.tool--disabled:hover,
+.tool--disabled:focus-within {
+  box-shadow: none;
+  transform: none;
+}
+
 .tool__badge {
   align-self: flex-start;
   font-size: 11px;
@@ -5644,12 +5654,54 @@ body[data-split-mode="sounds"] .split-block--pattern {
   font-weight: 800;
 }
 
+.lesson-flits-links {
+  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+}
+
+.lesson-flits-links > strong {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.lesson-flits-links > div {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lesson-flits-link {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.lesson-flits-link span {
+  color: var(--ink);
+  display: block;
+  font-weight: 800;
+}
+
+.lesson-flits-link p {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 5px 0 0;
+}
+
 @media (max-width: 760px) {
   .note-hero,
   .note-privacy,
   .note-grid,
   .note-fields,
-  .note-radar-grid {
+  .note-radar-grid,
+  .lesson-flits-links > div {
     grid-template-columns: 1fr;
   }
 

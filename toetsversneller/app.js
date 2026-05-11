@@ -28,23 +28,13 @@ const tracks = [
   },
   {
     id: 'lessen',
-    title: 'Lescoach · W1-W9',
+    title: 'Collegecoach · W1-W15',
     href: '/lessen-coach/',
     storage: () => masteryRatio('lessen_mastery', 'lessen_done'),
     max: 100,
-    red: 'Schriftelijk en mondeling gescheiden houden: rubric versus punten/casus.',
-    quick: 'Open je zwakste les en maak één schriftelijk casusantwoord.',
-    boss: 'Lesboss: één leskern toepassen in mondeling én schriftelijk antwoord.'
-  },
-  {
-    id: 'flits',
-    title: 'Flitscollege Coach',
-    href: '/flitscollege-coach/',
-    storage: () => masteryRatio('flits_mastery', 'flits_done'),
-    max: 100,
-    red: 'Begrip niet los noemen: altijd kind/casus/gevolg toevoegen.',
-    quick: 'Leg één flitsbegrip uit met: begrip -> casus -> daarom.',
-    boss: 'Flitsboss: 10 kernbegrippen toepassen op één casus.'
+    red: 'Schriftelijk, mondeling en flitscolleges gescheiden houden: rubric versus punten/casus.',
+    quick: 'Open je zwakste les en maak één schriftelijk casusantwoord met flitskoppeling.',
+    boss: 'Collegeboss: één leskern en één flitscollege toepassen in mondeling én schriftelijk antwoord.'
   },
   {
     id: 'accent',
