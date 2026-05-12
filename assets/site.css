@@ -3965,6 +3965,344 @@ a { color: inherit; }
   clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
+/* ============ Bite the Label ============ */
+
+.bite-app {
+  max-width: 1180px;
+}
+
+.bite-hero,
+.bite-games {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
+}
+
+.bite-hero {
+  align-items: start;
+  margin-top: 24px;
+}
+
+.bite-scanner,
+.bite-stats,
+.bite-result,
+.bite-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+.bite-section-head {
+  align-items: start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.bite-label {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.bite-scanner h2,
+.bite-result h3,
+.bite-card h3 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 500;
+  line-height: 1.03;
+  margin: 0 0 12px;
+}
+
+.bite-card h3,
+.bite-result h3 {
+  font-size: 30px;
+}
+
+.bite-meter {
+  background: var(--ink);
+  border-radius: var(--radius);
+  color: var(--bg);
+  display: grid;
+  flex: 0 0 120px;
+  gap: 2px;
+  padding: 13px 14px;
+  text-align: center;
+}
+
+.bite-meter span,
+.bite-stat-grid span,
+.bite-swap span,
+.bite-challenge span,
+.bite-duel span,
+.bite-boss-score span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bite-meter strong {
+  font-family: var(--font-display);
+  font-size: 42px;
+  line-height: 1;
+}
+
+.bite-input-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.bite-field {
+  display: grid;
+  gap: 7px;
+}
+
+.bite-field span {
+  color: var(--ink-faint);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bite-field input,
+.bite-field textarea {
+  background: var(--bg);
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.bite-field textarea {
+  resize: vertical;
+}
+
+.bite-actions,
+.bite-choice-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.bite-demo-strip {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin-top: 18px;
+}
+
+.bite-demo-strip button,
+.bite-duel button,
+.bite-choice-row button {
+  appearance: none;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  text-align: left;
+  transition: border-color 0.15s ease, transform 0.08s ease;
+}
+
+.bite-demo-strip button:hover,
+.bite-duel button:hover,
+.bite-choice-row button:hover,
+.bite-demo-strip button:focus,
+.bite-duel button:focus,
+.bite-choice-row button:focus {
+  border-color: var(--accent);
+}
+
+.bite-demo-strip button:active,
+.bite-duel button:active,
+.bite-choice-row button:active {
+  transform: scale(0.99);
+}
+
+.bite-demo-strip span,
+.bite-duel small {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.bite-stat-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.bite-stat-grid article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.bite-stat-grid strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 42px;
+  line-height: 1;
+  margin-top: 4px;
+}
+
+.bite-note,
+.bite-result p,
+.bite-card p,
+.bite-feedback {
+  color: var(--ink-soft);
+}
+
+.bite-note {
+  font-size: 13px;
+}
+
+.bite-result {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.2fr);
+  margin: 18px 0;
+}
+
+.bite-reasons {
+  display: grid;
+  gap: 10px;
+}
+
+.bite-reasons article,
+.bite-swap,
+.bite-challenge,
+.bite-feedback,
+.bite-boss-stage {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.bite-reasons strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.bite-reasons p,
+.bite-swap p,
+.bite-challenge p,
+.bite-boss-stage p {
+  margin: 0;
+}
+
+.bite-swap,
+.bite-challenge {
+  border-color: var(--accent);
+}
+
+.bite-swap span,
+.bite-challenge span {
+  color: var(--accent);
+}
+
+.bite-games {
+  margin-bottom: 18px;
+}
+
+.bite-duel {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.bite-duel button {
+  min-height: 160px;
+}
+
+.bite-duel strong {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.bite-duel small {
+  line-height: 1.35;
+}
+
+.bite-feedback {
+  margin-top: 12px;
+}
+
+.bite-claim {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1.05;
+  margin: 12px 0;
+  padding: 22px;
+}
+
+.bite-choice-row button {
+  flex: 1 1 160px;
+  text-align: center;
+}
+
+.bite-boss-stage {
+  margin-top: 12px;
+}
+
+.bite-boss-score {
+  display: grid;
+  gap: 8px;
+  text-align: center;
+}
+
+.bite-boss-score strong {
+  font-family: var(--font-display);
+  font-size: 70px;
+  line-height: 1;
+}
+
+@media (max-width: 880px) {
+  .bite-hero,
+  .bite-games,
+  .bite-result {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .bite-section-head {
+    display: grid;
+  }
+
+  .bite-meter {
+    width: 100%;
+  }
+
+  .bite-duel {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ============ Minimale Paren ============ */
 
 .drill__stage--paren {

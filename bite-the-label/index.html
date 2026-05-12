@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Bite the Label — snelle etikettrainer voor ultra-bewerkte voeding." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Bite the Label &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=32" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; Bite the Label</div>
+  <main class="studio bite-app">
+    <nav class="studio__nav">
+      <a class="studio__home" href="/">&larr; Tiemen Leert Praten</a>
+      <h1 class="studio__title">Bite the Label</h1>
+      <span aria-hidden="true" style="width:8ch"></span>
+    </nav>
+
+    <header class="bite-hero">
+      <section class="bite-scanner" aria-labelledby="bite-scanner-title">
+        <div class="bite-section-head">
+          <div>
+            <p class="bite-label">Scan. Spot. Swap.</p>
+            <h2 id="bite-scanner-title">Ontmasker je etiket in 20 seconden.</h2>
+          </div>
+          <div class="bite-meter" aria-label="Etiketscore">
+            <span id="score-label">Start</span>
+            <strong id="score-value">--</strong>
+          </div>
+        </div>
+
+        <div class="bite-input-grid">
+          <label class="bite-field" for="product-name">
+            <span>Productnaam of claim</span>
+            <input id="product-name" type="text" placeholder="Bijv. fit ontbijtkoek, 0% yoghurt, proteinebar" />
+          </label>
+          <label class="bite-field" for="ingredient-input">
+            <span>Ingrediënten</span>
+            <textarea id="ingredient-input" rows="7" placeholder="Plak of typ de ingrediëntenlijst. Fictieve demo's staan hieronder."></textarea>
+          </label>
+        </div>
+
+        <div class="bite-actions">
+          <button class="btn btn--primary" type="button" id="analyze-label">Check etiket</button>
+          <button class="btn btn--ghost" type="button" id="clear-label">Wis</button>
+        </div>
+
+        <div class="bite-demo-strip" id="demo-products" aria-label="Fictieve demo-producten"></div>
+      </section>
+
+      <aside class="bite-stats" aria-label="Lokale voortgang">
+        <p class="bite-label">Streak</p>
+        <div class="bite-stat-grid">
+          <article>
+            <span>Labels</span>
+            <strong id="labels-checked">0</strong>
+          </article>
+          <article>
+            <span>Traps</span>
+            <strong id="traps-spotted">0</strong>
+          </article>
+          <article>
+            <span>Beste reeks</span>
+            <strong id="best-streak">0</strong>
+          </article>
+        </div>
+        <p class="bite-note">
+          Alleen deze teller wordt lokaal bewaard. Geen uploads, geen externe analyse, geen persoonlijk voedingsadvies.
+        </p>
+      </aside>
+    </header>
+
+    <section class="bite-result" id="result-card" aria-live="polite">
+      <div>
+        <p class="bite-label">Resultaat</p>
+        <h3 id="result-title">Kies een demo of plak een etiket.</h3>
+        <p id="result-summary">Je krijgt drie harde signalen, een betere swap en een mini-opdracht.</p>
+      </div>
+      <div class="bite-reasons" id="reason-list"></div>
+      <div class="bite-swap">
+        <span>Betere bite</span>
+        <p id="swap-text">Nog geen swap gekozen.</p>
+      </div>
+      <div class="bite-challenge">
+        <span>30 seconden</span>
+        <p id="challenge-text">Vind straks het ingrediënt dat het product verraadt.</p>
+      </div>
+    </section>
+
+    <section class="bite-games" aria-label="Trainingsgames">
+      <article class="bite-card">
+        <div class="bite-section-head">
+          <div>
+            <p class="bite-label">Label Duel</p>
+            <h3>Kies de betere bite.</h3>
+          </div>
+          <button class="btn btn--ghost" type="button" id="new-duel">Nieuw duel</button>
+        </div>
+        <div class="bite-duel" id="duel-options"></div>
+        <div class="bite-feedback" id="duel-feedback">Kies links of rechts. De strengste reden wint.</div>
+      </article>
+
+      <article class="bite-card">
+        <div class="bite-section-head">
+          <div>
+            <p class="bite-label">Claim Crusher</p>
+            <h3>Wat kan deze claim verbergen?</h3>
+          </div>
+          <button class="btn btn--ghost" type="button" id="new-claim">Nieuwe claim</button>
+        </div>
+        <p class="bite-claim" id="claim-text"></p>
+        <div class="bite-choice-row" id="claim-options"></div>
+        <div class="bite-feedback" id="claim-feedback">Kies de valkuil achter de claim.</div>
+      </article>
+    </section>
+
+    <section class="bite-card bite-boss" aria-labelledby="boss-title">
+      <div class="bite-section-head">
+        <div>
+          <p class="bite-label">Pantry Boss</p>
+          <h3 id="boss-title">Vijf rondes tot Etiketklaar.</h3>
+        </div>
+        <button class="btn btn--primary" type="button" id="start-boss">Start boss</button>
+      </div>
+      <div class="bite-boss-stage" id="boss-stage">
+        <p>Kies steeds het minst ultra-bewerkte product. Na vijf rondes krijg je je Etiketklaar-score.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/bite-the-label/app.js"></script>
+</body>
+</html>
