@@ -314,6 +314,9 @@ function renderStatus() {
 function importData() {
   try {
     let parsed = parseImportText(els.importText.value);
+    const importedAudioTimes = parsed._privateAudioTimes || parsed.privateAudioTimes || null;
+    delete parsed._privateAudioTimes;
+    delete parsed.privateAudioTimes;
     if (parsed.schema !== 'schlichting-v1' && (parsed.rules || parsed.items || parsed.rubric || parsed.zgScripts)) {
       parsed = mergePartialImports([parsed]);
     }
@@ -325,6 +328,10 @@ function importData() {
     }
     state.data = parsed;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    if (importedAudioTimes && typeof importedAudioTimes === 'object') {
+      state.audio.saved = importedAudioTimes;
+      localStorage.setItem(AUDIO_TIMES_KEY, JSON.stringify(importedAudioTimes));
+    }
     els.validation.innerHTML = validationHtml(validation);
     renderAll();
   } catch (error) {
@@ -624,7 +631,13 @@ function exportData() {
     els.validation.innerHTML = '<div class="sch-warn"><strong>Nog niets te exporteren.</strong><br>Importeer eerst je privédata.</div>';
     return;
   }
-  const blob = new Blob([JSON.stringify(state.data, null, 2)], { type: 'application/json' });
+  syncAllAudioSegmentsIntoData();
+  const payload = {
+    ...state.data,
+    _privateAudioTimes: state.audio.saved,
+    _exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -1225,7 +1238,7 @@ function groupControlHtml(group) {
   return `
     <div class="sch-audio-group-control">
       <strong>${escapeHtml(group.label)}</strong>
-      <button class="btn btn--ghost" type="button" data-audio-json="${escapeHtml(group.id)}" ${hasJsonTimes ? '' : 'disabled'}>Gebruik JSON-tijden</button>
+      <button class="btn btn--ghost" type="button" data-audio-json="${escapeHtml(group.id)}" ${hasJsonTimes ? '' : 'disabled'}>Gebruik JSON-schattingen</button>
       <button class="btn btn--ghost" type="button" data-audio-autosplit="${escapeHtml(group.id)}">Detecteer opnieuw</button>
       <button class="btn btn--ghost" type="button" data-audio-equal="${escapeHtml(group.id)}">Evenredig verdelen</button>
       <span class="sch-audio-mini">${escapeHtml(loaded.method)} · JSON ${escapeHtml(imported.length)}/${escapeHtml(group.expected)}${hasJsonTimes ? ` · laatste JSON-einde ${escapeHtml(formatSeconds(lastJsonEnd))} op mp3 ${escapeHtml(formatSeconds(loaded.duration))}` : ''} · correcties worden lokaal bewaard</span>
@@ -1336,6 +1349,16 @@ function applyImportedAudioTimes(groupId) {
     window.alert(`Voor ${groupDef.label} zijn ${imported.length}/${groupDef.expected} JSON-tijden beschikbaar. Vul eerst alle audioCheck-tijden aan.`);
     return;
   }
+  const lastJsonEnd = Math.max(...imported.map(segment => segment.end));
+  const message = [
+    `${groupDef.label}: JSON-tijden toepassen?`,
+    '',
+    `Dit overschrijft je huidige handmatige audio-grenzen voor ${groupDef.label}.`,
+    `Laatste JSON-einde: ${formatSeconds(lastJsonEnd)}. Mp3-duur: ${formatSeconds(group.duration)}.`,
+    '',
+    'Gebruik dit alleen als je zeker weet dat de JSON-tijden jouw gecorrigeerde timestamps zijn.'
+  ].join('\n');
+  if (!window.confirm(message)) return;
   const next = imported.map(segment => {
     const start = clamp(roundTime(segment.start), 0, group.duration);
     const end = clamp(roundTime(segment.end), 0, group.duration);
@@ -1424,6 +1447,36 @@ function saveAudioSegments(groupId) {
     }))
   };
   localStorage.setItem(AUDIO_TIMES_KEY, JSON.stringify(state.audio.saved));
+  syncAudioSegmentsIntoData(groupId);
+}
+
+function syncAllAudioSegmentsIntoData() {
+  Object.keys(state.audio.groups).forEach(groupId => syncAudioSegmentsIntoData(groupId));
+}
+
+function syncAudioSegmentsIntoData(groupId) {
+  const group = state.audio.groups[groupId];
+  const items = state.data?.zinsontwikkeling?.items;
+  if (!group || !Array.isArray(items)) return;
+  group.segments.forEach(segment => {
+    const item = items.find(candidate => Number(candidate.number) === Number(segment.item));
+    if (!item) return;
+    item.audioCheck = {
+      ...(item.audioCheck || {}),
+      audioFile: item.audioCheck?.audioFile || group.fileName || '',
+      estimatedStart: formatTimestamp(segment.start),
+      estimatedEnd: formatTimestamp(segment.end)
+    };
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+}
+
+function formatTimestamp(value) {
+  const safe = roundTime(value);
+  const minutes = Math.floor(safe / 60);
+  const seconds = safe - (minutes * 60);
+  const secondsText = seconds < 10 ? `0${seconds.toFixed(2)}` : seconds.toFixed(2);
+  return `${minutes}:${secondsText}`;
 }
 
 function clearAudio() {
