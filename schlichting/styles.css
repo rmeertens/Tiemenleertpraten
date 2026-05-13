@@ -382,6 +382,72 @@
   padding: 14px;
 }
 
+.sch-source-images {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 12px;
+  margin: 14px 0;
+  padding: 14px;
+}
+
+.sch-source-image-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sch-source-image-slot {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.sch-source-image-thumb {
+  aspect-ratio: 4 / 3;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  display: block;
+  overflow: hidden;
+}
+
+.sch-source-image-thumb img {
+  display: block;
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.sch-source-image-empty {
+  align-items: center;
+  aspect-ratio: 4 / 3;
+  background: var(--bg);
+  border: 1px dashed var(--rule);
+  border-radius: 10px;
+  color: var(--ink-soft);
+  display: flex;
+  font-size: 14px;
+  justify-content: center;
+}
+
+.sch-source-image-upload {
+  color: var(--ink-soft);
+  display: grid;
+  font-size: 13px;
+  font-weight: 900;
+  gap: 8px;
+}
+
+.sch-source-image-upload input {
+  font: inherit;
+  max-width: 100%;
+}
+
 .sch-score-row {
   display: flex;
   flex-wrap: wrap;
@@ -523,6 +589,7 @@
   .sch-prep-grid,
   .sch-wizard,
   .sch-audio-import,
+  .sch-source-image-grid,
   .sch-audio-row {
     grid-template-columns: 1fr;
   }

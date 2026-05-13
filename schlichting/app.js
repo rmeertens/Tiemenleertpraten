@@ -4,6 +4,13 @@ const STORAGE_KEY = 'schlichting_private_data_v1';
 const SCORE_KEY = 'schlichting_private_scores_v1';
 const PREP_KEY = 'schlichting_private_prep_v1';
 const AUDIO_TIMES_KEY = 'schlichting_private_audio_times_v1';
+const SOURCE_IMAGE_DB = 'schlichting_private_source_images_v1';
+const SOURCE_IMAGE_STORE = 'images';
+
+const SOURCE_IMAGE_KINDS = [
+  { id: 'testmap', label: 'Testmap' },
+  { id: 'handleiding', label: 'Afnamehandleiding' }
+];
 
 const AUDIO_GROUPS = [
   { id: 'zo1-10', label: 'ZO 1-10', start: 1, end: 10, expected: 10 },
@@ -203,7 +210,8 @@ const state = {
     segments: {},
     activeStop: null,
     saved: readJson(AUDIO_TIMES_KEY, {})
-  }
+  },
+  sourceImages: {}
 };
 
 const els = {
@@ -238,6 +246,11 @@ function boot() {
   }
   bindEvents();
   renderAll();
+  loadSourceImages().then(() => {
+    renderCockpit('zinsontwikkeling');
+  }).catch(() => {
+    state.sourceImages = {};
+  });
 }
 
 function bindEvents() {
@@ -311,12 +324,15 @@ function renderStatus() {
   `;
 }
 
-function importData() {
+async function importData() {
   try {
     let parsed = parseImportText(els.importText.value);
     const importedAudioTimes = parsed._privateAudioTimes || parsed.privateAudioTimes || null;
+    const importedSourceImages = parsed._privateSourceImages || parsed.privateSourceImages || null;
     delete parsed._privateAudioTimes;
     delete parsed.privateAudioTimes;
+    delete parsed._privateSourceImages;
+    delete parsed.privateSourceImages;
     if (parsed.schema !== 'schlichting-v1' && (parsed.rules || parsed.items || parsed.rubric || parsed.zgScripts)) {
       parsed = mergePartialImports([parsed]);
     }
@@ -331,6 +347,9 @@ function importData() {
     if (importedAudioTimes && typeof importedAudioTimes === 'object') {
       state.audio.saved = importedAudioTimes;
       localStorage.setItem(AUDIO_TIMES_KEY, JSON.stringify(importedAudioTimes));
+    }
+    if (Array.isArray(importedSourceImages)) {
+      await restoreSourceImages(importedSourceImages);
     }
     els.validation.innerHTML = validationHtml(validation);
     renderAll();
@@ -626,15 +645,17 @@ function importErrorHelp(error) {
   return `${error.message}. Tip: plak alleen geldige JSON of een compleet \`\`\`json-blok uit NotebookLM.`;
 }
 
-function exportData() {
+async function exportData() {
   if (!state.data) {
     els.validation.innerHTML = '<div class="sch-warn"><strong>Nog niets te exporteren.</strong><br>Importeer eerst je privédata.</div>';
     return;
   }
   syncAllAudioSegmentsIntoData();
+  const privateSourceImages = await serializeSourceImages();
   const payload = {
     ...state.data,
     _privateAudioTimes: state.audio.saved,
+    _privateSourceImages: privateSourceImages,
     _exportedAt: new Date().toISOString()
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -646,15 +667,20 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
-function clearData() {
+async function clearData() {
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(SCORE_KEY);
   localStorage.removeItem(PREP_KEY);
+  await clearSourceImageRecords();
+  Object.values(state.sourceImages).forEach(record => {
+    if (record.url) URL.revokeObjectURL(record.url);
+  });
   state.data = null;
   state.scores = [];
   state.prep = {};
+  state.sourceImages = {};
   els.importText.value = '';
-  els.validation.innerHTML = '<div class="sch-ok"><strong>Privédata gewist.</strong><br>Import, prepnotities en scores zijn uit deze browser verwijderd.</div>';
+  els.validation.innerHTML = '<div class="sch-ok"><strong>Privédata gewist.</strong><br>Import, bronfoto’s, prepnotities en scores zijn uit deze browser verwijderd.</div>';
   renderAll();
 }
 
@@ -672,8 +698,10 @@ function privacyCheck() {
     'Privacycheck:',
     '1. Officiële Schlichting-items staan niet in de repo.',
     '2. Importdata staat alleen in localStorage van deze browser.',
-    '3. Wis privédata verwijdert de lokale import.',
-    '4. Gebruik geen gedeelde computer zonder daarna te wissen.'
+    '3. Bronfoto’s staan alleen in IndexedDB van deze browser.',
+    '4. Exporteer back-up kan bronfoto’s bevatten; deel dat bestand niet.',
+    '5. Wis privédata verwijdert de lokale import.',
+    '6. Gebruik geen gedeelde computer zonder daarna te wissen.'
   ].join('\n');
   window.alert(message);
 }
@@ -899,6 +927,7 @@ function renderCockpit(type) {
         ${factHtml('Bron', item.source)}
       </div>
         ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
+        ${type === 'zinsontwikkeling' ? sourceImagesHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? rawSourceHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? audioCheckHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? audioForItemHtml(item.number) : ''}
@@ -916,6 +945,7 @@ function renderCockpit(type) {
   bindScoreButtons();
   bindAudioButtons();
   bindMaterialChecks();
+  bindSourceImageControls();
 }
 
 function materialChecklistHtml(item) {
@@ -949,6 +979,40 @@ function rawSourceHtml(item) {
   `;
 }
 
+function sourceImagesHtml(item) {
+  return `
+    <div class="sch-source-images">
+      <div>
+        <p class="sch-label">Privé bronfoto's</p>
+        <p class="sch-score-note">Upload per item je eigen PNG/JPG. De foto's blijven lokaal in deze browser, komen niet in GitHub en zitten alleen in je privéback-up als je die exporteert.</p>
+      </div>
+      <div class="sch-source-image-grid">
+        ${SOURCE_IMAGE_KINDS.map(kind => sourceImageSlotHtml(item.number, kind)).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function sourceImageSlotHtml(itemNumber, kind) {
+  const record = state.sourceImages[sourceImageId(itemNumber, kind.id)];
+  return `
+    <article class="sch-source-image-slot">
+      <strong>${escapeHtml(kind.label)}</strong>
+      ${record ? `
+        <a href="${escapeHtml(record.url)}" target="_blank" rel="noopener" class="sch-source-image-thumb" aria-label="${escapeHtml(kind.label)} ZO ${escapeHtml(itemNumber)} groot openen">
+          <img src="${escapeHtml(record.url)}" alt="${escapeHtml(kind.label)} ZO ${escapeHtml(itemNumber)}" />
+        </a>
+        <span class="sch-audio-mini">${escapeHtml(record.fileName || 'bronfoto')}</span>
+        <button class="btn btn--ghost" type="button" data-source-image-delete="${escapeHtml(kind.id)}" data-source-image-item="${escapeHtml(itemNumber)}">Verwijder</button>
+      ` : '<div class="sch-source-image-empty">Nog geen foto</div>'}
+      <label class="sch-source-image-upload">
+        <span>${record ? 'Vervang foto' : 'Upload foto'}</span>
+        <input type="file" accept="image/png,image/jpeg,image/webp" data-source-image-upload="${escapeHtml(kind.id)}" data-source-image-item="${escapeHtml(itemNumber)}" />
+      </label>
+    </article>
+  `;
+}
+
 function audioCheckHtml(item) {
   const check = item.audioCheck;
   if (!check || typeof check !== 'object') return '';
@@ -974,6 +1038,25 @@ function bindMaterialChecks() {
     input.checked = localStorage.getItem(key) === 'true';
     input.addEventListener('change', () => {
       localStorage.setItem(key, String(input.checked));
+    });
+  });
+}
+
+function bindSourceImageControls() {
+  document.querySelectorAll('[data-source-image-upload]').forEach(input => {
+    if (input.dataset.bound === 'true') return;
+    input.dataset.bound = 'true';
+    input.addEventListener('change', () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      saveSourceImage(Number(input.dataset.sourceImageItem), input.dataset.sourceImageUpload, file);
+    });
+  });
+  document.querySelectorAll('[data-source-image-delete]').forEach(button => {
+    if (button.dataset.bound === 'true') return;
+    button.dataset.bound = 'true';
+    button.addEventListener('click', () => {
+      deleteSourceImage(Number(button.dataset.sourceImageItem), button.dataset.sourceImageDelete);
     });
   });
 }
@@ -1601,6 +1684,178 @@ function scoreText(item) {
   const details = listText(item?.scoringDetails);
   if (!score || score === '1' || score === '0/1') return details || score;
   return details ? `${score} · ${details}` : score;
+}
+
+async function loadSourceImages() {
+  const records = await getAllSourceImageRecords();
+  Object.values(state.sourceImages).forEach(record => {
+    if (record.url) URL.revokeObjectURL(record.url);
+  });
+  state.sourceImages = {};
+  records.forEach(record => {
+    state.sourceImages[record.id] = {
+      ...record,
+      url: URL.createObjectURL(record.blob)
+    };
+  });
+}
+
+async function saveSourceImage(itemNumber, kind, file) {
+  if (!file.type.startsWith('image/')) {
+    window.alert('Kies een PNG, JPG of WebP-afbeelding.');
+    return;
+  }
+  const id = sourceImageId(itemNumber, kind);
+  const record = {
+    id,
+    itemNumber,
+    kind,
+    fileName: file.name,
+    type: file.type,
+    size: file.size,
+    updatedAt: new Date().toISOString(),
+    blob: file
+  };
+  await putSourceImageRecord(record);
+  const previous = state.sourceImages[id];
+  if (previous?.url) URL.revokeObjectURL(previous.url);
+  state.sourceImages[id] = {
+    ...record,
+    url: URL.createObjectURL(file)
+  };
+  renderCockpit('zinsontwikkeling');
+}
+
+async function deleteSourceImage(itemNumber, kind) {
+  const id = sourceImageId(itemNumber, kind);
+  await deleteSourceImageRecord(id);
+  if (state.sourceImages[id]?.url) URL.revokeObjectURL(state.sourceImages[id].url);
+  delete state.sourceImages[id];
+  renderCockpit('zinsontwikkeling');
+}
+
+async function serializeSourceImages() {
+  const records = await getAllSourceImageRecords();
+  return Promise.all(records.map(async record => ({
+    id: record.id,
+    itemNumber: record.itemNumber,
+    kind: record.kind,
+    fileName: record.fileName,
+    type: record.type,
+    size: record.size,
+    updatedAt: record.updatedAt,
+    dataUrl: await blobToDataUrl(record.blob)
+  })));
+}
+
+async function restoreSourceImages(records) {
+  await clearSourceImageRecords();
+  Object.values(state.sourceImages).forEach(record => {
+    if (record.url) URL.revokeObjectURL(record.url);
+  });
+  state.sourceImages = {};
+  for (const record of records) {
+    if (!record?.id || !record?.dataUrl) continue;
+    const blob = dataUrlToBlob(record.dataUrl);
+    const restored = {
+      id: record.id,
+      itemNumber: Number(record.itemNumber),
+      kind: record.kind,
+      fileName: record.fileName || 'bronfoto',
+      type: record.type || blob.type || 'image/png',
+      size: record.size || blob.size,
+      updatedAt: record.updatedAt || new Date().toISOString(),
+      blob
+    };
+    await putSourceImageRecord(restored);
+    state.sourceImages[restored.id] = {
+      ...restored,
+      url: URL.createObjectURL(blob)
+    };
+  }
+}
+
+function sourceImageId(itemNumber, kind) {
+  return `ZO-${itemNumber}:${kind}`;
+}
+
+function openSourceImageDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(SOURCE_IMAGE_DB, 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(SOURCE_IMAGE_STORE)) {
+        const store = db.createObjectStore(SOURCE_IMAGE_STORE, { keyPath: 'id' });
+        store.createIndex('itemNumber', 'itemNumber', { unique: false });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function getAllSourceImageRecords() {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(SOURCE_IMAGE_STORE, 'readonly');
+    const request = transaction.objectStore(SOURCE_IMAGE_STORE).getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function putSourceImageRecord(record) {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(SOURCE_IMAGE_STORE, 'readwrite');
+    const request = transaction.objectStore(SOURCE_IMAGE_STORE).put(record);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function deleteSourceImageRecord(id) {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(SOURCE_IMAGE_STORE, 'readwrite');
+    const request = transaction.objectStore(SOURCE_IMAGE_STORE).delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function clearSourceImageRecords() {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(SOURCE_IMAGE_STORE, 'readwrite');
+    const request = transaction.objectStore(SOURCE_IMAGE_STORE).clear();
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+function dataUrlToBlob(dataUrl) {
+  const [header, base64] = String(dataUrl).split(',');
+  const mime = header.match(/data:(.*?);base64/)?.[1] || 'application/octet-stream';
+  const binary = atob(base64 || '');
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return new Blob([bytes], { type: mime });
 }
 
 function readData() {
