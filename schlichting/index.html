@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Privé Schlichting-trainer met browser-only import voor Taalbegrip en Zinsontwikkeling." />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Schlichting Privétrainer &middot; Tiemen Leert Praten</title>
+  <link rel="stylesheet" href="/assets/site.css?v=31" />
+  <link rel="stylesheet" href="/schlichting/styles.css?v=1" />
+</head>
+<body>
+  <div class="version-stamp">v1 &middot; privé</div>
+  <main class="sch-app">
+    <nav class="sch-nav">
+      <a href="/spraak-taal/">← Spraak-Taal</a>
+      <span>Schlichting Privétrainer</span>
+      <button class="sch-quiet" type="button" id="privacy-check">Privacycheck</button>
+    </nav>
+
+    <header class="sch-hero">
+      <div>
+        <p class="eyebrow">Browser-only import</p>
+        <h1>Schlichting zonder ruis.</h1>
+        <p>
+          Train Taalbegrip en Taalproductie-3 Zinsontwikkeling met jouw eigen privédata.
+          Officiële itemteksten staan niet in deze site; ze blijven lokaal in jouw browser.
+        </p>
+      </div>
+      <aside class="sch-status" id="data-status" aria-live="polite"></aside>
+    </header>
+
+    <section class="sch-tabs" aria-label="Schlichting onderdelen">
+      <button class="sch-tab is-active" type="button" data-view="import">Import</button>
+      <button class="sch-tab" type="button" data-view="prep">15 min prep</button>
+      <button class="sch-tab" type="button" data-view="wizard">Startwizard</button>
+      <button class="sch-tab" type="button" data-view="taalbegrip">Taalbegrip</button>
+      <button class="sch-tab" type="button" data-view="zinsontwikkeling">Zinsontwikkeling</button>
+      <button class="sch-tab" type="button" data-view="scripts">ZG scripts</button>
+      <button class="sch-tab" type="button" data-view="simulation">Simulatie</button>
+      <button class="sch-tab" type="button" data-view="dashboard">Score</button>
+    </section>
+
+    <section class="sch-view is-active" id="view-import">
+      <article class="sch-card sch-import-card">
+        <div>
+          <p class="sch-label">Stap 1</p>
+          <h2>Importeer je NotebookLM-export</h2>
+          <p>
+            Plak JSON volgens schema <code>schlichting-v1</code>. De data wordt alleen in
+            <code>localStorage</code> van deze browser opgeslagen.
+          </p>
+        </div>
+        <div class="sch-actions">
+          <button class="btn btn--primary" type="button" id="load-example">Laad fictieve testdata</button>
+          <button class="btn btn--ghost" type="button" id="export-data">Exporteer back-up</button>
+          <button class="btn btn--ghost" type="button" id="clear-data">Wis privédata</button>
+        </div>
+        <label class="sch-field">
+          <span>Privé JSON</span>
+          <textarea id="import-text" spellcheck="false" placeholder='{"schema":"schlichting-v1", ...}'></textarea>
+        </label>
+        <div class="sch-actions">
+          <button class="btn btn--primary" type="button" id="import-data">Importeer en valideer</button>
+          <button class="btn btn--ghost" type="button" id="copy-prompt">Kopieer NotebookLM-prompt</button>
+        </div>
+        <div class="sch-validation" id="validation-panel"></div>
+      </article>
+
+      <article class="sch-card">
+        <p class="sch-label">NotebookLM prompt</p>
+        <h2>Laat NotebookLM brondata maken</h2>
+        <pre class="sch-prompt" id="notebook-prompt"></pre>
+      </article>
+    </section>
+
+    <section class="sch-view" id="view-prep">
+      <article class="sch-card">
+        <div class="sch-section-head">
+          <div>
+            <p class="sch-label">Toetsritme</p>
+            <h2>15 minuten voorbereiding</h2>
+            <p>Werk van testsituatie naar start, afname, scoring en foutverantwoording.</p>
+          </div>
+          <div class="sch-timer">
+            <strong id="timer-display">15:00</strong>
+            <button class="btn btn--primary" type="button" id="timer-toggle">Start</button>
+          </div>
+        </div>
+        <div class="sch-prep-grid" id="prep-grid"></div>
+      </article>
+    </section>
+
+    <section class="sch-view" id="view-wizard">
+      <article class="sch-card">
+        <p class="sch-label">Leeftijd → startpunt</p>
+        <h2>Startwizard</h2>
+        <div class="sch-wizard">
+          <label class="sch-field">
+            <span>Geboortedatum</span>
+            <input type="date" id="birth-date" />
+          </label>
+          <label class="sch-field">
+            <span>Testdatum</span>
+            <input type="date" id="test-date" />
+          </label>
+          <button class="btn btn--primary" type="button" id="calculate-age">Bereken start</button>
+        </div>
+        <div class="sch-wizard-result" id="wizard-result"></div>
+      </article>
+    </section>
+
+    <section class="sch-view" id="view-taalbegrip">
+      <article class="sch-card">
+        <div class="sch-section-head">
+          <div>
+            <p class="sch-label">Afnamecockpit</p>
+            <h2>Taalbegrip</h2>
+          </div>
+          <div class="sch-actions">
+            <button class="btn btn--ghost" type="button" data-prev="taalbegrip">Vorige</button>
+            <button class="btn btn--primary" type="button" data-next="taalbegrip">Volgende</button>
+          </div>
+        </div>
+        <div id="taalbegrip-cockpit"></div>
+      </article>
+    </section>
+
+    <section class="sch-view" id="view-zinsontwikkeling">
+      <article class="sch-card">
+        <div class="sch-section-head">
+          <div>
+            <p class="sch-label">Afnamecockpit</p>
+            <h2>Zinsontwikkeling</h2>
+          </div>
+          <div class="sch-actions">
+            <button class="btn btn--ghost" type="button" data-prev="zinsontwikkeling">Vorige</button>
+            <button class="btn btn--primary" type="button" data-next="zinsontwikkeling">Volgende</button>
+          </div>
+        </div>
+        <div id="zinsontwikkeling-cockpit"></div>
+      </article>
+    </section>
+
+    <section class="sch-view" id="view-scripts">
+      <article class="sch-card">
+        <p class="sch-label">ZG-scriptcoach</p>
+        <h2>Maak je docentantwoord strak</h2>
+        <div class="sch-script-list" id="script-list"></div>
+      </article>
+    </section>
+
+    <section class="sch-view" id="view-simulation">
+      <article class="sch-card">
+        <div class="sch-section-head">
+          <div>
+            <p class="sch-label">Kale toets</p>
+            <h2>Simulatie zonder tekststeun</h2>
+            <p>Kies een onderdeel, spreek hardop, score jezelf direct 0-4 en herstel het onderdeel.</p>
+          </div>
+          <select id="simulation-part" aria-label="Kies simulatieonderdeel">
+            <option value="setup">Testsituatie</option>
+            <option value="taalbegrip">Taalbegrip-item</option>
+            <option value="zinsontwikkeling">Zinsontwikkeling-item</option>
+            <option value="scoring">Scoring uitleggen</option>
+            <option value="error">Eigen fout verantwoorden</option>
+          </select>
+        </div>
+        <div class="sch-sim-card" id="simulation-card"></div>
+        <div class="sch-score-row" id="simulation-score"></div>
+      </article>
+    </section>
+
+    <section class="sch-view" id="view-dashboard">
+      <article class="sch-card">
+        <p class="sch-label">Bewijs</p>
+        <h2>Scoreoverzicht</h2>
+        <div class="sch-dashboard" id="dashboard"></div>
+      </article>
+    </section>
+  </main>
+  <script src="/schlichting/schema-example.js?v=1"></script>
+  <script src="/schlichting/app.js?v=1"></script>
+</body>
+</html>
