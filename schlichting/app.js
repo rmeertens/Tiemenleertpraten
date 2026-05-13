@@ -13,16 +13,13 @@ const AUDIO_FILE_STORE = 'audioFiles';
 const SCORE_FORM_PAGE_STORE = 'scoreFormPages';
 
 const SOURCE_IMAGE_KINDS = [
-  { id: 'testmap', label: 'Testmap' },
   { id: 'handleiding', label: 'Afnamehandleiding' },
-  { id: 'scoreformulier', label: 'Scoreformulier' }
+  { id: 'testmap', label: 'Testmap' }
 ];
 
 const PRIVATE_SECTION_DEFAULTS = [
-  { id: 'testmap', title: 'Testmap', field: 'testmapText', sourceField: 'testmapSource' },
-  { id: 'handleiding', title: 'Afnamehandleiding', field: 'handleidingText', sourceField: 'handleidingSource' },
-  { id: 'scoreformulier', title: 'Scoreformulier', field: 'scoreformulierText', sourceField: 'scoreformulierSource' },
-  { id: 'stamplijst', title: 'Eigen stamplijst', field: 'stamplijstText', sourceField: 'stamplijstSource' }
+  { id: 'handleiding', title: 'Afnamehandleiding', field: 'handleidingText', sourceField: 'handleidingSource', open: true },
+  { id: 'testmap', title: 'Testmap', field: 'testmapText', sourceField: 'testmapSource', open: false }
 ];
 
 const AUDIO_GROUPS = [
@@ -1260,33 +1257,37 @@ function renderCockpit(type) {
         ['Herhalen', item.repeat],
         ['Intonatie', item.intonation]
       ];
+  const detailFacts = secondaryFacts.filter(([key]) => !['Materiaal', 'Herhalen'].includes(key));
+  const factsHtml = `
+    <div class="sch-facts sch-facts--compact">
+      ${factHtml('Scoring', scoreText(item))}
+      ${factHtml('Bron', item.source)}
+      ${detailFacts.map(([key, value]) => factHtml(key, value)).join('')}
+      ${factHtml('Valkuilen', listText(item.pitfalls))}
+    </div>
+  `;
 
   target.innerHTML = `
     ${type === 'zinsontwikkeling' ? trainingProgressHtml(items.length) : ''}
-    <div class="sch-cockpit-grid">
-      <article class="sch-item-card">
-        <p class="sch-label">${escapeHtml(index + 1)} van ${escapeHtml(items.length)}</p>
-        <h3>${escapeHtml(title)}</h3>
-        <div class="sch-script-line">${escapeHtml(item.script || 'Geen script in import.')}</div>
-        <div class="sch-facts">
-        ${factHtml('Scoring', scoreText(item))}
-        ${factHtml('Bron', item.source)}
-      </div>
-        ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
-        ${type === 'zinsontwikkeling' ? sourceImagesHtml(item) : ''}
-        ${type === 'zinsontwikkeling' ? privateSectionsHtml(item) : ''}
-        ${type === 'zinsontwikkeling' ? rawSourceHtml(item) : ''}
-        ${type === 'zinsontwikkeling' ? audioCheckHtml(item) : ''}
-        ${scoreButtons(`${type}:${item.number}`, `${type} item ${item.number}`)}
-      </article>
-      <aside class="sch-item-card">
-        <p class="sch-label">Waar je op let</p>
-        <div class="sch-facts">
-          ${secondaryFacts.map(([key, value]) => factHtml(key, value)).join('')}
-          ${factHtml('Valkuilen', listText(item.pitfalls))}
+    <article class="sch-item-card sch-item-card--wide">
+      <div class="sch-item-headline">
+        <div>
+          <p class="sch-label">${escapeHtml(index + 1)} van ${escapeHtml(items.length)}</p>
+          <h3>${escapeHtml(title)}</h3>
         </div>
-      </aside>
-    </div>
+        <div class="sch-item-headline-facts">
+          ${factHtml('Materiaal', item.material)}
+          ${factHtml('Herhalen', item.repeat)}
+        </div>
+      </div>
+      ${type === 'zinsontwikkeling' ? privateSectionsHtml(item) : ''}
+      <div class="sch-script-line">${escapeHtml(displayScript(item))}</div>
+      ${factsHtml}
+      ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
+      ${type === 'zinsontwikkeling' ? rawSourceHtml(item) : ''}
+      ${type === 'zinsontwikkeling' ? audioCheckHtml(item) : ''}
+      ${scoreButtons(`${type}:${item.number}`, `${type} item ${item.number}`)}
+    </article>
   `;
   bindScoreButtons();
   bindAudioButtons();
@@ -1294,6 +1295,16 @@ function renderCockpit(type) {
   bindSourceImageControls();
   bindTrainingControls();
   renderAudioFab();
+}
+
+function displayScript(item) {
+  if (hasUsefulText(privateSectionText(item, 'handleiding'))) {
+    return 'Volledige afname staat hierboven in Afnamehandleiding. Gebruik die als leidend script.';
+  }
+  if (hasUsefulText(privateSectionText(item, 'testmap')) || hasUsefulText(item.rawBlock)) {
+    return 'Korte cue uit import verborgen om verwarring te voorkomen. Gebruik de bronkaart hierboven.';
+  }
+  return item.fullScript || item.completeScript || item.script || 'Geen script in import.';
 }
 
 function trainingProgressHtml(totalItems) {
@@ -1364,13 +1375,13 @@ function privateSectionsHtml(item) {
   const sections = normalizePrivateSections(item);
   return `
     <div class="sch-private-sections">
-      <p class="sch-label">Privé tekst per item</p>
       ${sections.map(section => `
-        <details class="sch-private-section">
+        <details class="sch-private-section sch-private-section--${escapeHtml(section.id)}" ${section.open ? 'open' : ''}>
           <summary>
             <span>${escapeHtml(section.title || 'Privé tekst')}</span>
             ${section.source ? `<small>${escapeHtml(section.source)}</small>` : ''}
           </summary>
+          ${sourceImageInlineHtml(item.number, section.id)}
           <div class="sch-private-section-body">
             ${hasUsefulText(section.body)
               ? formatPrivateText(section.body)
@@ -1386,11 +1397,11 @@ function normalizePrivateSections(item) {
   const explicit = Array.isArray(item.privateSections) ? item.privateSections : [];
   const byTitle = new Map();
   explicit.forEach(section => {
-    if (!section?.title) return;
-    byTitle.set(section.title.toLowerCase(), section);
+    if (section?.title) byTitle.set(section.title.toLowerCase(), section);
+    if (section?.id) byTitle.set(section.id.toLowerCase(), section);
   });
   return PRIVATE_SECTION_DEFAULTS.map(defaultSection => {
-    const explicitSection = byTitle.get(defaultSection.title.toLowerCase());
+    const explicitSection = byTitle.get(defaultSection.title.toLowerCase()) || byTitle.get(defaultSection.id);
     return {
       ...defaultSection,
       ...(explicitSection || {}),
@@ -1401,10 +1412,21 @@ function normalizePrivateSections(item) {
   });
 }
 
+function privateSectionText(item, sectionId) {
+  const explicit = Array.isArray(item.privateSections)
+    ? item.privateSections.find(section => {
+        const title = String(section?.title || '').toLowerCase();
+        const id = String(section?.id || '').toLowerCase();
+        return id === sectionId || title === sectionId || (sectionId === 'handleiding' && title.includes('handleiding'));
+      })
+    : null;
+  if (hasUsefulText(explicit?.body)) return explicit.body;
+  return fallbackPrivateText(item, sectionId);
+}
+
 function fallbackPrivateText(item, sectionId) {
-  if (sectionId === 'handleiding') return item.manualText || '';
-  if (sectionId === 'scoreformulier') return item.scoreFormText || '';
-  if (sectionId === 'stamplijst') return item.stampListText || '';
+  if (sectionId === 'handleiding') return item.handleidingText || item.manualText || '';
+  if (sectionId === 'testmap') return item.testmapText || '';
   return '';
 }
 
@@ -1500,18 +1522,10 @@ function inlineMarkdown(value) {
     .replace(/\*([^*]+)\*/g, '<em>$1</em>');
 }
 
-function sourceImagesHtml(item) {
-  return `
-    <div class="sch-source-images">
-      <div>
-        <p class="sch-label">Privé bronfoto's</p>
-        <p class="sch-score-note">Upload per item je eigen PNG/JPG. De foto's blijven lokaal in deze browser, komen niet in GitHub en zitten alleen in je privéback-up als je die exporteert.</p>
-      </div>
-      <div class="sch-source-image-grid">
-        ${SOURCE_IMAGE_KINDS.map(kind => sourceImageSlotHtml(item.number, kind)).join('')}
-      </div>
-    </div>
-  `;
+function sourceImageInlineHtml(itemNumber, kindId) {
+  const kind = SOURCE_IMAGE_KINDS.find(candidate => candidate.id === kindId);
+  if (!kind) return '';
+  return `<div class="sch-source-image-inline">${sourceImageSlotHtml(itemNumber, kind)}</div>`;
 }
 
 function sourceImageSlotHtml(itemNumber, kind) {
