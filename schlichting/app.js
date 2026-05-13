@@ -2,6 +2,7 @@
 
 const STORAGE_KEY = 'schlichting_private_data_v1';
 const SCORE_KEY = 'schlichting_private_scores_v1';
+const TRAINING_KEY = 'schlichting_private_training_v1';
 const PREP_KEY = 'schlichting_private_prep_v1';
 const AUDIO_TIMES_KEY = 'schlichting_private_audio_times_v1';
 const SCORE_FORM_PENCIL_KEY = 'schlichting_scoreformulier_potlood_v1';
@@ -221,6 +222,7 @@ const state = {
   view: 'import',
   data: readData(),
   scores: readJson(SCORE_KEY, []),
+  training: readJson(TRAINING_KEY, { sessions: [], current: null }),
   prep: readJson(PREP_KEY, {}),
   itemIndex: {
     taalbegrip: 0,
@@ -233,6 +235,7 @@ const state = {
     groups: {},
     segments: {},
     activeStop: null,
+    currentItem: null,
     saved: readJson(AUDIO_TIMES_KEY, {})
   },
   sourceImages: {},
@@ -270,6 +273,9 @@ const els = {
   audioImport: document.getElementById('audio-import'),
   audioPanel: document.getElementById('audio-panel'),
   audioPlayer: document.getElementById('audio-player'),
+  audioFab: document.getElementById('audio-fab'),
+  audioFabTitle: document.getElementById('audio-fab-title'),
+  audioFabTime: document.getElementById('audio-fab-time'),
   scoreFormPaper: document.getElementById('scoreform-paper'),
   scoreFormDock: document.getElementById('scoreform-dock'),
   scoreFormFab: document.getElementById('scoreform-fab'),
@@ -318,6 +324,10 @@ function bindEvents() {
   document.getElementById('copy-prompt').addEventListener('click', copyPrompt);
   document.getElementById('privacy-check').addEventListener('click', privacyCheck);
   document.getElementById('clear-audio').addEventListener('click', clearAudio);
+  els.audioFab?.addEventListener('click', () => {
+    const itemNumber = currentZinsItemNumber();
+    if (itemNumber) playAudioSegment(itemNumber);
+  });
   document.getElementById('open-scoreform-dock')?.addEventListener('click', () => setScoreFormDock({ open: true, collapsed: false }));
   document.getElementById('scoreform-fab')?.addEventListener('click', () => setScoreFormDock({ open: true, collapsed: false }));
   document.getElementById('close-scoreform-dock')?.addEventListener('click', () => setScoreFormDock({ open: false }));
@@ -349,6 +359,7 @@ function renderAll() {
   renderScripts();
   renderAudioImport();
   renderAudioPanel();
+  renderAudioFab();
   renderScoreFormDock();
   renderScoreFormPaper();
   renderSimulation();
@@ -366,6 +377,7 @@ function showView(view) {
   document.querySelectorAll('.sch-view').forEach(section => {
     section.classList.toggle('is-active', section.id === `view-${view}`);
   });
+  renderAudioFab();
 }
 
 function persistScoreFormDock() {
@@ -432,6 +444,7 @@ async function importData() {
     const importedSourceImages = parsed._privateSourceImages || parsed.privateSourceImages || null;
     const importedScoreFormPages = parsed._privateScoreFormPages || parsed.privateScoreFormPages || null;
     const importedScoreFormStrokes = parsed._privateScoreFormStrokes || parsed.privateScoreFormStrokes || null;
+    const importedTraining = parsed._privateTraining || parsed.privateTraining || null;
     delete parsed._privateAudioTimes;
     delete parsed.privateAudioTimes;
     delete parsed._privateSourceImages;
@@ -440,6 +453,8 @@ async function importData() {
     delete parsed.privateScoreFormPages;
     delete parsed._privateScoreFormStrokes;
     delete parsed.privateScoreFormStrokes;
+    delete parsed._privateTraining;
+    delete parsed.privateTraining;
     if (parsed.schema !== 'schlichting-v1' && (parsed.rules || parsed.items || parsed.rubric || parsed.zgScripts)) {
       parsed = mergePartialImports([parsed]);
     }
@@ -464,6 +479,13 @@ async function importData() {
     if (importedScoreFormStrokes && typeof importedScoreFormStrokes === 'object') {
       state.scoreForm.strokes = importedScoreFormStrokes;
       localStorage.setItem(SCORE_FORM_PENCIL_KEY, JSON.stringify(importedScoreFormStrokes));
+    }
+    if (importedTraining && typeof importedTraining === 'object') {
+      state.training = {
+        sessions: Array.isArray(importedTraining.sessions) ? importedTraining.sessions : [],
+        current: importedTraining.current && typeof importedTraining.current === 'object' ? importedTraining.current : null
+      };
+      saveTraining();
     }
     els.validation.innerHTML = validationHtml(validation);
     renderAll();
@@ -947,6 +969,7 @@ async function exportData() {
     _privateSourceImages: privateSourceImages,
     _privateScoreFormPages: privateScoreFormPages,
     _privateScoreFormStrokes: state.scoreForm.strokes,
+    _privateTraining: state.training,
     _exportedAt: new Date().toISOString()
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -961,6 +984,7 @@ async function exportData() {
 async function clearData() {
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(SCORE_KEY);
+  localStorage.removeItem(TRAINING_KEY);
   localStorage.removeItem(PREP_KEY);
   localStorage.removeItem(AUDIO_TIMES_KEY);
   localStorage.removeItem(SCORE_FORM_PENCIL_KEY);
@@ -976,6 +1000,7 @@ async function clearData() {
   });
   state.data = null;
   state.scores = [];
+  state.training = { sessions: [], current: null };
   state.prep = {};
   state.sourceImages = {};
   state.audio.groups = {};
@@ -1204,6 +1229,9 @@ function renderCockpit(type) {
   const index = clamp(state.itemIndex[type], 0, items.length - 1);
   state.itemIndex[type] = index;
   const item = items[index];
+  if (type === 'zinsontwikkeling' && state.view === 'zinsontwikkeling') {
+    markZinsTrainingItem(item.number, items.length);
+  }
   const isTaalbegrip = type === 'taalbegrip';
   const title = isTaalbegrip ? `Item ${item.number}` : `Zinsontwikkeling ${item.number}`;
   const secondaryFacts = isTaalbegrip
@@ -1227,6 +1255,7 @@ function renderCockpit(type) {
       ];
 
   target.innerHTML = `
+    ${type === 'zinsontwikkeling' ? trainingProgressHtml(items.length) : ''}
     <div class="sch-cockpit-grid">
       <article class="sch-item-card">
         <p class="sch-label">${escapeHtml(index + 1)} van ${escapeHtml(items.length)}</p>
@@ -1241,7 +1270,6 @@ function renderCockpit(type) {
         ${type === 'zinsontwikkeling' ? privateSectionsHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? rawSourceHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? audioCheckHtml(item) : ''}
-        ${type === 'zinsontwikkeling' ? audioForItemHtml(item.number) : ''}
         ${scoreButtons(`${type}:${item.number}`, `${type} item ${item.number}`)}
       </article>
       <aside class="sch-item-card">
@@ -1257,6 +1285,41 @@ function renderCockpit(type) {
   bindAudioButtons();
   bindMaterialChecks();
   bindSourceImageControls();
+  bindTrainingControls();
+  renderAudioFab();
+}
+
+function trainingProgressHtml(totalItems) {
+  const current = ensureTrainingCurrent(totalItems, false);
+  const latest = latestCompletedTrainingSession(totalItems);
+  const completedToday = !current && latest?.date === localDateKey();
+  const visitedCount = completedToday ? totalItems : current?.visited?.length || 0;
+  const percent = totalItems ? Math.round((visitedCount / totalItems) * 100) : 0;
+  const elapsed = completedToday
+    ? latest.durationMs
+    : current?.startedAt
+      ? Math.max(0, Date.now() - new Date(current.startedAt).getTime())
+      : 0;
+  const streak = trainingStreak(state.training.sessions);
+  const statusText = completedToday
+    ? `ronde klaar · streak ${streak} dag${streak === 1 ? '' : 'en'} · ${formatDuration(elapsed)}`
+    : `${percent}% doorlopen · streak ${streak} dag${streak === 1 ? '' : 'en'} · ${formatDuration(elapsed)} bezig`;
+  return `
+    <article class="sch-training-strip">
+      <div>
+        <p class="sch-label">Dagelijkse ronde</p>
+        <strong>${escapeHtml(visitedCount)} / ${escapeHtml(totalItems)} items</strong>
+        <span>${escapeHtml(statusText)}</span>
+      </div>
+      <div class="sch-training-bar" aria-label="Voortgang Zinsontwikkeling">
+        <span style="width:${escapeHtml(percent)}%"></span>
+      </div>
+      <div class="sch-actions">
+        <button class="btn btn--ghost" type="button" data-training-reset>Nieuwe ronde</button>
+        <button class="btn btn--primary" type="button" data-view-score>Bekijk progressie</button>
+      </div>
+    </article>
+  `;
 }
 
 function materialChecklistHtml(item) {
@@ -1523,6 +1586,130 @@ function moveItem(type, delta) {
   if (!items.length) return;
   state.itemIndex[type] = clamp(state.itemIndex[type] + delta, 0, items.length - 1);
   renderCockpit(type);
+}
+
+function ensureTrainingCurrent(totalItems, create = true) {
+  state.training.sessions = Array.isArray(state.training.sessions) ? state.training.sessions : [];
+  const current = state.training.current;
+  if (current && !current.completedAt) {
+    current.totalItems = totalItems;
+    current.visited = Array.isArray(current.visited) ? current.visited : [];
+    return current;
+  }
+  if (!create) return current && !current.completedAt ? current : null;
+  state.training.current = {
+    id: `zo-${Date.now()}`,
+    type: 'zinsontwikkeling',
+    startedAt: new Date().toISOString(),
+    totalItems,
+    visited: []
+  };
+  saveTraining();
+  return state.training.current;
+}
+
+function markZinsTrainingItem(itemNumber, totalItems) {
+  const current = ensureTrainingCurrent(totalItems, true);
+  const number = Number(itemNumber);
+  if (!current.visited.includes(number)) {
+    current.visited.push(number);
+    current.visited.sort((a, b) => a - b);
+    current.lastItemAt = new Date().toISOString();
+    if (current.visited.length >= totalItems) completeZinsTrainingRound(current);
+    saveTraining();
+  }
+}
+
+function completeZinsTrainingRound(current) {
+  if (current.completedAt) return;
+  const now = new Date();
+  const started = new Date(current.startedAt);
+  const durationMs = Math.max(0, now.getTime() - started.getTime());
+  const session = {
+    id: current.id,
+    type: 'zinsontwikkeling',
+    date: localDateKey(now),
+    startedAt: current.startedAt,
+    completedAt: now.toISOString(),
+    durationMs,
+    minutes: Math.max(1, Math.round(durationMs / 60000)),
+    totalItems: current.totalItems,
+    visited: [...current.visited]
+  };
+  const existing = new Set(state.training.sessions.map(item => item.id));
+  if (!existing.has(session.id)) state.training.sessions.unshift(session);
+  state.training.sessions = state.training.sessions.slice(0, 120);
+  state.training.current = null;
+}
+
+function resetTrainingRound() {
+  state.training.current = null;
+  saveTraining();
+  renderCockpit('zinsontwikkeling');
+  renderDashboard();
+}
+
+function saveTraining() {
+  localStorage.setItem(TRAINING_KEY, JSON.stringify(state.training));
+}
+
+function bindTrainingControls() {
+  document.querySelectorAll('[data-training-reset]').forEach(button => {
+    if (button.dataset.bound === 'true') return;
+    button.dataset.bound = 'true';
+    button.addEventListener('click', resetTrainingRound);
+  });
+  document.querySelectorAll('[data-view-score]').forEach(button => {
+    if (button.dataset.bound === 'true') return;
+    button.dataset.bound = 'true';
+    button.addEventListener('click', () => showView('dashboard'));
+  });
+}
+
+function localDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function addDays(dateKey, days) {
+  const date = new Date(`${dateKey}T12:00:00`);
+  date.setDate(date.getDate() + days);
+  return localDateKey(date);
+}
+
+function uniqueSessionDates(sessions = []) {
+  return [...new Set(sessions.map(item => item.date).filter(Boolean))].sort().reverse();
+}
+
+function latestCompletedTrainingSession(totalItems) {
+  const sessions = Array.isArray(state.training.sessions) ? state.training.sessions : [];
+  return sessions.find(session => session.type === 'zinsontwikkeling' && (!totalItems || session.totalItems === totalItems)) || null;
+}
+
+function trainingStreak(sessions = []) {
+  const dates = new Set(uniqueSessionDates(sessions));
+  let cursor = localDateKey();
+  if (!dates.has(cursor) && dates.has(addDays(cursor, -1))) cursor = addDays(cursor, -1);
+  let streak = 0;
+  while (dates.has(cursor)) {
+    streak += 1;
+    cursor = addDays(cursor, -1);
+  }
+  return streak;
+}
+
+function formatDuration(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  return `${minutes}:${seconds}`;
+}
+
+function formatMinutes(minutes) {
+  if (!Number.isFinite(minutes) || minutes <= 0) return '-';
+  return `${Math.round(minutes)} min`;
 }
 
 function emptyStateHtml(type) {
@@ -1818,6 +2005,25 @@ function audioForItemHtml(itemNumber) {
   `;
 }
 
+function currentZinsItemNumber() {
+  const items = getItems('zinsontwikkeling');
+  if (!items.length) return null;
+  const index = clamp(state.itemIndex.zinsontwikkeling, 0, items.length - 1);
+  return Number(items[index]?.number) || null;
+}
+
+function renderAudioFab() {
+  if (!els.audioFab) return;
+  const itemNumber = currentZinsItemNumber();
+  const segment = itemNumber ? state.audio.segments[itemNumber] : null;
+  const show = state.view === 'zinsontwikkeling' && Boolean(segment);
+  els.audioFab.hidden = !show;
+  els.audioFab.classList.toggle('is-playing', Boolean(show && state.audio.currentItem === itemNumber && !els.audioPlayer.paused));
+  if (!show) return;
+  els.audioFabTitle.textContent = `ZO ${itemNumber}`;
+  els.audioFabTime.textContent = `${formatSeconds(segment.start)} - ${formatSeconds(segment.end)}`;
+}
+
 function renderScoreFormPaper() {
   if (!els.scoreFormPaper) return;
   const pages = state.scoreForm.pages.sort((a, b) => Number(a.pageNumber) - Number(b.pageNumber));
@@ -2080,6 +2286,7 @@ function playAudioSegment(itemNumber, padding = 0) {
     els.audioPlayer.removeEventListener('timeupdate', state.audio.activeStop);
     state.audio.activeStop = null;
   }
+  state.audio.currentItem = itemNumber;
   els.audioPlayer.src = group.url;
   els.audioPlayer.currentTime = Math.max(0, segment.start - padding);
   const stop = () => {
@@ -2087,11 +2294,13 @@ function playAudioSegment(itemNumber, padding = 0) {
       els.audioPlayer.pause();
       els.audioPlayer.removeEventListener('timeupdate', stop);
       state.audio.activeStop = null;
+      state.audio.currentItem = null;
+      renderAudioFab();
     }
   };
   state.audio.activeStop = stop;
   els.audioPlayer.addEventListener('timeupdate', stop);
-  els.audioPlayer.play();
+  els.audioPlayer.play().then(renderAudioFab).catch(renderAudioFab);
 }
 
 function updateAudioTime(input) {
@@ -2372,7 +2581,66 @@ function renderDashboard() {
   const lowest = values.length ? Math.min(...values) : '-';
   const highest = values.length ? Math.max(...values) : '-';
   const last = state.scores[0];
+  const sessions = Array.isArray(state.training.sessions) ? state.training.sessions : [];
+  const durations = sessions.map(item => item.minutes).filter(value => Number.isFinite(value) && value > 0);
+  const lastSession = sessions[0];
+  const lastSeven = durations.slice(0, 7);
+  const lastSevenAverage = lastSeven.length ? lastSeven.reduce((sum, value) => sum + value, 0) / lastSeven.length : 0;
+  const fastest = durations.length ? Math.min(...durations) : 0;
+  const streak = trainingStreak(sessions);
   els.dashboard.innerHTML = `
+    <div class="sch-dashboard-section">
+      <div class="sch-dashboard-section-head">
+        <div>
+          <p class="sch-label">Dagelijkse ZO-ronde</p>
+          <h3>Maak de ketting zichtbaar</h3>
+        </div>
+        <button class="btn btn--primary" type="button" data-view-zins>Verder trainen</button>
+      </div>
+      <div class="sch-dashboard-grid">
+        ${statHtml('Streak', `${streak} dag${streak === 1 ? '' : 'en'}`)}
+        ${statHtml('Rondes', sessions.length)}
+        ${statHtml('Laatste tijd', lastSession ? formatMinutes(lastSession.minutes) : '-')}
+        ${statHtml('Snelste', fastest ? formatMinutes(fastest) : '-')}
+      </div>
+      <div class="sch-dashboard-grid sch-dashboard-grid--compact">
+        ${statHtml('Gem. laatste 7', lastSevenAverage ? formatMinutes(lastSevenAverage) : '-')}
+        ${statHtml('Vandaag', sessions.some(item => item.date === localDateKey()) ? 'klaar' : 'open')}
+        ${statHtml('Dekking', lastSession ? `${lastSession.visited?.length || 0}/${lastSession.totalItems || 36}` : '-')}
+        ${statHtml('Tempo', trainingTempoLabel(sessions))}
+      </div>
+      <div class="sch-history sch-training-history">
+        ${sessions.length ? sessions.slice(0, 8).map(session => `
+          <article>
+            <strong>${escapeHtml(formatDateLabel(session.date))}</strong><br>
+            ${escapeHtml(formatMinutes(session.minutes))} · ${escapeHtml(session.visited?.length || 0)} / ${escapeHtml(session.totalItems || 36)} items
+          </article>
+        `).join('') : '<article>Nog geen volledige Zinsontwikkeling-ronde. Doorloop alle ZO-items één keer om je eerste streak-dag te zetten.</article>'}
+      </div>
+    </div>
+    <div class="sch-dashboard-section">
+      <div class="sch-dashboard-section-head">
+        <div>
+          <p class="sch-label">Meetbaar maken</p>
+          <h3>Progressie die echt iets zegt</h3>
+        </div>
+      </div>
+      <div class="sch-metric-list">
+        ${metricHtml('Dekking', 'Heb je alle ZO-items gezien, niet alleen je favorieten?')}
+        ${metricHtml('Rondetijd', 'Wordt de route sneller zonder dat je slordig wordt?')}
+        ${metricHtml('Streak', 'Hoeveel dagen achter elkaar hou je het vast?')}
+        ${metricHtml('Zelfscore', 'Scoor timing, materiaalregie en scoring steeds 0-4.')}
+        ${metricHtml('Foutenreeks', 'Noteer waar je 2 dagen achter elkaar struikelt. Dat zijn je drill-items.')}
+        ${metricHtml('Papiercheck', 'Gebruik het potloodformulier om na afloop handmatig je scorecontrole te doen.')}
+      </div>
+    </div>
+    <div class="sch-dashboard-section">
+      <div class="sch-dashboard-section-head">
+        <div>
+          <p class="sch-label">Toetsklaar-score</p>
+          <h3>Strenge oefenscores</h3>
+        </div>
+      </div>
     <div class="sch-dashboard-grid">
       ${statHtml('Pogingen', state.scores.length)}
       ${statHtml('Gemiddeld', values.length ? average.toFixed(1) : '-')}
@@ -2383,11 +2651,37 @@ function renderDashboard() {
       ${last ? `<article><strong>Laatste poging: ${escapeHtml(last.label)}</strong><br>${escapeHtml(last.value)} / 4 · ${escapeHtml(last.text)}</article>` : '<article>Nog geen scores. Doe een simulatie of score een cockpit-item.</article>'}
       ${state.scores.slice(1, 8).map(item => `<article>${escapeHtml(item.label)} · ${escapeHtml(item.value)} / 4 · ${escapeHtml(item.text)}</article>`).join('')}
     </div>
+    </div>
   `;
+  els.dashboard.querySelector('[data-view-zins]')?.addEventListener('click', () => showView('zinsontwikkeling'));
 }
 
 function statHtml(label, value) {
   return `<article class="sch-dashboard-stat"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></article>`;
+}
+
+function metricHtml(label, text) {
+  return `<article><strong>${escapeHtml(label)}</strong><span>${escapeHtml(text)}</span></article>`;
+}
+
+function trainingTempoLabel(sessions) {
+  if (!sessions.length) return '-';
+  if (sessions.length === 1) return 'basislijn';
+  const latest = sessions[0].minutes;
+  const previous = sessions[1].minutes;
+  if (!Number.isFinite(latest) || !Number.isFinite(previous)) return '-';
+  if (latest < previous) return `${previous - latest} min sneller`;
+  if (latest > previous) return `${latest - previous} min trager`;
+  return 'gelijk';
+}
+
+function formatDateLabel(dateKey) {
+  if (!dateKey) return 'Onbekende datum';
+  const today = localDateKey();
+  if (dateKey === today) return 'Vandaag';
+  if (dateKey === addDays(today, -1)) return 'Gisteren';
+  const [year, month, day] = dateKey.split('-');
+  return `${day}-${month}-${year}`;
 }
 
 function factHtml(label, value) {
