@@ -95,6 +95,13 @@ Verplichte hoofdstructuur:
         "repeat": "...",
         "intonation": "...",
         "pitfalls": ["..."],
+        "audioCheck": {
+          "audioFile": "ZO1-10.mp3",
+          "spokenStimulus": "wat je hoort in de opname",
+          "estimatedStart": "0:00",
+          "estimatedEnd": "0:10",
+          "intonationNotes": ["waar let je auditief op"]
+        },
         "source": "..."
       }
     ]
@@ -124,7 +131,7 @@ Deel 1: Schlichting Taalbegrip
 Verzamel leeftijdsbereik, startregels, terugkeerregels, afbreekregels, testsituatie, materiaal, zichtbaarheid, houding testleider, neutraliteit, secties, exacte itemzinnen, correcte responsen, foutresponsen, scoring, toegestane herhaling, verboden hulp, valkuilen en toetsverantwoording.
 
 Deel 2: Schlichting Taalproductie-3 Zinsontwikkeling
-Verzamel algemene instructie, oefenitems, exacte stimuluszinnen, materiaal per item, handelingen per item, doelconstructies, morfosyntactische criteria, correcte/incorrecte voorbeelden, toegestane variaties, scoringdetails, herhaling, intonatie/prosodie, valkuilen, onderscheid met articulatie/fonologie en toetsverantwoording.
+Verzamel algemene instructie, oefenitems, exacte stimuluszinnen, materiaal per item, handelingen per item, doelconstructies, morfosyntactische criteria, correcte/incorrecte voorbeelden, toegestane variaties, scoringdetails, herhaling, intonatie/prosodie, valkuilen, onderscheid met articulatie/fonologie en toetsverantwoording. Als je audiobronnen of transcripties hebt: voeg per item audioCheck toe met bestandsnaam, hoorbare stimulus, globale start/eindtijd en intonatiepunten. Markeer tijden als schatting wanneer ze niet uit een echte tijdlijn komen.
 
 Deel 3: ZG-checklist
 Maak criteria voor neutraal aanbieden, exact formuleren, juist starten, juist afbreken, juist scoren, impulsief kindgedrag begrenzen, eigen fout herkennen, betrouwbaarheid/validiteit benoemen.
@@ -702,6 +709,8 @@ function validateZinsontwikkelingCoverage(items, warnings) {
     if (!hasUsefulText(item.target)) warnings.push(`${label}: doelstructuur ontbreekt.`);
     if (!hasUsefulList(item.scoringDetails) && !hasUsefulText(item.scoring)) warnings.push(`${label}: specifieke scoringdetails ontbreken.`);
     if (!hasUsefulList(item.allowedVariations) && Number(item.number) >= 5) warnings.push(`${label}: toegestane variaties zijn nog niet ingevuld.`);
+    if (item.audioCheck && !audioCheckRange(item)) warnings.push(`${label}: audioCheck heeft geen bruikbare start/eindtijd.`);
+    if (item.audioCheck && !hasUsefulText(item.audioCheck.spokenStimulus)) warnings.push(`${label}: audioCheck mist een hoorbare stimulus.`);
   });
 }
 
@@ -865,6 +874,7 @@ function renderCockpit(type) {
       </div>
         ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? rawSourceHtml(item) : ''}
+        ${type === 'zinsontwikkeling' ? audioCheckHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? audioForItemHtml(item.number) : ''}
         ${scoreButtons(`${type}:${item.number}`, `${type} item ${item.number}`)}
       </article>
@@ -910,6 +920,25 @@ function rawSourceHtml(item) {
       <summary>Volledige lokale bronkaart ZO ${escapeHtml(item.number)}</summary>
       <pre>${escapeHtml(item.rawBlock)}</pre>
     </details>
+  `;
+}
+
+function audioCheckHtml(item) {
+  const check = item.audioCheck;
+  if (!check || typeof check !== 'object') return '';
+  const range = audioCheckRange(item);
+  const timing = range ? `${formatSeconds(range.start)} - ${formatSeconds(range.end)}` : 'Geen bruikbare tijd in import';
+  return `
+    <div class="sch-audio-check">
+      <p class="sch-label">Audiocheck uit import</p>
+      <div class="sch-facts">
+        ${factHtml('Bestand', check.audioFile)}
+        ${factHtml('Hoorbare stimulus', check.spokenStimulus)}
+        ${factHtml('Tijd uit import', timing)}
+        ${factHtml('Let op', listText(check.intonationNotes))}
+      </div>
+      <p class="sch-score-note">Gebruik dit als controlekaart. NotebookLM-tijden zijn pas betrouwbaar nadat je ze met de echte mp3 hebt nabeluisterd.</p>
+    </div>
   `;
 }
 
@@ -1166,6 +1195,9 @@ function renderAudioPanel() {
   els.audioPanel.querySelectorAll('[data-audio-equal]').forEach(button => {
     button.addEventListener('click', () => resplitAudioGroup(button.dataset.audioEqual, 'equal'));
   });
+  els.audioPanel.querySelectorAll('[data-audio-json]').forEach(button => {
+    button.addEventListener('click', () => applyImportedAudioTimes(button.dataset.audioJson));
+  });
   els.audioPanel.querySelectorAll('[data-audio-time]').forEach(input => {
     input.addEventListener('change', () => updateAudioTime(input));
   });
@@ -1174,12 +1206,16 @@ function renderAudioPanel() {
 function groupControlHtml(group) {
   const loaded = state.audio.groups[group.id];
   if (!loaded) return '';
+  const imported = importedAudioSegmentsForGroup(group);
+  const hasJsonTimes = imported.length === group.expected;
+  const lastJsonEnd = imported.length ? Math.max(...imported.map(segment => segment.end)) : 0;
   return `
     <div class="sch-audio-group-control">
       <strong>${escapeHtml(group.label)}</strong>
+      <button class="btn btn--ghost" type="button" data-audio-json="${escapeHtml(group.id)}" ${hasJsonTimes ? '' : 'disabled'}>Gebruik JSON-tijden</button>
       <button class="btn btn--ghost" type="button" data-audio-autosplit="${escapeHtml(group.id)}">Detecteer opnieuw</button>
       <button class="btn btn--ghost" type="button" data-audio-equal="${escapeHtml(group.id)}">Evenredig verdelen</button>
-      <span class="sch-audio-mini">${escapeHtml(loaded.method)} · correcties worden lokaal bewaard</span>
+      <span class="sch-audio-mini">${escapeHtml(loaded.method)} · JSON ${escapeHtml(imported.length)}/${escapeHtml(group.expected)}${hasJsonTimes ? ` · laatste JSON-einde ${escapeHtml(formatSeconds(lastJsonEnd))} op mp3 ${escapeHtml(formatSeconds(loaded.duration))}` : ''} · correcties worden lokaal bewaard</span>
     </div>
   `;
 }
@@ -1276,6 +1312,92 @@ function resplitAudioGroup(groupId, mode) {
   renderAudioImport();
   renderAudioPanel();
   renderCockpit('zinsontwikkeling');
+}
+
+function applyImportedAudioTimes(groupId) {
+  const groupDef = AUDIO_GROUPS.find(group => group.id === groupId);
+  const group = state.audio.groups[groupId];
+  if (!groupDef || !group) return;
+  const imported = importedAudioSegmentsForGroup(groupDef);
+  if (imported.length !== groupDef.expected) {
+    window.alert(`Voor ${groupDef.label} zijn ${imported.length}/${groupDef.expected} JSON-tijden beschikbaar. Vul eerst alle audioCheck-tijden aan.`);
+    return;
+  }
+  const next = imported.map(segment => {
+    const start = clamp(roundTime(segment.start), 0, group.duration);
+    const end = clamp(roundTime(segment.end), 0, group.duration);
+    return {
+      item: segment.item,
+      groupId,
+      start,
+      end
+    };
+  }).filter(segment => segment.end > segment.start);
+  if (next.length !== groupDef.expected) {
+    window.alert('Een of meer JSON-tijden vallen buiten de mp3 of hebben geen geldige duur. Controleer estimatedStart en estimatedEnd.');
+    return;
+  }
+  group.segments = next;
+  group.method = 'JSON-tijden uit import';
+  next.forEach(segment => {
+    state.audio.segments[segment.item] = segment;
+  });
+  saveAudioSegments(groupId);
+  renderAudioImport();
+  renderAudioPanel();
+  renderCockpit('zinsontwikkeling');
+}
+
+function importedAudioSegmentsForGroup(group) {
+  return getItems('zinsontwikkeling')
+    .filter(item => Number(item.number) >= group.start && Number(item.number) <= group.end)
+    .map(item => {
+      const checkGroup = audioGroupIdFromCheck(item);
+      if (checkGroup && checkGroup !== group.id) return null;
+      const range = audioCheckRange(item);
+      if (!range) return null;
+      return {
+        item: Number(item.number),
+        groupId: group.id,
+        start: range.start,
+        end: range.end
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.item - b.item);
+}
+
+function audioGroupIdFromCheck(item) {
+  const file = String(item?.audioCheck?.audioFile || '').toLowerCase();
+  if (file.includes('zo1-10') || file.includes('zo1_10')) return 'zo1-10';
+  if (file.includes('zo11-20') || file.includes('zo11_20')) return 'zo11-20';
+  if (file.includes('zo21-36') || file.includes('zo21_36')) return 'zo21-36';
+  return audioGroupForItem(Number(item?.number))?.id || '';
+}
+
+function audioGroupForItem(itemNumber) {
+  return AUDIO_GROUPS.find(group => itemNumber >= group.start && itemNumber <= group.end) || null;
+}
+
+function audioCheckRange(item) {
+  const check = item?.audioCheck;
+  if (!check || typeof check !== 'object') return null;
+  const start = parseTimestamp(check.estimatedStart);
+  const end = parseTimestamp(check.estimatedEnd);
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null;
+  return { start: roundTime(start), end: roundTime(end) };
+}
+
+function parseTimestamp(value) {
+  if (typeof value === 'number') return value;
+  const text = String(value || '').trim().replace(',', '.');
+  if (!text) return NaN;
+  if (/^\d+(?:\.\d+)?$/.test(text)) return Number(text);
+  const parts = text.split(':').map(part => Number(part));
+  if (parts.some(part => !Number.isFinite(part))) return NaN;
+  if (parts.length === 2) return (parts[0] * 60) + parts[1];
+  if (parts.length === 3) return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
+  return NaN;
 }
 
 function saveAudioSegments(groupId) {
@@ -1427,6 +1549,14 @@ function randomFrom(items) {
 
 function roundTime(value) {
   return Math.max(0, Math.round(Number(value) * 100) / 100);
+}
+
+function formatSeconds(value) {
+  const safe = Math.max(0, Number(value) || 0);
+  const minutes = Math.floor(safe / 60);
+  const seconds = Math.round((safe - (minutes * 60)) * 100) / 100;
+  const secondsText = seconds < 10 ? `0${seconds}` : String(seconds);
+  return `${minutes}:${secondsText}s`;
 }
 
 function clamp(value, min, max) {

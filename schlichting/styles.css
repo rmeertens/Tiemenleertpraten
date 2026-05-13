@@ -372,11 +372,26 @@
   white-space: pre-wrap;
 }
 
+.sch-audio-check {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 10px;
+  margin: 14px 0;
+  padding: 14px;
+}
+
 .sch-score-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 14px;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
 }
 
 .sch-score-row button {
