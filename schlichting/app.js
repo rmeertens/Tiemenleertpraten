@@ -394,13 +394,20 @@ function setScoreFormDock(patch) {
 function renderScoreFormDock() {
   if (!els.scoreFormDock) return;
   const width = Math.min(Math.max(Number(state.scoreForm.dock.width) || 520, 360), Math.min(window.innerWidth - 32, 980));
+  const open = Boolean(state.scoreForm.dock.open);
+  const collapsed = Boolean(state.scoreForm.dock.collapsed);
+  const reservedWidth = open ? (collapsed ? 52 : width) : 0;
   state.scoreForm.dock.width = width;
   els.scoreFormDock.style.setProperty('--scoreform-width', `${width}px`);
-  els.scoreFormDock.classList.toggle('is-open', Boolean(state.scoreForm.dock.open));
-  els.scoreFormDock.classList.toggle('is-collapsed', Boolean(state.scoreForm.dock.collapsed));
-  els.scoreFormDock.setAttribute('aria-hidden', String(!state.scoreForm.dock.open));
-  els.scoreFormFab?.classList.toggle('is-hidden', Boolean(state.scoreForm.dock.open && !state.scoreForm.dock.collapsed));
+  document.body.style.setProperty('--scoreform-space', `${reservedWidth}px`);
+  document.body.classList.toggle('sch-scoreform-split', open);
+  document.body.classList.toggle('sch-scoreform-split-collapsed', open && collapsed);
+  els.scoreFormDock.classList.toggle('is-open', open);
+  els.scoreFormDock.classList.toggle('is-collapsed', collapsed);
+  els.scoreFormDock.setAttribute('aria-hidden', String(!open));
+  els.scoreFormFab?.classList.toggle('is-hidden', Boolean(open && !collapsed));
   document.getElementById('collapse-scoreform-dock')?.replaceChildren(document.createTextNode(state.scoreForm.dock.collapsed ? 'Uitklappen' : 'Inklappen'));
+  renderAudioFab();
 }
 
 function startScoreFormResize(event) {
