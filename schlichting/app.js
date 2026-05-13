@@ -709,17 +709,30 @@ function validateZinsontwikkelingCoverage(items, warnings) {
     if (!hasUsefulText(item.target)) warnings.push(`${label}: doelstructuur ontbreekt.`);
     if (!hasUsefulList(item.scoringDetails) && !hasUsefulText(item.scoring)) warnings.push(`${label}: specifieke scoringdetails ontbreken.`);
     if (!hasUsefulList(item.allowedVariations) && Number(item.number) >= 5) warnings.push(`${label}: toegestane variaties zijn nog niet ingevuld.`);
+    if (!hasUsefulList(item.pitfalls)) warnings.push(`${label}: toetsvalkuilen ontbreken.`);
     if (item.audioCheck && !audioCheckRange(item)) warnings.push(`${label}: audioCheck heeft geen bruikbare start/eindtijd.`);
     if (item.audioCheck && !hasUsefulText(item.audioCheck.spokenStimulus)) warnings.push(`${label}: audioCheck mist een hoorbare stimulus.`);
+    if (containsUnresolvedMarker(item)) warnings.push(`${label}: bevat nog BRONCONTROLE NODIG of bron_onduidelijk.`);
   });
 }
 
 function hasUsefulText(value) {
-  return typeof value === 'string' && value.trim() && value.trim() !== 'bron_onduidelijk';
+  const text = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return Boolean(text) && text !== 'bron_onduidelijk' && text !== 'broncontrole nodig';
 }
 
 function hasUsefulList(value) {
   return Array.isArray(value) && value.some(item => hasUsefulText(item));
+}
+
+function containsUnresolvedMarker(value) {
+  if (typeof value === 'string') {
+    const text = value.toLowerCase();
+    return text.includes('broncontrole nodig') || text.includes('bron_onduidelijk');
+  }
+  if (Array.isArray(value)) return value.some(item => containsUnresolvedMarker(item));
+  if (value && typeof value === 'object') return Object.values(value).some(item => containsUnresolvedMarker(item));
+  return false;
 }
 
 function renderValidation() {
@@ -869,7 +882,7 @@ function renderCockpit(type) {
         <h3>${escapeHtml(title)}</h3>
         <div class="sch-script-line">${escapeHtml(item.script || 'Geen script in import.')}</div>
         <div class="sch-facts">
-        ${factHtml('Scoring', item.scoring)}
+        ${factHtml('Scoring', scoreText(item))}
         ${factHtml('Bron', item.source)}
       </div>
         ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
@@ -1528,6 +1541,13 @@ function factHtml(label, value) {
 function listText(value) {
   if (Array.isArray(value)) return value.join(' · ');
   return value || '';
+}
+
+function scoreText(item) {
+  const score = String(item?.scoring || '').trim();
+  const details = listText(item?.scoringDetails);
+  if (!score || score === '1' || score === '0/1') return details || score;
+  return details ? `${score} · ${details}` : score;
 }
 
 function readData() {
