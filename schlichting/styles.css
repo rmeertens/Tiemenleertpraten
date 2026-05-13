@@ -223,7 +223,9 @@
 
 .sch-prep-grid,
 .sch-dashboard,
-.sch-script-list {
+.sch-script-list,
+.sch-audio-panel,
+.sch-audio-import {
   display: grid;
   gap: 12px;
 }
@@ -326,6 +328,28 @@
   margin: 0;
 }
 
+.sch-material-check {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 9px;
+  margin: 14px 0;
+  padding: 14px;
+}
+
+.sch-material-check label {
+  align-items: start;
+  color: var(--ink-soft);
+  display: grid;
+  gap: 9px;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.sch-material-check input {
+  margin-top: 5px;
+}
+
 .sch-score-row {
   display: flex;
   flex-wrap: wrap;
@@ -385,6 +409,56 @@
   padding: 12px;
 }
 
+.sch-audio-import {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.sch-audio-drop {
+  background: var(--bg);
+  border: 1px dashed var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.sch-audio-drop input {
+  font: inherit;
+  max-width: 100%;
+}
+
+.sch-audio-table {
+  display: grid;
+  gap: 8px;
+}
+
+.sch-audio-row {
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 80px minmax(0, 1fr) 82px 82px auto;
+  padding: 10px;
+}
+
+.sch-audio-row input {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 9px;
+  color: var(--ink);
+  font: inherit;
+  padding: 8px;
+  width: 100%;
+}
+
+.sch-audio-mini {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
 @media (max-width: 860px) {
   .sch-hero,
   .sch-section-head,
@@ -394,7 +468,9 @@
   }
 
   .sch-prep-grid,
-  .sch-wizard {
+  .sch-wizard,
+  .sch-audio-import,
+  .sch-audio-row {
     grid-template-columns: 1fr;
   }
 

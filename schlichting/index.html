@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Privé Schlichting-trainer met browser-only import voor Taalbegrip en Zinsontwikkeling." />
   <meta name="color-scheme" content="light dark" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Schlichting Privétrainer &middot; Tiemen Leert Praten</title>
   <link rel="stylesheet" href="/assets/site.css?v=31" />
@@ -38,6 +38,7 @@
       <button class="sch-tab" type="button" data-view="wizard">Startwizard</button>
       <button class="sch-tab" type="button" data-view="taalbegrip">Taalbegrip</button>
       <button class="sch-tab" type="button" data-view="zinsontwikkeling">Zinsontwikkeling</button>
+      <button class="sch-tab" type="button" data-view="audio">Audio</button>
       <button class="sch-tab" type="button" data-view="scripts">ZG scripts</button>
       <button class="sch-tab" type="button" data-view="simulation">Simulatie</button>
       <button class="sch-tab" type="button" data-view="dashboard">Score</button>
@@ -149,6 +150,25 @@
         <p class="sch-label">ZG-scriptcoach</p>
         <h2>Maak je docentantwoord strak</h2>
         <div class="sch-script-list" id="script-list"></div>
+      </article>
+    </section>
+
+    <section class="sch-view" id="view-audio">
+      <article class="sch-card">
+        <div class="sch-section-head">
+          <div>
+            <p class="sch-label">Intonatiecheck</p>
+            <h2>Audio virtueel opknippen</h2>
+            <p>
+              Selecteer je drie lokale mp3-bestanden. De tool zet niets online en bewaart
+              de audio niet in GitHub; segmenten blijven in deze browsersessie.
+            </p>
+          </div>
+          <button class="btn btn--ghost" type="button" id="clear-audio">Wis audio</button>
+        </div>
+        <div class="sch-audio-import" id="audio-import"></div>
+        <div class="sch-audio-panel" id="audio-panel"></div>
+        <audio id="audio-player" preload="metadata"></audio>
       </article>
     </section>
 

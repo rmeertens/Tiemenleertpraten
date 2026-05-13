@@ -4,6 +4,12 @@ const STORAGE_KEY = 'schlichting_private_data_v1';
 const SCORE_KEY = 'schlichting_private_scores_v1';
 const PREP_KEY = 'schlichting_private_prep_v1';
 
+const AUDIO_GROUPS = [
+  { id: 'zo1-10', label: 'ZO 1-10', start: 1, end: 10, expected: 10 },
+  { id: 'zo11-20', label: 'ZO 11-20', start: 11, end: 20, expected: 10 },
+  { id: 'zo21-36', label: 'ZO 21-36', start: 21, end: 36, expected: 16 }
+];
+
 const NOTEBOOK_PROMPT = `Je bent bronextractor voor mijn privé Schlichting-toetstrainer. Gebruik uitsluitend de geüploade Schlichting-handleiding, scans, scoreformulieren en toetsinformatie. Werk exact waar exacte afname-instructies nodig zijn. Geef bij elke regel een bronverwijzing, paginanummer of scanverwijzing.
 
 Maak output als geldige JSON volgens schema schlichting-v1. Gebruik dubbele aanhalingstekens en geen Markdown rondom de JSON.
@@ -76,9 +82,14 @@ Verplichte hoofdstructuur:
         "id": "ZO-1",
         "number": 1,
         "script": "exacte stimuluszin",
+        "material": "benodigd materiaal",
+        "instructionSteps": ["handeling 1", "handeling 2"],
+        "actionChecklist": ["materiaal correct klaarleggen", "juiste handeling voordoen"],
         "target": "morfosyntactisch criterium",
         "correctExamples": ["..."],
         "incorrectExamples": ["..."],
+        "allowedVariations": ["..."],
+        "scoringDetails": ["..."],
         "scoring": "...",
         "repeat": "...",
         "intonation": "...",
@@ -112,7 +123,7 @@ Deel 1: Schlichting Taalbegrip
 Verzamel leeftijdsbereik, startregels, terugkeerregels, afbreekregels, testsituatie, materiaal, zichtbaarheid, houding testleider, neutraliteit, secties, exacte itemzinnen, correcte responsen, foutresponsen, scoring, toegestane herhaling, verboden hulp, valkuilen en toetsverantwoording.
 
 Deel 2: Schlichting Taalproductie-3 Zinsontwikkeling
-Verzamel algemene instructie, oefenitems, exacte stimuluszinnen, doelconstructies, morfosyntactische criteria, correcte/incorrecte voorbeelden, scoring, herhaling, intonatie/prosodie, valkuilen, onderscheid met articulatie/fonologie en toetsverantwoording.
+Verzamel algemene instructie, oefenitems, exacte stimuluszinnen, materiaal per item, handelingen per item, doelconstructies, morfosyntactische criteria, correcte/incorrecte voorbeelden, toegestane variaties, scoringdetails, herhaling, intonatie/prosodie, valkuilen, onderscheid met articulatie/fonologie en toetsverantwoording.
 
 Deel 3: ZG-checklist
 Maak criteria voor neutraal aanbieden, exact formuleren, juist starten, juist afbreken, juist scoren, impulsief kindgedrag begrenzen, eigen fout herkennen, betrouwbaarheid/validiteit benoemen.
@@ -178,7 +189,12 @@ const state = {
   },
   simPart: 'setup',
   secondsLeft: 15 * 60,
-  timer: null
+  timer: null,
+  audio: {
+    groups: {},
+    segments: {},
+    activeStop: null
+  }
 };
 
 const els = {
@@ -198,7 +214,10 @@ const els = {
   simPart: document.getElementById('simulation-part'),
   simCard: document.getElementById('simulation-card'),
   simScore: document.getElementById('simulation-score'),
-  dashboard: document.getElementById('dashboard')
+  dashboard: document.getElementById('dashboard'),
+  audioImport: document.getElementById('audio-import'),
+  audioPanel: document.getElementById('audio-panel'),
+  audioPlayer: document.getElementById('audio-player')
 };
 
 boot();
@@ -227,6 +246,7 @@ function bindEvents() {
   document.getElementById('clear-data').addEventListener('click', clearData);
   document.getElementById('copy-prompt').addEventListener('click', copyPrompt);
   document.getElementById('privacy-check').addEventListener('click', privacyCheck);
+  document.getElementById('clear-audio').addEventListener('click', clearAudio);
   document.getElementById('calculate-age').addEventListener('click', renderWizard);
   els.timerToggle.addEventListener('click', toggleTimer);
 
@@ -251,6 +271,8 @@ function renderAll() {
   renderCockpit('taalbegrip');
   renderCockpit('zinsontwikkeling');
   renderScripts();
+  renderAudioImport();
+  renderAudioPanel();
   renderSimulation();
   renderDashboard();
 }
@@ -646,9 +668,13 @@ function renderCockpit(type) {
         ['Verboden hulp', item.forbiddenHelp]
       ]
     : [
+        ['Materiaal', item.material],
+        ['Handelingen', listText(item.instructionSteps)],
         ['Doelconstructie', item.target],
         ['Correcte voorbeelden', listText(item.correctExamples)],
         ['Incorrecte voorbeelden', listText(item.incorrectExamples)],
+        ['Toegestane variaties', listText(item.allowedVariations)],
+        ['Scoringdetails', listText(item.scoringDetails)],
         ['Herhalen', item.repeat],
         ['Intonatie', item.intonation]
       ];
@@ -660,9 +686,11 @@ function renderCockpit(type) {
         <h3>${escapeHtml(title)}</h3>
         <div class="sch-script-line">${escapeHtml(item.script || 'Geen script in import.')}</div>
         <div class="sch-facts">
-          ${factHtml('Scoring', item.scoring)}
-          ${factHtml('Bron', item.source)}
-        </div>
+        ${factHtml('Scoring', item.scoring)}
+        ${factHtml('Bron', item.source)}
+      </div>
+        ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
+        ${type === 'zinsontwikkeling' ? audioForItemHtml(item.number) : ''}
         ${scoreButtons(`${type}:${item.number}`, `${type} item ${item.number}`)}
       </article>
       <aside class="sch-item-card">
@@ -675,6 +703,39 @@ function renderCockpit(type) {
     </div>
   `;
   bindScoreButtons();
+  bindAudioButtons();
+  bindMaterialChecks();
+}
+
+function materialChecklistHtml(item) {
+  const checks = [
+    item.material ? `Materiaal klaar: ${item.material}` : 'Materiaal uit import controleren',
+    'Alleen materiaal voor dit item zichtbaar',
+    'Testmap goed tussen testleider en kind',
+    'Stimuluszin exact en natuurlijk',
+    ...(Array.isArray(item.actionChecklist) ? item.actionChecklist : [])
+  ];
+  return `
+    <div class="sch-material-check">
+      <p class="sch-label">Materiaalcheck</p>
+      ${checks.map((check, index) => `
+        <label>
+          <input type="checkbox" data-material-check="${escapeHtml(item.id || item.number)}-${escapeHtml(index)}" />
+          <span>${escapeHtml(check)}</span>
+        </label>
+      `).join('')}
+    </div>
+  `;
+}
+
+function bindMaterialChecks() {
+  document.querySelectorAll('[data-material-check]').forEach(input => {
+    const key = `schlichting_material_${input.dataset.materialCheck}`;
+    input.checked = localStorage.getItem(key) === 'true';
+    input.addEventListener('change', () => {
+      localStorage.setItem(key, String(input.checked));
+    });
+  });
 }
 
 function getItems(type) {
@@ -725,6 +786,228 @@ function renderSimulation() {
   `;
   els.simScore.innerHTML = scoreButtons(`sim:${state.simPart}:${Date.now()}`, prompt.title);
   bindScoreButtons();
+}
+
+function renderAudioImport() {
+  els.audioImport.innerHTML = AUDIO_GROUPS.map(group => {
+    const loaded = state.audio.groups[group.id];
+    return `
+      <label class="sch-audio-drop">
+        <strong>${escapeHtml(group.label)}</strong>
+        <span class="sch-audio-mini">${loaded ? `${loaded.fileName} · ${loaded.segments.length}/${group.expected} segmenten` : 'Kies lokale mp3'}</span>
+        <input type="file" accept="audio/*" data-audio-group="${escapeHtml(group.id)}" />
+      </label>
+    `;
+  }).join('');
+
+  els.audioImport.querySelectorAll('[data-audio-group]').forEach(input => {
+    input.addEventListener('change', () => {
+      const group = AUDIO_GROUPS.find(item => item.id === input.dataset.audioGroup);
+      const file = input.files?.[0];
+      if (group && file) importAudioGroup(group, file);
+    });
+  });
+}
+
+async function importAudioGroup(group, file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const audioContext = new AudioContext();
+  const decoded = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+  await audioContext.close();
+  const objectUrl = URL.createObjectURL(file);
+  const segments = detectSpeechSegments(decoded, group.expected).map((segment, index) => ({
+    item: group.start + index,
+    groupId: group.id,
+    start: segment.start,
+    end: segment.end
+  }));
+  state.audio.groups[group.id] = {
+    fileName: file.name,
+    url: objectUrl,
+    duration: decoded.duration,
+    segments
+  };
+  segments.forEach(segment => {
+    state.audio.segments[segment.item] = segment;
+  });
+  renderAudioImport();
+  renderAudioPanel();
+  renderCockpit('zinsontwikkeling');
+}
+
+function detectSpeechSegments(buffer, expected) {
+  const samples = buffer.getChannelData(0);
+  const sampleRate = buffer.sampleRate;
+  const frame = Math.max(1, Math.floor(sampleRate * 0.05));
+  const hop = Math.max(1, Math.floor(sampleRate * 0.025));
+  const rms = [];
+  for (let start = 0; start + frame < samples.length; start += hop) {
+    let sum = 0;
+    for (let i = start; i < start + frame; i += 1) sum += samples[i] * samples[i];
+    rms.push({ time: start / sampleRate, value: Math.sqrt(sum / frame) });
+  }
+  const values = rms.map(item => item.value).sort((a, b) => a - b);
+  const p80 = values[Math.floor(values.length * 0.8)] || 0;
+  const max = values[values.length - 1] || 0;
+  const threshold = Math.max(0.004, Math.min(0.035, Math.max(p80 * 0.25, max * 0.035)));
+  const raw = [];
+  let open = null;
+  rms.forEach(item => {
+    if (item.value >= threshold && open === null) open = item.time;
+    if (item.value < threshold && open !== null) {
+      raw.push({ start: Math.max(0, open - 0.18), end: item.time + 0.25 });
+      open = null;
+    }
+  });
+  if (open !== null) raw.push({ start: Math.max(0, open - 0.18), end: buffer.duration });
+
+  let regions = raw
+    .filter(item => item.end - item.start >= 0.35)
+    .reduce((acc, item) => {
+      const previous = acc[acc.length - 1];
+      if (previous && item.start - previous.end < 1.1) {
+        previous.end = item.end;
+      } else {
+        acc.push({ ...item });
+      }
+      return acc;
+    }, []);
+
+  regions = fitSegmentCount(regions, expected, buffer.duration);
+  return regions.map(item => ({
+    start: roundTime(item.start),
+    end: roundTime(Math.min(buffer.duration, item.end))
+  }));
+}
+
+function fitSegmentCount(regions, expected, duration) {
+  let next = [...regions];
+  if (!next.length) return equalSegments(expected, duration);
+  while (next.length > expected) {
+    let bestIndex = 0;
+    let bestGap = Infinity;
+    for (let i = 0; i < next.length - 1; i += 1) {
+      const gap = next[i + 1].start - next[i].end;
+      if (gap < bestGap) {
+        bestGap = gap;
+        bestIndex = i;
+      }
+    }
+    next[bestIndex].end = next[bestIndex + 1].end;
+    next.splice(bestIndex + 1, 1);
+  }
+  while (next.length < expected) {
+    let longestIndex = 0;
+    next.forEach((item, index) => {
+      if (item.end - item.start > next[longestIndex].end - next[longestIndex].start) longestIndex = index;
+    });
+    const item = next[longestIndex];
+    const middle = item.start + ((item.end - item.start) / 2);
+    next.splice(longestIndex, 1, { start: item.start, end: middle }, { start: middle, end: item.end });
+  }
+  return next;
+}
+
+function equalSegments(expected, duration) {
+  return Array.from({ length: expected }, (_, index) => ({
+    start: (duration / expected) * index,
+    end: (duration / expected) * (index + 1)
+  }));
+}
+
+function renderAudioPanel() {
+  const all = Object.values(state.audio.groups).flatMap(group => group.segments || []);
+  if (!all.length) {
+    els.audioPanel.innerHTML = '<div class="sch-warn"><strong>Nog geen audio gekoppeld.</strong><br>Selecteer de drie mp3’s. De tool probeert daarna automatisch ZO1-36 te verdelen op stiltes.</div>';
+    return;
+  }
+  els.audioPanel.innerHTML = `
+    <div class="sch-audio-table">
+      ${all.sort((a, b) => a.item - b.item).map(segment => audioRowHtml(segment)).join('')}
+    </div>
+  `;
+  els.audioPanel.querySelectorAll('[data-audio-play]').forEach(button => {
+    button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioPlay)));
+  });
+  els.audioPanel.querySelectorAll('[data-audio-time]').forEach(input => {
+    input.addEventListener('change', () => updateAudioTime(input));
+  });
+}
+
+function audioRowHtml(segment) {
+  return `
+    <div class="sch-audio-row">
+      <strong>ZO ${escapeHtml(segment.item)}</strong>
+      <span class="sch-audio-mini">${escapeHtml(state.audio.groups[segment.groupId]?.fileName || '')}</span>
+      <input type="number" min="0" step="0.05" value="${escapeHtml(segment.start)}" data-audio-time="start" data-audio-item="${escapeHtml(segment.item)}" aria-label="Starttijd ZO ${escapeHtml(segment.item)}" />
+      <input type="number" min="0" step="0.05" value="${escapeHtml(segment.end)}" data-audio-time="end" data-audio-item="${escapeHtml(segment.item)}" aria-label="Eindtijd ZO ${escapeHtml(segment.item)}" />
+      <button class="btn btn--primary" type="button" data-audio-play="${escapeHtml(segment.item)}">Luister</button>
+    </div>
+  `;
+}
+
+function audioForItemHtml(itemNumber) {
+  const segment = state.audio.segments[itemNumber];
+  if (!segment) {
+    return '<div class="sch-warn"><strong>Geen audio gekoppeld.</strong><br>Ga naar Audio en selecteer de mp3-bestanden.</div>';
+  }
+  return `
+    <div class="sch-actions">
+      <button class="btn btn--primary" type="button" data-audio-play="${escapeHtml(itemNumber)}">Luister naar intonatie ZO ${escapeHtml(itemNumber)}</button>
+      <span class="sch-score-note">${escapeHtml(segment.start)}s - ${escapeHtml(segment.end)}s</span>
+    </div>
+  `;
+}
+
+function bindAudioButtons() {
+  document.querySelectorAll('[data-audio-play]').forEach(button => {
+    if (button.dataset.audioBound === 'true') return;
+    button.dataset.audioBound = 'true';
+    button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioPlay)));
+  });
+}
+
+function playAudioSegment(itemNumber) {
+  const segment = state.audio.segments[itemNumber];
+  const group = segment ? state.audio.groups[segment.groupId] : null;
+  if (!segment || !group) return;
+  if (state.audio.activeStop) {
+    els.audioPlayer.removeEventListener('timeupdate', state.audio.activeStop);
+    state.audio.activeStop = null;
+  }
+  els.audioPlayer.src = group.url;
+  els.audioPlayer.currentTime = Math.max(0, segment.start);
+  const stop = () => {
+    if (els.audioPlayer.currentTime >= segment.end) {
+      els.audioPlayer.pause();
+      els.audioPlayer.removeEventListener('timeupdate', stop);
+      state.audio.activeStop = null;
+    }
+  };
+  state.audio.activeStop = stop;
+  els.audioPlayer.addEventListener('timeupdate', stop);
+  els.audioPlayer.play();
+}
+
+function updateAudioTime(input) {
+  const item = Number(input.dataset.audioItem);
+  const segment = state.audio.segments[item];
+  if (!segment) return;
+  segment[input.dataset.audioTime] = roundTime(Number(input.value));
+  renderCockpit('zinsontwikkeling');
+}
+
+function clearAudio() {
+  Object.values(state.audio.groups).forEach(group => {
+    if (group.url) URL.revokeObjectURL(group.url);
+  });
+  els.audioPlayer.pause();
+  els.audioPlayer.removeAttribute('src');
+  state.audio.groups = {};
+  state.audio.segments = {};
+  renderAudioImport();
+  renderAudioPanel();
+  renderCockpit('zinsontwikkeling');
 }
 
 function simulationPrompt(part) {
@@ -844,6 +1127,10 @@ function readJson(key, fallback) {
 function randomFrom(items) {
   if (!items?.length) return null;
   return items[Math.floor(Math.random() * items.length)];
+}
+
+function roundTime(value) {
+  return Math.max(0, Math.round(Number(value) * 100) / 100);
 }
 
 function clamp(value, min, max) {
