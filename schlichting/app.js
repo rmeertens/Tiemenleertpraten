@@ -670,6 +670,7 @@ function validateData(data) {
 
   validateItems(data?.taalbegrip?.items || [], 'Taalbegrip', ['number', 'script', 'scoring', 'source'], warnings);
   validateItems(data?.zinsontwikkeling?.items || [], 'Zinsontwikkeling', ['number', 'script', 'scoring', 'source'], warnings);
+  validateZinsontwikkelingCoverage(data?.zinsontwikkeling?.items || [], warnings);
 
   return { errors, warnings };
 }
@@ -683,6 +684,33 @@ function validateItems(items, label, fields, warnings) {
     if (item.number && numbers.has(item.number)) warnings.push(`${label}: itemnummer ${item.number} komt dubbel voor.`);
     if (item.number) numbers.add(item.number);
   });
+}
+
+function validateZinsontwikkelingCoverage(items, warnings) {
+  if (!items.length) return;
+  if (items.length < 36) warnings.push(`Zinsontwikkeling: ${items.length}/36 items aanwezig. Voor volledige afname moeten ZO-1 t/m ZO-36 gevuld zijn.`);
+  const byNumber = new Set(items.map(item => Number(item.number)));
+  for (let number = 1; number <= 36; number += 1) {
+    if (!byNumber.has(number)) warnings.push(`Zinsontwikkeling: ZO-${number} ontbreekt.`);
+  }
+  items.forEach(item => {
+    const label = `ZO-${item.number}`;
+    if (!hasUsefulText(item.script)) warnings.push(`${label}: exacte stimuluszin/script ontbreekt.`);
+    if (!hasUsefulText(item.material)) warnings.push(`${label}: materiaal ontbreekt of is niet expliciet.`);
+    if (!hasUsefulList(item.instructionSteps)) warnings.push(`${label}: volledige afnamestappen ontbreken.`);
+    if (!hasUsefulText(item.repeat)) warnings.push(`${label}: herhaalregel ontbreekt.`);
+    if (!hasUsefulText(item.target)) warnings.push(`${label}: doelstructuur ontbreekt.`);
+    if (!hasUsefulList(item.scoringDetails) && !hasUsefulText(item.scoring)) warnings.push(`${label}: specifieke scoringdetails ontbreken.`);
+    if (!hasUsefulList(item.allowedVariations) && Number(item.number) >= 5) warnings.push(`${label}: toegestane variaties zijn nog niet ingevuld.`);
+  });
+}
+
+function hasUsefulText(value) {
+  return typeof value === 'string' && value.trim() && value.trim() !== 'bron_onduidelijk';
+}
+
+function hasUsefulList(value) {
+  return Array.isArray(value) && value.some(item => hasUsefulText(item));
 }
 
 function renderValidation() {
