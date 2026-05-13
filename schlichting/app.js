@@ -3,6 +3,7 @@
 const STORAGE_KEY = 'schlichting_private_data_v1';
 const SCORE_KEY = 'schlichting_private_scores_v1';
 const PREP_KEY = 'schlichting_private_prep_v1';
+const AUDIO_TIMES_KEY = 'schlichting_private_audio_times_v1';
 
 const AUDIO_GROUPS = [
   { id: 'zo1-10', label: 'ZO 1-10', start: 1, end: 10, expected: 10 },
@@ -193,7 +194,8 @@ const state = {
   audio: {
     groups: {},
     segments: {},
-    activeStop: null
+    activeStop: null,
+    saved: readJson(AUDIO_TIMES_KEY, {})
   }
 };
 
@@ -304,7 +306,11 @@ function renderStatus() {
 
 function importData() {
   try {
-    const parsed = parseImportText(els.importText.value);
+    let parsed = parseImportText(els.importText.value);
+    if (parsed.schema !== 'schlichting-v1' && (parsed.rules || parsed.items || parsed.rubric || parsed.zgScripts)) {
+      parsed = mergePartialImports([parsed]);
+    }
+    parsed = mergeSchlichtingData(state.data, parsed);
     const validation = validateData(parsed);
     if (validation.errors.length) {
       els.validation.innerHTML = validationHtml(validation);
@@ -334,6 +340,8 @@ function parseImportText(text) {
     if (firstBrace >= 0 && lastBrace > firstBrace) {
       return JSON.parse(trimmed.slice(firstBrace, lastBrace + 1));
     }
+    const rawItems = parseRawZinsontwikkelingText(trimmed);
+    if (rawItems.length) return mergePartialImports([{ items: rawItems }]);
     throw firstError;
   }
 }
@@ -421,12 +429,150 @@ function mergePartialImports(parts) {
         startRules: normalizeStartRules(part.rules.startRules || [])
       };
     }
-    if (Array.isArray(part.items)) merged.zinsontwikkeling.items = part.items;
+    if (Array.isArray(part.items)) {
+      merged.zinsontwikkeling.items = mergeItemsByNumber(merged.zinsontwikkeling.items, part.items);
+    }
+    if (Array.isArray(part.zinsontwikkeling?.items)) {
+      merged.zinsontwikkeling.items = mergeItemsByNumber(merged.zinsontwikkeling.items, part.zinsontwikkeling.items);
+    }
     if (part.rubric) merged.rubric = part.rubric;
     if (Array.isArray(part.zgScripts)) merged.zgScripts = part.zgScripts;
   });
 
   return merged;
+}
+
+function mergeSchlichtingData(current, incoming) {
+  if (!current) return incoming;
+  const merged = {
+    ...current,
+    ...incoming,
+    taalbegrip: {
+      ...(current.taalbegrip || {}),
+      ...(incoming.taalbegrip || {}),
+      rules: {
+        ...(current.taalbegrip?.rules || {}),
+        ...(incoming.taalbegrip?.rules || {})
+      },
+      sections: incoming.taalbegrip?.sections?.length ? incoming.taalbegrip.sections : (current.taalbegrip?.sections || []),
+      items: mergeItemsByNumber(current.taalbegrip?.items || [], incoming.taalbegrip?.items || [])
+    },
+    zinsontwikkeling: {
+      ...(current.zinsontwikkeling || {}),
+      ...(incoming.zinsontwikkeling || {}),
+      rules: {
+        ...(current.zinsontwikkeling?.rules || {}),
+        ...(incoming.zinsontwikkeling?.rules || {})
+      },
+      items: mergeItemsByNumber(current.zinsontwikkeling?.items || [], incoming.zinsontwikkeling?.items || [])
+    },
+    rubric: incoming.rubric?.criteria?.length ? incoming.rubric : (current.rubric || incoming.rubric),
+    zgScripts: incoming.zgScripts?.length ? mergeScripts(current.zgScripts || [], incoming.zgScripts) : (current.zgScripts || incoming.zgScripts || [])
+  };
+  return merged;
+}
+
+function mergeItemsByNumber(baseItems = [], newItems = []) {
+  const byNumber = new Map();
+  baseItems.forEach(item => byNumber.set(Number(item.number), { ...item }));
+  newItems.forEach(item => {
+    const number = Number(item.number);
+    byNumber.set(number, { ...(byNumber.get(number) || {}), ...withoutEmptyImportValues(item) });
+  });
+  return [...byNumber.values()].sort((a, b) => Number(a.number) - Number(b.number));
+}
+
+function withoutEmptyImportValues(item) {
+  return Object.fromEntries(Object.entries(item).filter(([key, value]) => {
+    if (key === 'id' || key === 'number') return true;
+    if (value === '') return false;
+    if (Array.isArray(value) && value.length === 0) return false;
+    return value !== null && value !== undefined;
+  }));
+}
+
+function mergeScripts(base = [], incoming = []) {
+  const byId = new Map();
+  base.forEach(item => byId.set(item.id || item.title, item));
+  incoming.forEach(item => byId.set(item.id || item.title, { ...(byId.get(item.id || item.title) || {}), ...item }));
+  return [...byId.values()];
+}
+
+function parseRawZinsontwikkelingText(text) {
+  if (!/item\s+\d{1,2}/i.test(text)) return [];
+  const normalized = text.replace(/\r/g, '\n').replace(/[ \t]+/g, ' ');
+  const matches = [...normalized.matchAll(/(?:^|\n)\s*Item\s+(\d{1,2})\b/gi)];
+  if (!matches.length) return [];
+  return matches.map((match, index) => {
+    const number = Number(match[1]);
+    const start = match.index + match[0].length;
+    const end = matches[index + 1]?.index ?? normalized.length;
+    const block = cleanupText(normalized.slice(start, end));
+    const target = firstUsefulLines(block, 3);
+    const material = extractLooseSection(block, ['MATERIAAL', 'MATERIAAI', 'MATI RIAAL', 'MATRIAAL'], ['HERHALING', 'HERHALEN', 'INSTRUCTIE', 'INTRO', 'SCORING']);
+    const repeat = extractLooseSection(block, ['HERHALING', 'HERHALEN', 'HEPHA', 'HIGHAL'], ['INSTRUCTIE', 'INTRO', 'SCORING']);
+    const instruction = extractLooseSection(block, ['INSTRUCTIE', 'INSTRUC', 'INTRO', 'INCT'], ['SCORING', 'SKOR', 'Item Goed', 'Fout']);
+    const scoring = extractLooseSection(block, ['SCORING', 'SKOR', 'Item Goed'], []);
+    return {
+      id: `ZO-${number}`,
+      number,
+      script: '',
+      material,
+      instructionSteps: splitInstruction(instruction),
+      actionChecklist: material ? [`Pak klaar: ${material}`] : [],
+      target,
+      correctExamples: [],
+      incorrectExamples: [],
+      allowedVariations: [],
+      scoringDetails: splitInstruction(scoring),
+      scoring: scoring || 'Zie lokale bronkaart en scoreformulier.',
+      repeat,
+      intonation: 'Gebruik de intonatie uit de gekoppelde audio-opname.',
+      pitfalls: ['Controleer exacte stimuluszin, materiaalhandeling en scoring tegen de bronkaart.'],
+      rawBlock: block,
+      source: 'Lokale OCR/NotebookLM-import'
+    };
+  }).filter(item => item.number >= 1 && item.number <= 36);
+}
+
+function extractLooseSection(block, starts, stops) {
+  const upper = block.toUpperCase();
+  const startHits = starts
+    .map(label => ({ label, index: upper.indexOf(label.toUpperCase()) }))
+    .filter(hit => hit.index >= 0)
+    .sort((a, b) => a.index - b.index);
+  if (!startHits.length) return '';
+  const start = startHits[0].index + startHits[0].label.length;
+  const stopHits = stops
+    .map(label => upper.indexOf(label.toUpperCase(), start))
+    .filter(index => index > start)
+    .sort((a, b) => a - b);
+  const end = stopHits[0] || block.length;
+  return cleanupText(block.slice(start, end));
+}
+
+function firstUsefulLines(text, count) {
+  return text.split('\n')
+    .map(line => line.trim())
+    .filter(line => line && !/^(MATERIAAL|HERHALING|INSTRUCTIE|SCORING)$/i.test(line))
+    .slice(0, count)
+    .join(' · ');
+}
+
+function splitInstruction(text) {
+  return cleanupText(text)
+    .split(/\n+|(?:^|\s)[•*-]\s+/)
+    .map(line => line.trim())
+    .filter(Boolean)
+    .slice(0, 18);
+}
+
+function cleanupText(text) {
+  return String(text || '')
+    .replace(/\u0000/g, '')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 function normalizeStartRules(rules) {
@@ -690,6 +836,7 @@ function renderCockpit(type) {
         ${factHtml('Bron', item.source)}
       </div>
         ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
+        ${type === 'zinsontwikkeling' ? rawSourceHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? audioForItemHtml(item.number) : ''}
         ${scoreButtons(`${type}:${item.number}`, `${type} item ${item.number}`)}
       </article>
@@ -725,6 +872,16 @@ function materialChecklistHtml(item) {
         </label>
       `).join('')}
     </div>
+  `;
+}
+
+function rawSourceHtml(item) {
+  if (!item.rawBlock) return '';
+  return `
+    <details class="sch-source-card">
+      <summary>Volledige lokale bronkaart ZO ${escapeHtml(item.number)}</summary>
+      <pre>${escapeHtml(item.rawBlock)}</pre>
+    </details>
   `;
 }
 
@@ -794,7 +951,7 @@ function renderAudioImport() {
     return `
       <label class="sch-audio-drop">
         <strong>${escapeHtml(group.label)}</strong>
-        <span class="sch-audio-mini">${loaded ? `${loaded.fileName} · ${loaded.segments.length}/${group.expected} segmenten` : 'Kies lokale mp3'}</span>
+        <span class="sch-audio-mini">${loaded ? `${loaded.fileName} · ${loaded.segments.length}/${group.expected} segmenten · ${loaded.method}` : 'Kies lokale mp3'}</span>
         <input type="file" accept="audio/*" data-audio-group="${escapeHtml(group.id)}" />
       </label>
     `;
@@ -815,7 +972,13 @@ async function importAudioGroup(group, file) {
   const decoded = await audioContext.decodeAudioData(arrayBuffer.slice(0));
   await audioContext.close();
   const objectUrl = URL.createObjectURL(file);
-  const segments = detectSpeechSegments(decoded, group.expected).map((segment, index) => ({
+  if (state.audio.groups[group.id]?.url) URL.revokeObjectURL(state.audio.groups[group.id].url);
+  const saved = state.audio.saved[group.id];
+  const useSaved = saved?.segments?.length === group.expected && Math.abs(Number(saved.duration) - decoded.duration) < 2;
+  const detected = useSaved
+    ? saved.segments
+    : detectSpeechSegments(decoded, group.expected);
+  const segments = detected.map((segment, index) => ({
     item: group.start + index,
     groupId: group.id,
     start: segment.start,
@@ -824,12 +987,15 @@ async function importAudioGroup(group, file) {
   state.audio.groups[group.id] = {
     fileName: file.name,
     url: objectUrl,
+    buffer: decoded,
     duration: decoded.duration,
+    method: useSaved ? 'bewaarde grenzen' : 'grootste pauzes',
     segments
   };
   segments.forEach(segment => {
     state.audio.segments[segment.item] = segment;
   });
+  saveAudioSegments(group.id);
   renderAudioImport();
   renderAudioPanel();
   renderCockpit('zinsontwikkeling');
@@ -861,11 +1027,11 @@ function detectSpeechSegments(buffer, expected) {
   });
   if (open !== null) raw.push({ start: Math.max(0, open - 0.18), end: buffer.duration });
 
-  let regions = raw
-    .filter(item => item.end - item.start >= 0.35)
+  const phrases = raw
+    .filter(item => item.end - item.start >= 0.18)
     .reduce((acc, item) => {
       const previous = acc[acc.length - 1];
-      if (previous && item.start - previous.end < 1.1) {
+      if (previous && item.start - previous.end < 0.28) {
         previous.end = item.end;
       } else {
         acc.push({ ...item });
@@ -873,11 +1039,42 @@ function detectSpeechSegments(buffer, expected) {
       return acc;
     }, []);
 
+  let regions = segmentByLargestPauses(phrases, expected, buffer.duration);
   regions = fitSegmentCount(regions, expected, buffer.duration);
   return regions.map(item => ({
     start: roundTime(item.start),
     end: roundTime(Math.min(buffer.duration, item.end))
   }));
+}
+
+function segmentByLargestPauses(phrases, expected, duration) {
+  if (phrases.length <= 1) return equalSegments(expected, duration);
+  if (phrases.length <= expected) return phrases;
+  const gaps = [];
+  for (let index = 0; index < phrases.length - 1; index += 1) {
+    gaps.push({
+      index,
+      gap: phrases[index + 1].start - phrases[index].end
+    });
+  }
+  const boundaryIndexes = new Set(
+    gaps
+      .sort((a, b) => b.gap - a.gap)
+      .slice(0, expected - 1)
+      .map(item => item.index)
+  );
+  const groups = [];
+  let current = { start: phrases[0].start, end: phrases[0].end };
+  for (let index = 0; index < phrases.length - 1; index += 1) {
+    current.end = phrases[index].end;
+    if (boundaryIndexes.has(index)) {
+      groups.push({ start: Math.max(0, current.start - 0.18), end: Math.min(duration, current.end + 0.28) });
+      current = { start: phrases[index + 1].start, end: phrases[index + 1].end };
+    }
+  }
+  current.end = phrases[phrases.length - 1].end;
+  groups.push({ start: Math.max(0, current.start - 0.18), end: Math.min(duration, current.end + 0.28) });
+  return groups;
 }
 
 function fitSegmentCount(regions, expected, duration) {
@@ -922,6 +1119,9 @@ function renderAudioPanel() {
     return;
   }
   els.audioPanel.innerHTML = `
+    <div class="sch-audio-tools">
+      ${AUDIO_GROUPS.map(group => groupControlHtml(group)).join('')}
+    </div>
     <div class="sch-audio-table">
       ${all.sort((a, b) => a.item - b.item).map(segment => audioRowHtml(segment)).join('')}
     </div>
@@ -929,9 +1129,31 @@ function renderAudioPanel() {
   els.audioPanel.querySelectorAll('[data-audio-play]').forEach(button => {
     button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioPlay)));
   });
+  els.audioPanel.querySelectorAll('[data-audio-context]').forEach(button => {
+    button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioContext), 1.25));
+  });
+  els.audioPanel.querySelectorAll('[data-audio-autosplit]').forEach(button => {
+    button.addEventListener('click', () => resplitAudioGroup(button.dataset.audioAutosplit, 'auto'));
+  });
+  els.audioPanel.querySelectorAll('[data-audio-equal]').forEach(button => {
+    button.addEventListener('click', () => resplitAudioGroup(button.dataset.audioEqual, 'equal'));
+  });
   els.audioPanel.querySelectorAll('[data-audio-time]').forEach(input => {
     input.addEventListener('change', () => updateAudioTime(input));
   });
+}
+
+function groupControlHtml(group) {
+  const loaded = state.audio.groups[group.id];
+  if (!loaded) return '';
+  return `
+    <div class="sch-audio-group-control">
+      <strong>${escapeHtml(group.label)}</strong>
+      <button class="btn btn--ghost" type="button" data-audio-autosplit="${escapeHtml(group.id)}">Detecteer opnieuw</button>
+      <button class="btn btn--ghost" type="button" data-audio-equal="${escapeHtml(group.id)}">Evenredig verdelen</button>
+      <span class="sch-audio-mini">${escapeHtml(loaded.method)} · correcties worden lokaal bewaard</span>
+    </div>
+  `;
 }
 
 function audioRowHtml(segment) {
@@ -942,6 +1164,7 @@ function audioRowHtml(segment) {
       <input type="number" min="0" step="0.05" value="${escapeHtml(segment.start)}" data-audio-time="start" data-audio-item="${escapeHtml(segment.item)}" aria-label="Starttijd ZO ${escapeHtml(segment.item)}" />
       <input type="number" min="0" step="0.05" value="${escapeHtml(segment.end)}" data-audio-time="end" data-audio-item="${escapeHtml(segment.item)}" aria-label="Eindtijd ZO ${escapeHtml(segment.item)}" />
       <button class="btn btn--primary" type="button" data-audio-play="${escapeHtml(segment.item)}">Luister</button>
+      <button class="btn btn--ghost" type="button" data-audio-context="${escapeHtml(segment.item)}">Context</button>
     </div>
   `;
 }
@@ -967,7 +1190,7 @@ function bindAudioButtons() {
   });
 }
 
-function playAudioSegment(itemNumber) {
+function playAudioSegment(itemNumber, padding = 0) {
   const segment = state.audio.segments[itemNumber];
   const group = segment ? state.audio.groups[segment.groupId] : null;
   if (!segment || !group) return;
@@ -976,9 +1199,9 @@ function playAudioSegment(itemNumber) {
     state.audio.activeStop = null;
   }
   els.audioPlayer.src = group.url;
-  els.audioPlayer.currentTime = Math.max(0, segment.start);
+  els.audioPlayer.currentTime = Math.max(0, segment.start - padding);
   const stop = () => {
-    if (els.audioPlayer.currentTime >= segment.end) {
+    if (els.audioPlayer.currentTime >= Math.min(group.duration, segment.end + padding)) {
       els.audioPlayer.pause();
       els.audioPlayer.removeEventListener('timeupdate', stop);
       state.audio.activeStop = null;
@@ -994,7 +1217,50 @@ function updateAudioTime(input) {
   const segment = state.audio.segments[item];
   if (!segment) return;
   segment[input.dataset.audioTime] = roundTime(Number(input.value));
+  const group = state.audio.groups[segment.groupId];
+  if (group) {
+    const match = group.segments.find(itemSegment => itemSegment.item === item);
+    if (match) match[input.dataset.audioTime] = segment[input.dataset.audioTime];
+    group.method = 'handmatig gecorrigeerd';
+    saveAudioSegments(segment.groupId);
+    renderAudioImport();
+  }
   renderCockpit('zinsontwikkeling');
+}
+
+function resplitAudioGroup(groupId, mode) {
+  const groupDef = AUDIO_GROUPS.find(group => group.id === groupId);
+  const group = state.audio.groups[groupId];
+  if (!groupDef || !group?.buffer) return;
+  const next = (mode === 'equal' ? equalSegments(groupDef.expected, group.duration) : detectSpeechSegments(group.buffer, groupDef.expected))
+    .map((segment, index) => ({
+      item: groupDef.start + index,
+      groupId,
+      start: segment.start,
+      end: segment.end
+    }));
+  group.segments = next;
+  group.method = mode === 'equal' ? 'evenredig verdeeld' : 'grootste pauzes';
+  next.forEach(segment => {
+    state.audio.segments[segment.item] = segment;
+  });
+  saveAudioSegments(groupId);
+  renderAudioImport();
+  renderAudioPanel();
+  renderCockpit('zinsontwikkeling');
+}
+
+function saveAudioSegments(groupId) {
+  const group = state.audio.groups[groupId];
+  if (!group) return;
+  state.audio.saved[groupId] = {
+    duration: group.duration,
+    segments: group.segments.map(segment => ({
+      start: roundTime(segment.start),
+      end: roundTime(segment.end)
+    }))
+  };
+  localStorage.setItem(AUDIO_TIMES_KEY, JSON.stringify(state.audio.saved));
 }
 
 function clearAudio() {
@@ -1005,6 +1271,8 @@ function clearAudio() {
   els.audioPlayer.removeAttribute('src');
   state.audio.groups = {};
   state.audio.segments = {};
+  state.audio.saved = {};
+  localStorage.removeItem(AUDIO_TIMES_KEY);
   renderAudioImport();
   renderAudioPanel();
   renderCockpit('zinsontwikkeling');
