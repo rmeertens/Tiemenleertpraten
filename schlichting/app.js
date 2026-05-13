@@ -6,10 +6,12 @@ const PREP_KEY = 'schlichting_private_prep_v1';
 const AUDIO_TIMES_KEY = 'schlichting_private_audio_times_v1';
 const SOURCE_IMAGE_DB = 'schlichting_private_source_images_v1';
 const SOURCE_IMAGE_STORE = 'images';
+const AUDIO_FILE_STORE = 'audioFiles';
 
 const SOURCE_IMAGE_KINDS = [
   { id: 'testmap', label: 'Testmap' },
-  { id: 'handleiding', label: 'Afnamehandleiding' }
+  { id: 'handleiding', label: 'Afnamehandleiding' },
+  { id: 'scoreformulier', label: 'Scoreformulier' }
 ];
 
 const PRIVATE_SECTION_DEFAULTS = [
@@ -269,6 +271,10 @@ function boot() {
     renderCockpit('zinsontwikkeling');
   }).catch(() => {
     state.sourceImages = {};
+  });
+  loadStoredAudioFiles().catch(() => {
+    renderAudioImport();
+    renderAudioPanel();
   });
 }
 
@@ -783,16 +789,24 @@ async function clearData() {
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(SCORE_KEY);
   localStorage.removeItem(PREP_KEY);
+  localStorage.removeItem(AUDIO_TIMES_KEY);
   await clearSourceImageRecords();
+  await clearAudioFileRecords();
   Object.values(state.sourceImages).forEach(record => {
     if (record.url) URL.revokeObjectURL(record.url);
+  });
+  Object.values(state.audio.groups).forEach(group => {
+    if (group.url) URL.revokeObjectURL(group.url);
   });
   state.data = null;
   state.scores = [];
   state.prep = {};
   state.sourceImages = {};
+  state.audio.groups = {};
+  state.audio.segments = {};
+  state.audio.saved = {};
   els.importText.value = '';
-  els.validation.innerHTML = '<div class="sch-ok"><strong>Privédata gewist.</strong><br>Import, bronfoto’s, prepnotities en scores zijn uit deze browser verwijderd.</div>';
+  els.validation.innerHTML = '<div class="sch-ok"><strong>Privédata gewist.</strong><br>Import, audio, bronfoto’s, prepnotities en scores zijn uit deze browser verwijderd.</div>';
   renderAll();
 }
 
@@ -811,9 +825,10 @@ function privacyCheck() {
     '1. Officiële Schlichting-items staan niet in de repo.',
     '2. Importdata staat alleen in localStorage van deze browser.',
     '3. Bronfoto’s staan alleen in IndexedDB van deze browser.',
-    '4. Exporteer back-up kan bronfoto’s bevatten; deel dat bestand niet.',
-    '5. Wis privédata verwijdert de lokale import.',
-    '6. Gebruik geen gedeelde computer zonder daarna te wissen.'
+    '4. Mp3’s staan alleen in IndexedDB van deze browser en worden niet online gezet.',
+    '5. Exporteer back-up kan bronfoto’s bevatten; deel dat bestand niet.',
+    '6. Wis privédata verwijdert de lokale import.',
+    '7. Gebruik geen gedeelde computer zonder daarna te wissen.'
   ].join('\n');
   window.alert(message);
 }
@@ -1386,12 +1401,24 @@ function renderAudioImport() {
   });
 }
 
-async function importAudioGroup(group, file) {
+async function importAudioGroup(group, file, options = {}) {
+  const shouldPersist = options.persist !== false;
   const arrayBuffer = await file.arrayBuffer();
   const audioContext = new AudioContext();
   const decoded = await audioContext.decodeAudioData(arrayBuffer.slice(0));
   await audioContext.close();
   const objectUrl = URL.createObjectURL(file);
+  if (shouldPersist) {
+    await putAudioFileRecord({
+      id: group.id,
+      groupId: group.id,
+      fileName: file.name,
+      type: file.type || 'audio/mpeg',
+      size: file.size,
+      updatedAt: new Date().toISOString(),
+      blob: file
+    });
+  }
   if (state.audio.groups[group.id]?.url) URL.revokeObjectURL(state.audio.groups[group.id].url);
   const saved = state.audio.saved[group.id];
   const useSaved = saved?.segments?.length === group.expected && Math.abs(Number(saved.duration) - decoded.duration) < 2;
@@ -1409,7 +1436,7 @@ async function importAudioGroup(group, file) {
     url: objectUrl,
     buffer: decoded,
     duration: decoded.duration,
-    method: useSaved ? 'bewaarde grenzen' : 'grootste pauzes',
+    method: options.method || (useSaved ? 'bewaarde grenzen' : 'grootste pauzes'),
     segments
   };
   segments.forEach(segment => {
@@ -1816,7 +1843,17 @@ function formatTimestamp(value) {
   return `${minutes}:${secondsText}`;
 }
 
-function clearAudio() {
+async function loadStoredAudioFiles() {
+  const records = await getAllAudioFileRecords();
+  for (const record of records) {
+    const group = AUDIO_GROUPS.find(item => item.id === record.groupId || item.id === record.id);
+    if (!group || !record.blob) continue;
+    const file = new File([record.blob], record.fileName || `${group.id}.mp3`, { type: record.type || 'audio/mpeg' });
+    await importAudioGroup(group, file, { persist: false, method: 'opgeslagen mp3 + bewaarde grenzen' });
+  }
+}
+
+async function clearAudio() {
   Object.values(state.audio.groups).forEach(group => {
     if (group.url) URL.revokeObjectURL(group.url);
   });
@@ -1825,6 +1862,7 @@ function clearAudio() {
   state.audio.groups = {};
   state.audio.segments = {};
   state.audio.saved = {};
+  await clearAudioFileRecords();
   localStorage.removeItem(AUDIO_TIMES_KEY);
   renderAudioImport();
   renderAudioPanel();
@@ -2035,12 +2073,15 @@ function sourceImageId(itemNumber, kind) {
 
 function openSourceImageDb() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(SOURCE_IMAGE_DB, 1);
+    const request = indexedDB.open(SOURCE_IMAGE_DB, 2);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains(SOURCE_IMAGE_STORE)) {
         const store = db.createObjectStore(SOURCE_IMAGE_STORE, { keyPath: 'id' });
         store.createIndex('itemNumber', 'itemNumber', { unique: false });
+      }
+      if (!db.objectStoreNames.contains(AUDIO_FILE_STORE)) {
+        db.createObjectStore(AUDIO_FILE_STORE, { keyPath: 'id' });
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -2086,6 +2127,39 @@ async function clearSourceImageRecords() {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(SOURCE_IMAGE_STORE, 'readwrite');
     const request = transaction.objectStore(SOURCE_IMAGE_STORE).clear();
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function getAllAudioFileRecords() {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(AUDIO_FILE_STORE, 'readonly');
+    const request = transaction.objectStore(AUDIO_FILE_STORE).getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function putAudioFileRecord(record) {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(AUDIO_FILE_STORE, 'readwrite');
+    const request = transaction.objectStore(AUDIO_FILE_STORE).put(record);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function clearAudioFileRecords() {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(AUDIO_FILE_STORE, 'readwrite');
+    const request = transaction.objectStore(AUDIO_FILE_STORE).clear();
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
     transaction.oncomplete = () => db.close();
