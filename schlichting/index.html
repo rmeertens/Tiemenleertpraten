@@ -9,7 +9,7 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Schlichting Privétrainer &middot; Tiemen Leert Praten</title>
   <link rel="stylesheet" href="/assets/site.css?v=31" />
-  <link rel="stylesheet" href="/schlichting/styles.css?v=7" />
+  <link rel="stylesheet" href="/schlichting/styles.css?v=9" />
 </head>
 <body>
   <div class="version-stamp">v1 &middot; privé</div>
@@ -39,6 +39,7 @@
       <button class="sch-tab" type="button" data-view="taalbegrip">Taalbegrip</button>
       <button class="sch-tab" type="button" data-view="zinsontwikkeling">Zinsontwikkeling</button>
       <button class="sch-tab" type="button" data-view="audio">Audio</button>
+      <button class="sch-tab" type="button" data-view="scoreform">Scoreformulier</button>
       <button class="sch-tab" type="button" data-view="scripts">ZG scripts</button>
       <button class="sch-tab" type="button" data-view="simulation">Simulatie</button>
       <button class="sch-tab" type="button" data-view="dashboard">Score</button>
@@ -172,6 +173,22 @@
       </article>
     </section>
 
+    <section class="sch-view" id="view-scoreform">
+      <article class="sch-card">
+        <div class="sch-section-head">
+          <div>
+            <p class="sch-label">Papiermodus</p>
+            <h2>Scoreformulier als vast zijpaneel</h2>
+            <p>
+              Open het scoreformulier naast je items. Je kunt het paneel inklappen, openklappen en breder of smaller slepen.
+            </p>
+          </div>
+          <button class="btn btn--primary" type="button" id="open-scoreform-dock">Open scoreformulier</button>
+        </div>
+        <div class="sch-warn"><strong>Los paneel.</strong><br>Het scoreformulier staat bewust los van de itemkaarten, zodat je tijdens afname of oefening door beide kanten apart kunt scrollen.</div>
+      </article>
+    </section>
+
     <section class="sch-view" id="view-simulation">
       <article class="sch-card">
         <div class="sch-section-head">
@@ -201,7 +218,24 @@
       </article>
     </section>
   </main>
+  <aside class="sch-scoreform-dock" id="scoreform-dock" aria-label="Scoreformulier zijpaneel" aria-hidden="true">
+    <div class="sch-scoreform-resizer" id="scoreform-resizer" role="separator" aria-orientation="vertical" aria-label="Sleep om scoreformulierpaneel te vergroten of verkleinen"></div>
+    <div class="sch-scoreform-shell">
+      <header class="sch-scoreform-head">
+        <div>
+          <p class="sch-label">Papiermodus</p>
+          <h2>Scoreformulier</h2>
+        </div>
+        <div class="sch-actions">
+          <button class="btn btn--ghost" type="button" id="collapse-scoreform-dock">Inklappen</button>
+          <button class="btn btn--ghost" type="button" id="close-scoreform-dock">Sluit</button>
+        </div>
+      </header>
+      <div id="scoreform-paper"></div>
+    </div>
+  </aside>
+  <button class="sch-scoreform-fab" type="button" id="scoreform-fab">Scoreformulier</button>
   <script src="/schlichting/schema-example.js?v=1"></script>
-  <script src="/schlichting/app.js?v=7"></script>
+  <script src="/schlichting/app.js?v=9"></script>
 </body>
 </html>

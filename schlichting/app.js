@@ -4,9 +4,12 @@ const STORAGE_KEY = 'schlichting_private_data_v1';
 const SCORE_KEY = 'schlichting_private_scores_v1';
 const PREP_KEY = 'schlichting_private_prep_v1';
 const AUDIO_TIMES_KEY = 'schlichting_private_audio_times_v1';
+const SCORE_FORM_PENCIL_KEY = 'schlichting_scoreformulier_potlood_v1';
+const SCORE_FORM_DOCK_KEY = 'schlichting_scoreformulier_dock_v1';
 const SOURCE_IMAGE_DB = 'schlichting_private_source_images_v1';
 const SOURCE_IMAGE_STORE = 'images';
 const AUDIO_FILE_STORE = 'audioFiles';
+const SCORE_FORM_PAGE_STORE = 'scoreFormPages';
 
 const SOURCE_IMAGE_KINDS = [
   { id: 'testmap', label: 'Testmap' },
@@ -232,7 +235,18 @@ const state = {
     activeStop: null,
     saved: readJson(AUDIO_TIMES_KEY, {})
   },
-  sourceImages: {}
+  sourceImages: {},
+  scoreForm: {
+    pages: [],
+    page: 1,
+    mode: 'pencil',
+    strokes: readJson(SCORE_FORM_PENCIL_KEY, {}),
+    dock: {
+      open: readJson(SCORE_FORM_DOCK_KEY, { open: false, width: 520, collapsed: false }).open || false,
+      width: readJson(SCORE_FORM_DOCK_KEY, { open: false, width: 520, collapsed: false }).width || 520,
+      collapsed: readJson(SCORE_FORM_DOCK_KEY, { open: false, width: 520, collapsed: false }).collapsed || false
+    }
+  }
 };
 
 const els = {
@@ -255,7 +269,11 @@ const els = {
   dashboard: document.getElementById('dashboard'),
   audioImport: document.getElementById('audio-import'),
   audioPanel: document.getElementById('audio-panel'),
-  audioPlayer: document.getElementById('audio-player')
+  audioPlayer: document.getElementById('audio-player'),
+  scoreFormPaper: document.getElementById('scoreform-paper'),
+  scoreFormDock: document.getElementById('scoreform-dock'),
+  scoreFormFab: document.getElementById('scoreform-fab'),
+  scoreFormResizer: document.getElementById('scoreform-resizer')
 };
 
 boot();
@@ -276,6 +294,12 @@ function boot() {
     renderAudioImport();
     renderAudioPanel();
   });
+  loadScoreFormPages().then(() => {
+    renderScoreFormPaper();
+  }).catch(() => {
+    state.scoreForm.pages = [];
+    renderScoreFormPaper();
+  });
 }
 
 function bindEvents() {
@@ -294,6 +318,11 @@ function bindEvents() {
   document.getElementById('copy-prompt').addEventListener('click', copyPrompt);
   document.getElementById('privacy-check').addEventListener('click', privacyCheck);
   document.getElementById('clear-audio').addEventListener('click', clearAudio);
+  document.getElementById('open-scoreform-dock')?.addEventListener('click', () => setScoreFormDock({ open: true, collapsed: false }));
+  document.getElementById('scoreform-fab')?.addEventListener('click', () => setScoreFormDock({ open: true, collapsed: false }));
+  document.getElementById('close-scoreform-dock')?.addEventListener('click', () => setScoreFormDock({ open: false }));
+  document.getElementById('collapse-scoreform-dock')?.addEventListener('click', () => setScoreFormDock({ collapsed: !state.scoreForm.dock.collapsed, open: true }));
+  els.scoreFormResizer?.addEventListener('pointerdown', startScoreFormResize);
   document.getElementById('calculate-age').addEventListener('click', renderWizard);
   els.timerToggle.addEventListener('click', toggleTimer);
 
@@ -320,11 +349,16 @@ function renderAll() {
   renderScripts();
   renderAudioImport();
   renderAudioPanel();
+  renderScoreFormDock();
+  renderScoreFormPaper();
   renderSimulation();
   renderDashboard();
 }
 
 function showView(view) {
+  if (view === 'scoreform') {
+    setScoreFormDock({ open: true, collapsed: false });
+  }
   state.view = view;
   document.querySelectorAll('.sch-tab').forEach(tab => {
     tab.classList.toggle('is-active', tab.dataset.view === view);
@@ -332,6 +366,48 @@ function showView(view) {
   document.querySelectorAll('.sch-view').forEach(section => {
     section.classList.toggle('is-active', section.id === `view-${view}`);
   });
+}
+
+function persistScoreFormDock() {
+  localStorage.setItem(SCORE_FORM_DOCK_KEY, JSON.stringify(state.scoreForm.dock));
+}
+
+function setScoreFormDock(patch) {
+  state.scoreForm.dock = { ...state.scoreForm.dock, ...patch };
+  persistScoreFormDock();
+  renderScoreFormDock();
+  renderScoreFormPaper();
+}
+
+function renderScoreFormDock() {
+  if (!els.scoreFormDock) return;
+  const width = Math.min(Math.max(Number(state.scoreForm.dock.width) || 520, 360), Math.min(window.innerWidth - 32, 980));
+  state.scoreForm.dock.width = width;
+  els.scoreFormDock.style.setProperty('--scoreform-width', `${width}px`);
+  els.scoreFormDock.classList.toggle('is-open', Boolean(state.scoreForm.dock.open));
+  els.scoreFormDock.classList.toggle('is-collapsed', Boolean(state.scoreForm.dock.collapsed));
+  els.scoreFormDock.setAttribute('aria-hidden', String(!state.scoreForm.dock.open));
+  els.scoreFormFab?.classList.toggle('is-hidden', Boolean(state.scoreForm.dock.open && !state.scoreForm.dock.collapsed));
+  document.getElementById('collapse-scoreform-dock')?.replaceChildren(document.createTextNode(state.scoreForm.dock.collapsed ? 'Uitklappen' : 'Inklappen'));
+}
+
+function startScoreFormResize(event) {
+  event.preventDefault();
+  const startX = event.clientX;
+  const startWidth = state.scoreForm.dock.width;
+  const resize = moveEvent => {
+    const nextWidth = Math.min(Math.max(startWidth + (startX - moveEvent.clientX), 360), Math.min(window.innerWidth - 32, 980));
+    state.scoreForm.dock.width = nextWidth;
+    renderScoreFormDock();
+  };
+  const stop = () => {
+    persistScoreFormDock();
+    renderScoreFormPaper();
+    window.removeEventListener('pointermove', resize);
+    window.removeEventListener('pointerup', stop);
+  };
+  window.addEventListener('pointermove', resize);
+  window.addEventListener('pointerup', stop);
 }
 
 function renderStatus() {
@@ -354,10 +430,16 @@ async function importData() {
     let parsed = parseImportText(els.importText.value);
     const importedAudioTimes = parsed._privateAudioTimes || parsed.privateAudioTimes || null;
     const importedSourceImages = parsed._privateSourceImages || parsed.privateSourceImages || null;
+    const importedScoreFormPages = parsed._privateScoreFormPages || parsed.privateScoreFormPages || null;
+    const importedScoreFormStrokes = parsed._privateScoreFormStrokes || parsed.privateScoreFormStrokes || null;
     delete parsed._privateAudioTimes;
     delete parsed.privateAudioTimes;
     delete parsed._privateSourceImages;
     delete parsed.privateSourceImages;
+    delete parsed._privateScoreFormPages;
+    delete parsed.privateScoreFormPages;
+    delete parsed._privateScoreFormStrokes;
+    delete parsed.privateScoreFormStrokes;
     if (parsed.schema !== 'schlichting-v1' && (parsed.rules || parsed.items || parsed.rubric || parsed.zgScripts)) {
       parsed = mergePartialImports([parsed]);
     }
@@ -375,6 +457,13 @@ async function importData() {
     }
     if (Array.isArray(importedSourceImages)) {
       await restoreSourceImages(importedSourceImages);
+    }
+    if (Array.isArray(importedScoreFormPages)) {
+      await restoreScoreFormPages(importedScoreFormPages);
+    }
+    if (importedScoreFormStrokes && typeof importedScoreFormStrokes === 'object') {
+      state.scoreForm.strokes = importedScoreFormStrokes;
+      localStorage.setItem(SCORE_FORM_PENCIL_KEY, JSON.stringify(importedScoreFormStrokes));
     }
     els.validation.innerHTML = validationHtml(validation);
     renderAll();
@@ -851,10 +940,13 @@ async function exportData() {
   }
   syncAllAudioSegmentsIntoData();
   const privateSourceImages = await serializeSourceImages();
+  const privateScoreFormPages = await serializeScoreFormPages();
   const payload = {
     ...state.data,
     _privateAudioTimes: state.audio.saved,
     _privateSourceImages: privateSourceImages,
+    _privateScoreFormPages: privateScoreFormPages,
+    _privateScoreFormStrokes: state.scoreForm.strokes,
     _exportedAt: new Date().toISOString()
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -871,8 +963,11 @@ async function clearData() {
   localStorage.removeItem(SCORE_KEY);
   localStorage.removeItem(PREP_KEY);
   localStorage.removeItem(AUDIO_TIMES_KEY);
+  localStorage.removeItem(SCORE_FORM_PENCIL_KEY);
+  localStorage.removeItem(SCORE_FORM_DOCK_KEY);
   await clearSourceImageRecords();
   await clearAudioFileRecords();
+  await clearScoreFormPageRecords();
   Object.values(state.sourceImages).forEach(record => {
     if (record.url) URL.revokeObjectURL(record.url);
   });
@@ -886,6 +981,11 @@ async function clearData() {
   state.audio.groups = {};
   state.audio.segments = {};
   state.audio.saved = {};
+  Object.values(state.scoreForm.pages).forEach(record => {
+    if (record.url) URL.revokeObjectURL(record.url);
+  });
+  state.scoreForm.pages = [];
+  state.scoreForm.strokes = {};
   els.importText.value = '';
   els.validation.innerHTML = '<div class="sch-ok"><strong>Privédata gewist.</strong><br>Import, audio, bronfoto’s, prepnotities en scores zijn uit deze browser verwijderd.</div>';
   renderAll();
@@ -907,9 +1007,10 @@ function privacyCheck() {
     '2. Importdata staat alleen in localStorage van deze browser.',
     '3. Bronfoto’s staan alleen in IndexedDB van deze browser.',
     '4. Mp3’s staan alleen in IndexedDB van deze browser en worden niet online gezet.',
-    '5. Exporteer back-up kan bronfoto’s bevatten; deel dat bestand niet.',
-    '6. Wis privédata verwijdert de lokale import.',
-    '7. Gebruik geen gedeelde computer zonder daarna te wissen.'
+    '5. Scoreformulierpagina’s en potloodmarkeringen staan alleen lokaal in deze browser.',
+    '6. Exporteer back-up kan bronfoto’s en scoreformulierpagina’s bevatten; deel dat bestand niet.',
+    '7. Wis privédata verwijdert de lokale import.',
+    '8. Gebruik geen gedeelde computer zonder daarna te wissen.'
   ].join('\n');
   window.alert(message);
 }
@@ -1717,6 +1818,252 @@ function audioForItemHtml(itemNumber) {
   `;
 }
 
+function renderScoreFormPaper() {
+  if (!els.scoreFormPaper) return;
+  const pages = state.scoreForm.pages.sort((a, b) => Number(a.pageNumber) - Number(b.pageNumber));
+  const active = pages.find(record => Number(record.pageNumber) === Number(state.scoreForm.page)) || pages[0];
+  if (active) state.scoreForm.page = Number(active.pageNumber);
+  els.scoreFormPaper.innerHTML = `
+    <div class="sch-paper-tool">
+      <div class="sch-paper-toolbar">
+        <label class="sch-paper-upload">
+          <span>${pages.length ? 'Vervang pagina’s' : 'Upload pagina’s'}</span>
+          <input type="file" accept="image/png,image/jpeg,image/webp" multiple data-scoreform-upload />
+        </label>
+        <button class="btn btn--ghost ${state.scoreForm.mode === 'pencil' ? 'is-active' : ''}" type="button" data-scoreform-mode="pencil">Potlood</button>
+        <button class="btn btn--ghost ${state.scoreForm.mode === 'eraser' ? 'is-active' : ''}" type="button" data-scoreform-mode="eraser">Gum</button>
+        <button class="btn btn--ghost" type="button" data-scoreform-undo ${active ? '' : 'disabled'}>Ongedaan</button>
+        <button class="btn btn--ghost" type="button" data-scoreform-clear-page ${active ? '' : 'disabled'}>Wis pagina</button>
+        <button class="btn btn--ghost" type="button" data-scoreform-clear-all ${pages.length ? '' : 'disabled'}>Wis alles</button>
+        <button class="btn btn--primary" type="button" data-scoreform-export-page ${active ? '' : 'disabled'}>Exporteer pagina</button>
+        <label class="sch-paper-size">
+          <span>Dikte</span>
+          <input type="range" min="2" max="18" value="${escapeHtml(state.scoreForm.size || 5)}" data-scoreform-size />
+        </label>
+        <span class="sch-audio-mini">${escapeHtml(pages.length)} pagina${pages.length === 1 ? '' : "'s"} lokaal opgeslagen</span>
+      </div>
+      ${pages.length ? `
+        <div class="sch-paper-pages">
+          ${pages.map(record => `<button class="btn btn--ghost ${Number(record.pageNumber) === Number(state.scoreForm.page) ? 'is-active' : ''}" type="button" data-scoreform-page="${escapeHtml(record.pageNumber)}">${escapeHtml(record.pageNumber)}</button>`).join('')}
+        </div>
+        <div class="sch-paper-desk">
+          <div class="sch-paper-sheet">
+            <img src="${escapeHtml(active.url)}" alt="Scoreformulier pagina ${escapeHtml(active.pageNumber)}" data-scoreform-image />
+            <canvas data-scoreform-canvas></canvas>
+          </div>
+        </div>
+        <p class="sch-score-note">Gebruik dit als digitaal potlood. De scanpagina’s en markeringen blijven lokaal in deze browser; ze worden niet meegecommit.</p>
+      ` : `
+        <div class="sch-audio-drop">
+          <strong>Nog geen scoreformulierpagina’s.</strong>
+          <p>Selecteer lokale PNG/JPG/WebP-pagina’s, bijvoorbeeld pagina 01 t/m 07. De tool sorteert op bestandsnaam en bewaart ze lokaal in deze browser.</p>
+        </div>
+      `}
+    </div>
+  `;
+  bindScoreFormPaper();
+}
+
+function bindScoreFormPaper() {
+  const root = els.scoreFormPaper;
+  root.querySelector('[data-scoreform-upload]')?.addEventListener('change', event => importScoreFormPages(event.target.files));
+  root.querySelectorAll('[data-scoreform-mode]').forEach(button => {
+    button.addEventListener('click', () => {
+      state.scoreForm.mode = button.dataset.scoreformMode;
+      renderScoreFormPaper();
+    });
+  });
+  root.querySelector('[data-scoreform-size]')?.addEventListener('input', event => {
+    state.scoreForm.size = Number(event.target.value);
+  });
+  root.querySelectorAll('[data-scoreform-page]').forEach(button => {
+    button.addEventListener('click', () => {
+      state.scoreForm.page = Number(button.dataset.scoreformPage);
+      renderScoreFormPaper();
+    });
+  });
+  root.querySelector('[data-scoreform-undo]')?.addEventListener('click', undoScoreFormStroke);
+  root.querySelector('[data-scoreform-clear-page]')?.addEventListener('click', clearScoreFormPage);
+  root.querySelector('[data-scoreform-clear-all]')?.addEventListener('click', clearScoreFormTool);
+  root.querySelector('[data-scoreform-export-page]')?.addEventListener('click', exportScoreFormPage);
+  const image = root.querySelector('[data-scoreform-image]');
+  const canvas = root.querySelector('[data-scoreform-canvas]');
+  if (image && canvas) {
+    const setup = () => setupScoreFormCanvas(image, canvas);
+    if (image.complete) setup();
+    image.addEventListener('load', setup, { once: true });
+    window.addEventListener('resize', setup, { once: true });
+  }
+}
+
+async function importScoreFormPages(fileList) {
+  const files = [...(fileList || [])]
+    .filter(file => file.type.startsWith('image/'))
+    .sort((a, b) => a.name.localeCompare(b.name, 'nl', { numeric: true }));
+  if (!files.length) {
+    window.alert('Kies PNG/JPG/WebP-afbeeldingen van je scoreformulier.');
+    return;
+  }
+  await clearScoreFormPageRecords();
+  state.scoreForm.pages.forEach(record => {
+    if (record.url) URL.revokeObjectURL(record.url);
+  });
+  state.scoreForm.pages = [];
+  state.scoreForm.strokes = {};
+  localStorage.removeItem(SCORE_FORM_PENCIL_KEY);
+  for (let index = 0; index < files.length; index += 1) {
+    const file = files[index];
+    const record = {
+      id: `scoreform-page-${index + 1}`,
+      pageNumber: index + 1,
+      fileName: file.name,
+      type: file.type,
+      size: file.size,
+      updatedAt: new Date().toISOString(),
+      blob: file
+    };
+    await putScoreFormPageRecord(record);
+    state.scoreForm.pages.push({ ...record, url: URL.createObjectURL(file) });
+  }
+  state.scoreForm.page = 1;
+  renderScoreFormPaper();
+}
+
+function scoreFormPageKey() {
+  return `page_${state.scoreForm.page}`;
+}
+
+function setupScoreFormCanvas(image, canvas) {
+  const rect = image.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const ratio = window.devicePixelRatio || 1;
+  canvas.style.width = `${rect.width}px`;
+  canvas.style.height = `${rect.height}px`;
+  canvas.width = Math.round(rect.width * ratio);
+  canvas.height = Math.round(rect.height * ratio);
+  const context = canvas.getContext('2d');
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  redrawScoreFormCanvas(canvas);
+  canvas.onpointerdown = event => startScoreFormStroke(event, canvas);
+  canvas.onpointermove = event => moveScoreFormStroke(event, canvas);
+  canvas.onpointerup = event => endScoreFormStroke(event, canvas);
+  canvas.onpointercancel = event => endScoreFormStroke(event, canvas);
+}
+
+function scoreFormPoint(event, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) / rect.width,
+    y: (event.clientY - rect.top) / rect.height
+  };
+}
+
+function startScoreFormStroke(event, canvas) {
+  event.preventDefault();
+  canvas.setPointerCapture(event.pointerId);
+  state.scoreForm.activeStroke = {
+    mode: state.scoreForm.mode || 'pencil',
+    size: Number(state.scoreForm.size || 5),
+    points: [scoreFormPoint(event, canvas)]
+  };
+}
+
+function moveScoreFormStroke(event, canvas) {
+  if (!state.scoreForm.activeStroke) return;
+  event.preventDefault();
+  state.scoreForm.activeStroke.points.push(scoreFormPoint(event, canvas));
+  redrawScoreFormCanvas(canvas, state.scoreForm.activeStroke);
+}
+
+function endScoreFormStroke(event, canvas) {
+  if (!state.scoreForm.activeStroke) return;
+  event.preventDefault();
+  const stroke = state.scoreForm.activeStroke;
+  state.scoreForm.activeStroke = null;
+  if (stroke.points.length > 1) {
+    const key = scoreFormPageKey();
+    state.scoreForm.strokes[key] = state.scoreForm.strokes[key] || [];
+    state.scoreForm.strokes[key].push(stroke);
+    localStorage.setItem(SCORE_FORM_PENCIL_KEY, JSON.stringify(state.scoreForm.strokes));
+  }
+  redrawScoreFormCanvas(canvas);
+}
+
+function redrawScoreFormCanvas(canvas, extraStroke = null) {
+  const context = canvas.getContext('2d');
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  const strokes = [...(state.scoreForm.strokes[scoreFormPageKey()] || [])];
+  if (extraStroke) strokes.push(extraStroke);
+  strokes.forEach(stroke => drawScoreFormStroke(canvas, stroke));
+}
+
+function drawScoreFormStroke(canvas, stroke) {
+  const context = canvas.getContext('2d');
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  if (!stroke.points?.length) return;
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
+  context.lineWidth = stroke.size || 5;
+  if (stroke.mode === 'eraser') {
+    context.globalCompositeOperation = 'destination-out';
+    context.strokeStyle = 'rgba(0,0,0,1)';
+  } else {
+    context.globalCompositeOperation = 'source-over';
+    context.strokeStyle = 'rgba(36,59,83,.92)';
+  }
+  context.beginPath();
+  context.moveTo(stroke.points[0].x * width, stroke.points[0].y * height);
+  stroke.points.slice(1).forEach(point => context.lineTo(point.x * width, point.y * height));
+  context.stroke();
+  context.globalCompositeOperation = 'source-over';
+}
+
+function undoScoreFormStroke() {
+  const key = scoreFormPageKey();
+  state.scoreForm.strokes[key] = state.scoreForm.strokes[key] || [];
+  state.scoreForm.strokes[key].pop();
+  localStorage.setItem(SCORE_FORM_PENCIL_KEY, JSON.stringify(state.scoreForm.strokes));
+  renderScoreFormPaper();
+}
+
+function clearScoreFormPage() {
+  if (!window.confirm(`Markeringen op pagina ${state.scoreForm.page} wissen?`)) return;
+  state.scoreForm.strokes[scoreFormPageKey()] = [];
+  localStorage.setItem(SCORE_FORM_PENCIL_KEY, JSON.stringify(state.scoreForm.strokes));
+  renderScoreFormPaper();
+}
+
+async function clearScoreFormTool() {
+  if (!window.confirm('Alle scoreformulierpagina’s en potloodmarkeringen uit deze browser wissen?')) return;
+  await clearScoreFormPageRecords();
+  state.scoreForm.pages.forEach(record => {
+    if (record.url) URL.revokeObjectURL(record.url);
+  });
+  state.scoreForm.pages = [];
+  state.scoreForm.strokes = {};
+  state.scoreForm.page = 1;
+  localStorage.removeItem(SCORE_FORM_PENCIL_KEY);
+  renderScoreFormPaper();
+}
+
+async function exportScoreFormPage() {
+  const root = els.scoreFormPaper;
+  const image = root.querySelector('[data-scoreform-image]');
+  const canvas = root.querySelector('[data-scoreform-canvas]');
+  if (!image || !canvas) return;
+  const output = document.createElement('canvas');
+  output.width = image.naturalWidth;
+  output.height = image.naturalHeight;
+  const context = output.getContext('2d');
+  context.drawImage(image, 0, 0, output.width, output.height);
+  context.drawImage(canvas, 0, 0, output.width, output.height);
+  const link = document.createElement('a');
+  link.href = output.toDataURL('image/png');
+  link.download = `scoreformulier-pagina-${state.scoreForm.page}-met-markeringen.png`;
+  link.click();
+}
+
 function bindAudioButtons() {
   document.querySelectorAll('[data-audio-play]').forEach(button => {
     if (button.dataset.audioBound === 'true') return;
@@ -2073,6 +2420,19 @@ async function loadSourceImages() {
   });
 }
 
+async function loadScoreFormPages() {
+  const records = await getAllScoreFormPageRecords();
+  state.scoreForm.pages.forEach(record => {
+    if (record.url) URL.revokeObjectURL(record.url);
+  });
+  state.scoreForm.pages = records
+    .map(record => ({ ...record, url: URL.createObjectURL(record.blob) }))
+    .sort((a, b) => Number(a.pageNumber) - Number(b.pageNumber));
+  if (!state.scoreForm.pages.some(record => Number(record.pageNumber) === Number(state.scoreForm.page))) {
+    state.scoreForm.page = state.scoreForm.pages[0]?.pageNumber || 1;
+  }
+}
+
 async function saveSourceImage(itemNumber, kind, file) {
   if (!file.type.startsWith('image/')) {
     window.alert('Kies een PNG, JPG of WebP-afbeelding.');
@@ -2148,13 +2508,51 @@ async function restoreSourceImages(records) {
   }
 }
 
+async function serializeScoreFormPages() {
+  const records = await getAllScoreFormPageRecords();
+  return Promise.all(records.map(async record => ({
+    id: record.id,
+    pageNumber: record.pageNumber,
+    fileName: record.fileName,
+    type: record.type,
+    size: record.size,
+    updatedAt: record.updatedAt,
+    dataUrl: await blobToDataUrl(record.blob)
+  })));
+}
+
+async function restoreScoreFormPages(records) {
+  await clearScoreFormPageRecords();
+  state.scoreForm.pages.forEach(record => {
+    if (record.url) URL.revokeObjectURL(record.url);
+  });
+  state.scoreForm.pages = [];
+  for (const record of records) {
+    if (!record?.id || !record?.dataUrl) continue;
+    const blob = dataUrlToBlob(record.dataUrl);
+    const restored = {
+      id: record.id,
+      pageNumber: Number(record.pageNumber),
+      fileName: record.fileName || `scoreformulier-pagina-${record.pageNumber}`,
+      type: record.type || blob.type || 'image/png',
+      size: record.size || blob.size,
+      updatedAt: record.updatedAt || new Date().toISOString(),
+      blob
+    };
+    await putScoreFormPageRecord(restored);
+    state.scoreForm.pages.push({ ...restored, url: URL.createObjectURL(blob) });
+  }
+  state.scoreForm.pages.sort((a, b) => Number(a.pageNumber) - Number(b.pageNumber));
+  state.scoreForm.page = state.scoreForm.pages[0]?.pageNumber || 1;
+}
+
 function sourceImageId(itemNumber, kind) {
   return `ZO-${itemNumber}:${kind}`;
 }
 
 function openSourceImageDb() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(SOURCE_IMAGE_DB, 2);
+    const request = indexedDB.open(SOURCE_IMAGE_DB, 3);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains(SOURCE_IMAGE_STORE)) {
@@ -2163,6 +2561,10 @@ function openSourceImageDb() {
       }
       if (!db.objectStoreNames.contains(AUDIO_FILE_STORE)) {
         db.createObjectStore(AUDIO_FILE_STORE, { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains(SCORE_FORM_PAGE_STORE)) {
+        const store = db.createObjectStore(SCORE_FORM_PAGE_STORE, { keyPath: 'id' });
+        store.createIndex('pageNumber', 'pageNumber', { unique: false });
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -2241,6 +2643,39 @@ async function clearAudioFileRecords() {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(AUDIO_FILE_STORE, 'readwrite');
     const request = transaction.objectStore(AUDIO_FILE_STORE).clear();
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function getAllScoreFormPageRecords() {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(SCORE_FORM_PAGE_STORE, 'readonly');
+    const request = transaction.objectStore(SCORE_FORM_PAGE_STORE).getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function putScoreFormPageRecord(record) {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(SCORE_FORM_PAGE_STORE, 'readwrite');
+    const request = transaction.objectStore(SCORE_FORM_PAGE_STORE).put(record);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function clearScoreFormPageRecords() {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(SCORE_FORM_PAGE_STORE, 'readwrite');
+    const request = transaction.objectStore(SCORE_FORM_PAGE_STORE).clear();
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
     transaction.oncomplete = () => db.close();
