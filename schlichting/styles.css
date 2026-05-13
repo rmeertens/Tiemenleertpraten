@@ -471,7 +471,25 @@ body.sch-scoreform-split .sch-app {
 }
 
 .sch-private-section--handleiding .sch-private-section-body {
+  font-size: 17px;
+  line-height: 1.7;
   max-height: min(58vh, 620px);
+}
+
+.sch-private-section--handleiding .sch-private-section-body em {
+  background: var(--accent-soft);
+  border-radius: 8px;
+  color: var(--accent);
+  display: inline;
+  font-style: italic;
+  font-weight: 900;
+  padding: 1px 5px 2px;
+}
+
+.sch-private-section--handleiding .sch-private-section-body strong em,
+.sch-private-section--handleiding .sch-private-section-body em strong {
+  color: var(--accent);
+  font-weight: 950;
 }
 
 .sch-private-section-body h3,
