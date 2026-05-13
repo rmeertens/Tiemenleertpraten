@@ -282,7 +282,7 @@ function renderStatus() {
 
 function importData() {
   try {
-    const parsed = JSON.parse(els.importText.value);
+    const parsed = parseImportText(els.importText.value);
     const validation = validateData(parsed);
     if (validation.errors.length) {
       els.validation.innerHTML = validationHtml(validation);
@@ -293,8 +293,155 @@ function importData() {
     els.validation.innerHTML = validationHtml(validation);
     renderAll();
   } catch (error) {
-    els.validation.innerHTML = `<div class="sch-alert"><strong>JSON lukt nog niet.</strong><br>${escapeHtml(error.message)}</div>`;
+    els.validation.innerHTML = `<div class="sch-alert"><strong>JSON lukt nog niet.</strong><br>${escapeHtml(importErrorHelp(error))}</div>`;
   }
+}
+
+function parseImportText(text) {
+  const trimmed = text.trim();
+  if (!trimmed) throw new Error('Plak eerst de NotebookLM-export.');
+  try {
+    return JSON.parse(trimmed);
+  } catch (firstError) {
+    const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fenced?.[1]) return JSON.parse(fenced[1].trim());
+    const objects = parseJsonObjects(trimmed);
+    if (objects.length > 1) return mergePartialImports(objects);
+    const firstBrace = trimmed.indexOf('{');
+    const lastBrace = trimmed.lastIndexOf('}');
+    if (firstBrace >= 0 && lastBrace > firstBrace) {
+      return JSON.parse(trimmed.slice(firstBrace, lastBrace + 1));
+    }
+    throw firstError;
+  }
+}
+
+function parseJsonObjects(text) {
+  const objects = [];
+  let depth = 0;
+  let start = -1;
+  let inString = false;
+  let escaped = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+    if (char === '"') {
+      inString = true;
+      continue;
+    }
+    if (char === '{') {
+      if (depth === 0) start = index;
+      depth += 1;
+    }
+    if (char === '}') {
+      depth -= 1;
+      if (depth === 0 && start >= 0) {
+        objects.push(JSON.parse(text.slice(start, index + 1)));
+        start = -1;
+      }
+    }
+  }
+  return objects;
+}
+
+function mergePartialImports(parts) {
+  const merged = {
+    schema: 'schlichting-v1',
+    title: 'Schlichting Taalproductie-3 - Zinsontwikkeling',
+    sourceNote: 'Privé-import op basis van meerdere NotebookLM-blokken. Niet committen of openbaar delen.',
+    taalbegrip: {
+      rules: {
+        ageRange: 'niet ingevuld in deze export',
+        setup: [],
+        startRules: [],
+        returnRule: 'niet ingevuld in deze export',
+        stopRule: 'niet ingevuld in deze export'
+      },
+      sections: [],
+      items: []
+    },
+    zinsontwikkeling: {
+      rules: {
+        setup: [],
+        startRules: [],
+        stopRule: '',
+        returnRule: '',
+        repeatRule: '',
+        scoringPrinciples: [],
+        pitfalls: [],
+        sources: []
+      },
+      items: []
+    },
+    rubric: { criteria: [] },
+    zgScripts: []
+  };
+
+  parts.forEach(part => {
+    if (part.schema === 'schlichting-v1') {
+      Object.assign(merged, part);
+      return;
+    }
+    if (part.rules) {
+      merged.zinsontwikkeling.rules = {
+        ...merged.zinsontwikkeling.rules,
+        ...part.rules,
+        startRules: normalizeStartRules(part.rules.startRules || [])
+      };
+    }
+    if (Array.isArray(part.items)) merged.zinsontwikkeling.items = part.items;
+    if (part.rubric) merged.rubric = part.rubric;
+    if (Array.isArray(part.zgScripts)) merged.zgScripts = part.zgScripts;
+  });
+
+  return merged;
+}
+
+function normalizeStartRules(rules) {
+  return rules.map((rule, index) => {
+    if (typeof rule !== 'string') return rule;
+    const parsed = {
+      minMonths: 0,
+      maxMonths: 999,
+      label: rule,
+      startItem: '',
+      returnRule: '',
+      stopRule: ''
+    };
+    if (rule.includes('2;0') && rule.includes('3;11')) {
+      parsed.minMonths = 24;
+      parsed.maxMonths = 47;
+      parsed.startItem = 1;
+    } else if (rule.includes('4;0') && rule.includes('4;11')) {
+      parsed.minMonths = 48;
+      parsed.maxMonths = 59;
+      parsed.startItem = 5;
+    } else if (rule.includes('5;0')) {
+      parsed.minMonths = 60;
+      parsed.maxMonths = 999;
+      parsed.startItem = 10;
+    } else {
+      parsed.label = `Regel ${index + 1}: ${rule}`;
+    }
+    return parsed;
+  });
+}
+
+function importErrorHelp(error) {
+  if (String(error.message).includes('Unexpected end') || String(error.message).includes('Unexpected EOF')) {
+    return 'De JSON is niet compleet. Kopieer vanaf de eerste { tot en met de laatste }. Vaak mist onderaan nog een afsluitende } of ].';
+  }
+  return `${error.message}. Tip: plak alleen geldige JSON of een compleet \`\`\`json-blok uit NotebookLM.`;
 }
 
 function exportData() {
