@@ -393,6 +393,8 @@ function parseImportText(text) {
     if (fenced?.[1]) return JSON.parse(fenced[1].trim());
     const privateHtmlItems = parsePrivateHtmlTestmap(trimmed);
     if (privateHtmlItems.length) return mergePartialImports([{ items: privateHtmlItems }]);
+    const scoreFormHtmlItems = parsePrivateHtmlScoreForm(trimmed);
+    if (scoreFormHtmlItems.length) return mergePartialImports([{ items: scoreFormHtmlItems }]);
     const objects = parseJsonObjects(trimmed);
     if (objects.length > 1) return mergePartialImports(objects);
     const firstBrace = trimmed.indexOf('{');
@@ -609,6 +611,85 @@ function testmapMarkdownFromHtmlItem(item) {
     subitem.scripts.forEach(value => lines.push(`- **Zeg:** ${value}`));
     subitem.optional.forEach(value => lines.push(`- _Optioneel:_ ${value}`));
     if (subitem.target) lines.push(`- **Doelwoord:** ${subitem.target}`);
+  });
+  return lines.join('\n');
+}
+
+function parsePrivateHtmlScoreForm(text) {
+  if (!/Scoreformulier\s+Zinsontwikkeling/i.test(text) || !/\bconst\s+items\s*=\s*\[/i.test(text)) return [];
+  const source = extractJavaScriptArraySource(text, 'items');
+  if (!source) return [];
+  try {
+    return parseScoreFormItemsArray(source)
+      .map(item => ({
+        id: `ZO-${item.n}`,
+        number: item.n,
+        scoreformulierText: scoreFormMarkdownFromHtmlItem(item),
+        scoreformulierSource: 'Lokale HTML-scoreformulier import'
+      }))
+      .filter(item => item.number >= 1 && item.number <= 36);
+  } catch {
+    return [];
+  }
+}
+
+function extractJavaScriptArraySource(text, variableName) {
+  const startMatch = new RegExp(`\\bconst\\s+${variableName}\\s*=\\s*\\[`, 'i').exec(text);
+  if (!startMatch) return '';
+  const start = startMatch.index + startMatch[0].lastIndexOf('[');
+  let depth = 0;
+  let inString = false;
+  let quote = '';
+  let escaped = false;
+  for (let index = start; index < text.length; index += 1) {
+    const char = text[index];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === quote) {
+        inString = false;
+      }
+      continue;
+    }
+    if (char === '\'' || char === '"' || char === '`') {
+      inString = true;
+      quote = char;
+      continue;
+    }
+    if (char === '[') depth += 1;
+    if (char === ']') {
+      depth -= 1;
+      if (depth === 0) return text.slice(start, index + 1);
+    }
+  }
+  return '';
+}
+
+function parseScoreFormItemsArray(source) {
+  const normalized = source
+    .replace(/([{,]\s*)([A-Za-z_$][\w$]*)\s*:/g, '$1"$2":')
+    .replace(/'/g, '"');
+  return JSON.parse(normalized);
+}
+
+function scoreFormMarkdownFromHtmlItem(item) {
+  const lines = [
+    `## Item ${item.n}`,
+    `**${item.t || `ZO-${item.n}`}**`
+  ];
+  (item.parts || []).forEach(part => {
+    const [title, good = [], bad = []] = part;
+    lines.push('', `### ${title}`);
+    if (good.length) {
+      lines.push('', '**G**');
+      good.forEach(option => lines.push(`- ${option}`));
+    }
+    if (bad.length) {
+      lines.push('', '**F**');
+      bad.forEach(option => lines.push(`- ${option}`));
+    }
   });
   return lines.join('\n');
 }
