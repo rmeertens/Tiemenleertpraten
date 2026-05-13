@@ -12,6 +12,13 @@ const SOURCE_IMAGE_KINDS = [
   { id: 'handleiding', label: 'Afnamehandleiding' }
 ];
 
+const PRIVATE_SECTION_DEFAULTS = [
+  { id: 'testmap', title: 'Testmap', field: 'testmapText', sourceField: 'testmapSource' },
+  { id: 'handleiding', title: 'Afnamehandleiding', field: 'handleidingText', sourceField: 'handleidingSource' },
+  { id: 'scoreformulier', title: 'Scoreformulier', field: 'scoreformulierText', sourceField: 'scoreformulierSource' },
+  { id: 'stamplijst', title: 'Eigen stamplijst', field: 'stamplijstText', sourceField: 'stamplijstSource' }
+];
+
 const AUDIO_GROUPS = [
   { id: 'zo1-10', label: 'ZO 1-10', start: 1, end: 10, expected: 10 },
   { id: 'zo11-20', label: 'ZO 11-20', start: 11, end: 20, expected: 10 },
@@ -102,6 +109,18 @@ Verplichte hoofdstructuur:
         "repeat": "...",
         "intonation": "...",
         "pitfalls": ["..."],
+        "privateSections": [
+          {
+            "title": "Testmap",
+            "body": "privétekst of scantranscriptie",
+            "source": "testmapblad ..."
+          },
+          {
+            "title": "Afnamehandleiding",
+            "body": "privétekst of eigen controlepunten",
+            "source": "handleiding p. ..."
+          }
+        ],
         "audioCheck": {
           "audioFile": "ZO1-10.mp3",
           "spokenStimulus": "wat je hoort in de opname",
@@ -373,6 +392,8 @@ function parseImportText(text) {
     if (firstBrace >= 0 && lastBrace > firstBrace) {
       return JSON.parse(trimmed.slice(firstBrace, lastBrace + 1));
     }
+    const privateMarkdownItems = parsePrivateMarkdownSections(trimmed);
+    if (privateMarkdownItems.length) return mergePartialImports([{ items: privateMarkdownItems }]);
     const rawItems = parseRawZinsontwikkelingText(trimmed);
     if (rawItems.length) return mergePartialImports([{ items: rawItems }]);
     throw firstError;
@@ -531,6 +552,25 @@ function mergeScripts(base = [], incoming = []) {
   return [...byId.values()];
 }
 
+function parsePrivateMarkdownSections(text) {
+  if (!/^##\s+Item\s+\d{1,2}\b/im.test(text)) return [];
+  const normalized = text.replace(/\r/g, '\n').trim();
+  const matches = [...normalized.matchAll(/^##\s+Item\s+(\d{1,2})\b.*$/gim)];
+  if (!matches.length) return [];
+  return matches.map((match, index) => {
+    const number = Number(match[1]);
+    const start = match.index;
+    const end = matches[index + 1]?.index ?? normalized.length;
+    const block = cleanupText(normalized.slice(start, end));
+    return {
+      id: `ZO-${number}`,
+      number,
+      handleidingText: block,
+      handleidingSource: 'Afnamehandleiding Taalproductie-3, hoofdstuk 6.3.5'
+    };
+  }).filter(item => item.number >= 1 && item.number <= 36 && hasUsefulText(item.handleidingText));
+}
+
 function parseRawZinsontwikkelingText(text) {
   if (!/item\s+\d{1,2}/i.test(text)) return [];
   const normalized = text.replace(/\r/g, '\n').replace(/[ \t]+/g, ' ');
@@ -642,7 +682,7 @@ function importErrorHelp(error) {
   if (String(error.message).includes('Unexpected end') || String(error.message).includes('Unexpected EOF')) {
     return 'De JSON is niet compleet. Kopieer vanaf de eerste { tot en met de laatste }. Vaak mist onderaan nog een afsluitende } of ].';
   }
-  return `${error.message}. Tip: plak alleen geldige JSON of een compleet \`\`\`json-blok uit NotebookLM.`;
+  return `${error.message}. Tip: plak geldige JSON, een compleet \`\`\`json-blok of Markdown met kopjes zoals "## Item 1".`;
 }
 
 async function exportData() {
@@ -754,6 +794,7 @@ function validateZinsontwikkelingCoverage(items, warnings) {
     if (item.audioCheck && !audioCheckRange(item)) warnings.push(`${label}: audioCheck heeft geen bruikbare start/eindtijd.`);
     if (item.audioCheck && !hasUsefulText(item.audioCheck.spokenStimulus)) warnings.push(`${label}: audioCheck mist een hoorbare stimulus.`);
     if (containsUnresolvedMarker(item)) warnings.push(`${label}: bevat nog BRONCONTROLE NODIG of bron_onduidelijk.`);
+    if (item.privateSections && !Array.isArray(item.privateSections)) warnings.push(`${label}: privateSections moet een lijst zijn.`);
   });
 }
 
@@ -928,6 +969,7 @@ function renderCockpit(type) {
       </div>
         ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? sourceImagesHtml(item) : ''}
+        ${type === 'zinsontwikkeling' ? privateSectionsHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? rawSourceHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? audioCheckHtml(item) : ''}
         ${type === 'zinsontwikkeling' ? audioForItemHtml(item.number) : ''}
@@ -977,6 +1019,58 @@ function rawSourceHtml(item) {
       <pre>${escapeHtml(item.rawBlock)}</pre>
     </details>
   `;
+}
+
+function privateSectionsHtml(item) {
+  const sections = normalizePrivateSections(item);
+  return `
+    <div class="sch-private-sections">
+      <p class="sch-label">Privé tekst per item</p>
+      ${sections.map(section => `
+        <details class="sch-private-section">
+          <summary>
+            <span>${escapeHtml(section.title || 'Privé tekst')}</span>
+            ${section.source ? `<small>${escapeHtml(section.source)}</small>` : ''}
+          </summary>
+          <div class="sch-private-section-body">
+            ${hasUsefulText(section.body)
+              ? formatPrivateText(section.body)
+              : `<span class="sch-empty-note">Nog leeg. Vul in je privé-JSON <code>${escapeHtml(section.field || 'privateSections')}</code> voor dit item.</span>`}
+          </div>
+        </details>
+      `).join('')}
+    </div>
+  `;
+}
+
+function normalizePrivateSections(item) {
+  const explicit = Array.isArray(item.privateSections) ? item.privateSections : [];
+  const byTitle = new Map();
+  explicit.forEach(section => {
+    if (!section?.title) return;
+    byTitle.set(section.title.toLowerCase(), section);
+  });
+  return PRIVATE_SECTION_DEFAULTS.map(defaultSection => {
+    const explicitSection = byTitle.get(defaultSection.title.toLowerCase());
+    return {
+      ...defaultSection,
+      ...(explicitSection || {}),
+      title: explicitSection?.title || defaultSection.title,
+      body: explicitSection?.body || item[defaultSection.field] || fallbackPrivateText(item, defaultSection.id),
+      source: explicitSection?.source || item[defaultSection.sourceField] || ''
+    };
+  });
+}
+
+function fallbackPrivateText(item, sectionId) {
+  if (sectionId === 'handleiding') return item.manualText || '';
+  if (sectionId === 'scoreformulier') return item.scoreFormText || '';
+  if (sectionId === 'stamplijst') return item.stampListText || '';
+  return '';
+}
+
+function formatPrivateText(value) {
+  return escapeHtml(value).replace(/\n/g, '<br>');
 }
 
 function sourceImagesHtml(item) {
