@@ -392,6 +392,8 @@ function parseImportText(text) {
     if (firstBrace >= 0 && lastBrace > firstBrace) {
       return JSON.parse(trimmed.slice(firstBrace, lastBrace + 1));
     }
+    const privateHtmlItems = parsePrivateHtmlTestmap(trimmed);
+    if (privateHtmlItems.length) return mergePartialImports([{ items: privateHtmlItems }]);
     const privateMarkdownItems = parsePrivateMarkdownSections(trimmed);
     if (privateMarkdownItems.length) return mergePartialImports([{ items: privateMarkdownItems }]);
     const rawItems = parseRawZinsontwikkelingText(trimmed);
@@ -552,6 +554,72 @@ function mergeScripts(base = [], incoming = []) {
   return [...byId.values()];
 }
 
+function parsePrivateHtmlTestmap(text) {
+  if (!/<div\s+class=["']item-card["']/i.test(text)) return [];
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, 'text/html');
+  const cards = [...doc.querySelectorAll('.item-card')];
+  return cards.map((card, index) => {
+    const numberText = textFrom(card.querySelector('.item-num'));
+    const number = parseItemNumber(numberText) || index + 1;
+    const headerParts = [...card.querySelectorAll('.item-header > span')].map(textFrom).filter(Boolean);
+    const title = headerParts.find(part => part !== numberText && !part.toLowerCase().startsWith('doelstructuur:')) || `Item ${number}`;
+    const target = textFrom(card.querySelector('.doelstructuur')).replace(/^doelstructuur:\s*/i, '');
+    const material = textFrom(card.querySelector('.materiaal'));
+    const subitems = [...card.querySelectorAll('.subitem')].map(subitem => ({
+      label: textFrom(subitem.querySelector('.sublabel')),
+      spontaan: textFrom(subitem.querySelector('.spontaan-tag')),
+      instructions: [...subitem.querySelectorAll('.instructie')].map(textFrom).filter(Boolean),
+      scripts: [...subitem.querySelectorAll('.zeg')].map(textFrom).filter(Boolean),
+      optional: [...subitem.querySelectorAll('.optioneel')].map(textFrom).filter(Boolean),
+      target: textFrom(subitem.querySelector('.doelwoord-tag')).replace(/^✓\s*doelwoord:\s*/i, '')
+    }));
+    return {
+      id: `ZO-${number}`,
+      number,
+      target,
+      material,
+      testmapText: testmapMarkdownFromHtmlItem({ number, title, target, material, subitems }),
+      testmapSource: 'Lokale HTML-testmap import'
+    };
+  }).filter(item => item.number >= 1 && item.number <= 36);
+}
+
+function testmapMarkdownFromHtmlItem(item) {
+  const lines = [
+    `## Item ${item.number}`,
+    `**${item.title}**`
+  ];
+  if (item.target) lines.push('', `**Doelstructuur**`, item.target);
+  if (item.material) lines.push('', `**Materiaal / afname**`, item.material);
+  item.subitems.forEach(subitem => {
+    lines.push('', `### ${subitem.label || 'Onderdeel'}`);
+    if (subitem.spontaan) lines.push(`- ${subitem.spontaan}`);
+    subitem.instructions.forEach(value => lines.push(`- _${value}_`));
+    subitem.scripts.forEach(value => lines.push(`- **Zeg:** ${value}`));
+    subitem.optional.forEach(value => lines.push(`- _Optioneel:_ ${value}`));
+    if (subitem.target) lines.push(`- **Doelwoord:** ${subitem.target}`);
+  });
+  return lines.join('\n');
+}
+
+function parseItemNumber(value) {
+  const text = String(value || '').trim().toUpperCase();
+  if (/^\d+$/.test(text)) return Number(text);
+  const roman = { I: 1, V: 5, X: 10, L: 50 };
+  let total = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    const current = roman[text[index]] || 0;
+    const next = roman[text[index + 1]] || 0;
+    total += current < next ? -current : current;
+  }
+  return total || 0;
+}
+
+function textFrom(node) {
+  return node?.textContent?.replace(/\s+/g, ' ').trim() || '';
+}
+
 function parsePrivateMarkdownSections(text) {
   if (!/^##\s+Item\s+\d{1,2}\b/im.test(text)) return [];
   const normalized = text.replace(/\r/g, '\n').trim();
@@ -682,7 +750,7 @@ function importErrorHelp(error) {
   if (String(error.message).includes('Unexpected end') || String(error.message).includes('Unexpected EOF')) {
     return 'De JSON is niet compleet. Kopieer vanaf de eerste { tot en met de laatste }. Vaak mist onderaan nog een afsluitende } of ].';
   }
-  return `${error.message}. Tip: plak geldige JSON, een compleet \`\`\`json-blok of Markdown met kopjes zoals "## Item 1".`;
+  return `${error.message}. Tip: plak geldige JSON, een compleet \`\`\`json-blok, HTML met item-card blokken of Markdown met kopjes zoals "## Item 1".`;
 }
 
 async function exportData() {
@@ -1070,7 +1138,95 @@ function fallbackPrivateText(item, sectionId) {
 }
 
 function formatPrivateText(value) {
-  return escapeHtml(value).replace(/\n/g, '<br>');
+  const lines = String(value || '').replace(/\r/g, '').split('\n');
+  const html = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index].trim();
+    if (!line || line === '---') {
+      index += 1;
+      continue;
+    }
+
+    if (/^\|.*\|$/.test(line)) {
+      const tableLines = [];
+      while (index < lines.length && /^\|.*\|$/.test(lines[index].trim())) {
+        tableLines.push(lines[index].trim());
+        index += 1;
+      }
+      html.push(markdownTableHtml(tableLines));
+      continue;
+    }
+
+    const heading = line.match(/^(#{1,4})\s+(.+)$/);
+    if (heading) {
+      const level = Math.min(4, heading[1].length + 2);
+      html.push(`<h${level}>${inlineMarkdown(heading[2])}</h${level}>`);
+      index += 1;
+      continue;
+    }
+
+    if (/^\*\*.+\*\*$/.test(line)) {
+      html.push(`<h4>${inlineMarkdown(line.replace(/^\*\*|\*\*$/g, ''))}</h4>`);
+      index += 1;
+      continue;
+    }
+
+    if (/^[-*]\s+/.test(line)) {
+      const items = [];
+      while (index < lines.length && /^[-*]\s+/.test(lines[index].trim())) {
+        items.push(lines[index].trim().replace(/^[-*]\s+/, ''));
+        index += 1;
+      }
+      html.push(`<ul>${items.map(item => `<li>${inlineMarkdown(item)}</li>`).join('')}</ul>`);
+      continue;
+    }
+
+    const paragraph = [line];
+    index += 1;
+    while (
+      index < lines.length &&
+      lines[index].trim() &&
+      lines[index].trim() !== '---' &&
+      !/^(#{1,4})\s+/.test(lines[index].trim()) &&
+      !/^\*\*.+\*\*$/.test(lines[index].trim()) &&
+      !/^[-*]\s+/.test(lines[index].trim()) &&
+      !/^\|.*\|$/.test(lines[index].trim())
+    ) {
+      paragraph.push(lines[index].trim());
+      index += 1;
+    }
+    html.push(`<p>${inlineMarkdown(paragraph.join(' '))}</p>`);
+  }
+
+  return html.join('');
+}
+
+function markdownTableHtml(lines) {
+  const rows = lines
+    .filter(line => !/^\|\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)+\|?$/.test(line))
+    .map(line => line.replace(/^\||\|$/g, '').split('|').map(cell => cell.trim()));
+  if (!rows.length) return '';
+  const [head, ...body] = rows;
+  return `
+    <div class="sch-private-table-wrap">
+      <table class="sch-private-table">
+        <thead><tr>${head.map(cell => `<th>${inlineMarkdown(cell)}</th>`).join('')}</tr></thead>
+        <tbody>${body.map(row => `<tr>${row.map(cell => `<td>${inlineMarkdown(cell)}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function inlineMarkdown(value) {
+  return escapeHtml(value)
+    .replaceAll('&lt;br&gt;', '<br>')
+    .replaceAll('&lt;br/&gt;', '<br>')
+    .replaceAll('&lt;br /&gt;', '<br>')
+    .replace(/&lt;u&gt;([\s\S]*?)&lt;\/u&gt;/g, '<u>$1</u>')
+    .replace(/\*\*([\s\S]*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>');
 }
 
 function sourceImagesHtml(item) {

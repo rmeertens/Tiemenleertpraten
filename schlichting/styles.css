@@ -427,6 +427,74 @@
   padding: 12px;
 }
 
+.sch-private-section-body h3,
+.sch-private-section-body h4,
+.sch-private-section-body h5,
+.sch-private-section-body h6 {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 18px 0 8px;
+}
+
+.sch-private-section-body h3:first-child,
+.sch-private-section-body h4:first-child {
+  margin-top: 0;
+}
+
+.sch-private-section-body p {
+  color: var(--ink-soft);
+  margin: 0 0 12px;
+}
+
+.sch-private-section-body ul {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding-left: 20px;
+}
+
+.sch-private-section-body li {
+  padding-left: 2px;
+}
+
+.sch-private-section-body strong {
+  color: var(--ink);
+}
+
+.sch-private-table-wrap {
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  margin: 10px 0 16px;
+  overflow: auto;
+}
+
+.sch-private-table {
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+.sch-private-table th,
+.sch-private-table td {
+  border-bottom: 1px solid var(--rule);
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.sch-private-table th {
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sch-private-table tr:last-child td {
+  border-bottom: 0;
+}
+
 .sch-empty-note {
   color: var(--ink-soft);
   display: block;
