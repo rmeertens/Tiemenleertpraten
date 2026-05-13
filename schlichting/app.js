@@ -385,6 +385,8 @@ function parseImportText(text) {
   } catch (firstError) {
     const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
     if (fenced?.[1]) return JSON.parse(fenced[1].trim());
+    const privateHtmlItems = parsePrivateHtmlTestmap(trimmed);
+    if (privateHtmlItems.length) return mergePartialImports([{ items: privateHtmlItems }]);
     const objects = parseJsonObjects(trimmed);
     if (objects.length > 1) return mergePartialImports(objects);
     const firstBrace = trimmed.indexOf('{');
@@ -392,8 +394,6 @@ function parseImportText(text) {
     if (firstBrace >= 0 && lastBrace > firstBrace) {
       return JSON.parse(trimmed.slice(firstBrace, lastBrace + 1));
     }
-    const privateHtmlItems = parsePrivateHtmlTestmap(trimmed);
-    if (privateHtmlItems.length) return mergePartialImports([{ items: privateHtmlItems }]);
     const privateMarkdownItems = parsePrivateMarkdownSections(trimmed);
     if (privateMarkdownItems.length) return mergePartialImports([{ items: privateMarkdownItems }]);
     const rawItems = parseRawZinsontwikkelingText(trimmed);
@@ -432,7 +432,11 @@ function parseJsonObjects(text) {
     if (char === '}') {
       depth -= 1;
       if (depth === 0 && start >= 0) {
-        objects.push(JSON.parse(text.slice(start, index + 1)));
+        try {
+          objects.push(JSON.parse(text.slice(start, index + 1)));
+        } catch {
+          // CSS and HTML snippets can also contain braces; skip those.
+        }
         start = -1;
       }
     }
