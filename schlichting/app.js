@@ -24,7 +24,9 @@ const PRIVATE_SECTION_DEFAULTS = [
 
 const AUDIO_GROUPS = [
   { id: 'tb-a-1-12', domain: 'TB', label: 'TB Sectie A · 1-12', start: 1, end: 12, expected: 12 },
-  { id: 'tb-b-13-33', domain: 'TB', label: 'TB Sectie B · 13-33', start: 13, end: 33, expected: 21 },
+  { id: 'tb-b-13-19', domain: 'TB', label: 'TB Sectie B · 13-19', start: 13, end: 19, expected: 7 },
+  { id: 'tb-b-20-26', domain: 'TB', label: 'TB Sectie B · 20-26', start: 20, end: 26, expected: 7 },
+  { id: 'tb-b-27-33', domain: 'TB', label: 'TB Sectie B · 27-33', start: 27, end: 33, expected: 7 },
   { id: 'tb-c-34-41', domain: 'TB', label: 'TB Sectie C · 34-41', start: 34, end: 41, expected: 8 },
   { id: 'tb-d-42-49', domain: 'TB', label: 'TB Sectie D · 42-49', start: 42, end: 49, expected: 8 },
   { id: 'tb-e-50-55', domain: 'TB', label: 'TB Sectie E · 50-55', start: 50, end: 55, expected: 6 },
@@ -1314,7 +1316,7 @@ function renderCockpit(type) {
   const items = getItems(type);
   if (!state.data || !items.length) {
     target.innerHTML = type === 'taalbegrip' && state.data?.taalbegrip?.sections?.length
-      ? taalbegripSectionsOverviewHtml()
+      ? taalbegripSectionCockpitHtml()
       : emptyStateHtml(type);
     return;
   }
@@ -1418,31 +1420,43 @@ function taalbegripSectionForItem(itemNumber) {
   }) || null;
 }
 
-function taalbegripSectionsOverviewHtml() {
+function taalbegripSectionCockpitHtml() {
   const sections = state.data?.taalbegrip?.sections || [];
+  const index = clamp(state.itemIndex.taalbegrip, 0, sections.length - 1);
+  state.itemIndex.taalbegrip = index;
+  const section = sections[index];
+  const range = section.itemRange ? `items ${section.itemRange[0]}-${section.itemRange[1]}` : 'itemreeks onbekend';
   return `
     <article class="sch-item-card sch-item-card--wide">
       <div class="sch-item-headline">
         <div>
-          <p class="sch-label">Taalbegrip</p>
-          <h3>Afnamehandleiding geïmporteerd</h3>
+          <p class="sch-label">${escapeHtml(index + 1)} van ${escapeHtml(sections.length)}</p>
+          <h3>${escapeHtml(section.title)}</h3>
         </div>
         <div class="sch-item-headline-facts">
-          ${factHtml('Secties', sections.length)}
-          ${factHtml('Volgende stap', 'Importeer of plak de itemlijst/scoreformulierdata')}
+          ${factHtml('Onderdeel', section.section ? `Sectie ${section.section}` : 'Taalbegrip')}
+          ${factHtml('Bereik', range)}
         </div>
       </div>
       <div class="sch-private-sections">
-        ${sections.map((section, index) => `
-          <details class="sch-private-section ${index === 0 ? 'sch-private-section--handleiding' : ''}" ${index === 0 ? 'open' : ''}>
-            <summary>
-              <span>${escapeHtml(section.title)}</span>
-              ${section.itemRange ? `<small>items ${escapeHtml(section.itemRange[0])}-${escapeHtml(section.itemRange[1])}</small>` : ''}
-            </summary>
-            <div class="sch-private-section-body">${formatPrivateText(section.body)}</div>
-          </details>
-        `).join('')}
+        <details class="sch-private-section sch-private-section--handleiding" open>
+          <summary>
+            <span>Afnamehandleiding</span>
+            <small>${escapeHtml(section.source || section.title)}</small>
+          </summary>
+          <div class="sch-private-section-body">${formatPrivateText(section.body)}</div>
+        </details>
+        <details class="sch-private-section">
+          <summary>
+            <span>Testmap</span>
+            <small>lokaal toevoegen per item zodra de TB-items zijn geïmporteerd</small>
+          </summary>
+          <div class="sch-private-section-body">
+            <span class="sch-empty-note">Nog leeg. Importeer straks de Taalbegrip-items of voeg per item een testmapfoto toe.</span>
+          </div>
+        </details>
       </div>
+      <div class="sch-script-line">Sectie-afname geladen. Gebruik vorige/volgende om door Taalbegrip te lopen; importeer daarna de itemlijst voor itemniveau.</div>
     </article>
   `;
 }
@@ -1744,6 +1758,13 @@ function getItems(type) {
 
 function moveItem(type, delta) {
   const items = getItems(type);
+  if (!items.length && type === 'taalbegrip') {
+    const sections = state.data?.taalbegrip?.sections || [];
+    if (!sections.length) return;
+    state.itemIndex.taalbegrip = clamp(state.itemIndex.taalbegrip + delta, 0, sections.length - 1);
+    renderCockpit('taalbegrip');
+    return;
+  }
   if (!items.length) return;
   state.itemIndex[type] = clamp(state.itemIndex[type] + delta, 0, items.length - 1);
   renderCockpit(type);
@@ -2602,7 +2623,9 @@ function importedAudioSegmentsForGroup(group) {
 function audioGroupIdFromCheck(item, domain = 'ZO') {
   const file = String(item?.audioCheck?.audioFile || '').toLowerCase();
   if (file.includes('tb-a') || file.includes('tb1-12') || file.includes('tb1_12')) return 'tb-a-1-12';
-  if (file.includes('tb-b') || file.includes('tb13-33') || file.includes('tb13_33')) return 'tb-b-13-33';
+  if (file.includes('tb-b-13-19') || file.includes('tb13-19') || file.includes('tb13_19')) return 'tb-b-13-19';
+  if (file.includes('tb-b-20-26') || file.includes('tb20-26') || file.includes('tb20_26')) return 'tb-b-20-26';
+  if (file.includes('tb-b-27-33') || file.includes('tb27-33') || file.includes('tb27_33')) return 'tb-b-27-33';
   if (file.includes('tb-c') || file.includes('tb34-41') || file.includes('tb34_41')) return 'tb-c-34-41';
   if (file.includes('tb-d') || file.includes('tb42-49') || file.includes('tb42_49')) return 'tb-d-42-49';
   if (file.includes('tb-e') || file.includes('tb50-55') || file.includes('tb50_55')) return 'tb-e-50-55';
