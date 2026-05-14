@@ -106,10 +106,16 @@ body.sch-scoreform-split .sch-app {
 }
 
 .sch-tab.is-active,
-.sch-score-row button.is-active {
+.sch-score-row button.is-active,
+.sch-paper-pages button.is-active {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
+}
+
+.sch-paper-pages button.is-active {
+  box-shadow: 0 0 0 3px rgba(215, 93, 63, 0.18);
+  transform: translateY(-1px);
 }
 
 .sch-view { display: none; }

@@ -37,6 +37,16 @@ const AUDIO_GROUPS = [
   { id: 'zo21-36', domain: 'ZO', label: 'ZO 21-36', start: 21, end: 36, expected: 16 }
 ];
 
+const TB_SCORE_FORM_SECTION_PAGES = {
+  A: 3,
+  B: 3,
+  C: 5,
+  D: 6,
+  E: 6,
+  F: 7,
+  G: 7
+};
+
 const NOTEBOOK_PROMPT = `Je bent bronextractor voor mijn privé Schlichting-toetstrainer. Gebruik uitsluitend de geüploade Schlichting-handleiding, scans, scoreformulieren en toetsinformatie. Werk exact waar exacte afname-instructies nodig zijn. Geef bij elke regel een bronverwijzing, paginanummer of scanverwijzing.
 
 Maak output als geldige JSON volgens schema schlichting-v1. Gebruik dubbele aanhalingstekens en geen Markdown rondom de JSON.
@@ -386,6 +396,7 @@ function showView(view) {
   if (view === 'taalbegrip') state.scoreForm.domain = 'TB';
   if (view === 'zinsontwikkeling') state.scoreForm.domain = 'ZO';
   state.view = view;
+  if (view === 'taalbegrip') syncTaalbegripScoreFormPage();
   document.querySelectorAll('.sch-tab').forEach(tab => {
     tab.classList.toggle('is-active', tab.dataset.view === view);
   });
@@ -403,6 +414,7 @@ function persistScoreFormDock() {
 function openScoreFormForCurrentView() {
   if (state.view === 'taalbegrip') state.scoreForm.domain = 'TB';
   if (state.view === 'zinsontwikkeling') state.scoreForm.domain = 'ZO';
+  if (state.view === 'taalbegrip') syncTaalbegripScoreFormPage();
   setScoreFormDock({ open: true, collapsed: false });
 }
 
@@ -1324,8 +1336,13 @@ function renderCockpit(type) {
     const hasTaalbegripSections = type === 'taalbegrip' && state.data?.taalbegrip?.sections?.length;
     target.innerHTML = hasTaalbegripSections ? taalbegripSectionCockpitHtml() : emptyStateHtml(type);
     if (hasTaalbegripSections) {
+      bindScoreButtons();
       bindAudioButtons();
+      bindMaterialChecks();
+      bindSourceImageControls();
+      bindTrainingControls();
       renderAudioFab();
+      renderScoreFormPaper();
     }
     return;
   }
@@ -1338,25 +1355,18 @@ function renderCockpit(type) {
   const isTaalbegrip = type === 'taalbegrip';
   const domain = isTaalbegrip ? 'TB' : 'ZO';
   const title = isTaalbegrip ? `Item ${item.number}` : `Zinsontwikkeling ${item.number}`;
-  const secondaryFacts = isTaalbegrip
-    ? [
-        ['Materiaal', item.material],
-        ['Correct', item.correct],
-        ['Fout', item.incorrect],
-        ['Herhalen', item.repeat],
-        ['Verboden hulp', item.forbiddenHelp]
-      ]
-    : [
-        ['Materiaal', item.material],
-        ['Handelingen', listText(item.instructionSteps)],
-        ['Doelconstructie', item.target],
-        ['Correcte voorbeelden', listText(item.correctExamples)],
-        ['Incorrecte voorbeelden', listText(item.incorrectExamples)],
-        ['Toegestane variaties', listText(item.allowedVariations)],
-        ['Scoringdetails', listText(item.scoringDetails)],
-        ['Herhalen', item.repeat],
-        ['Intonatie', item.intonation]
-      ];
+  const secondaryFacts = [
+    ['Materiaal', item.material],
+    ['Handelingen', listText(item.instructionSteps) || item.action || item.task],
+    ['Doelconstructie', item.target || item.skill || item.construct || (isTaalbegrip ? item.title : '')],
+    ['Correcte voorbeelden', listText(item.correctExamples) || item.correct],
+    ['Incorrecte voorbeelden', listText(item.incorrectExamples) || item.incorrect],
+    ['Toegestane variaties', listText(item.allowedVariations) || item.allowed],
+    ['Scoringdetails', listText(item.scoringDetails) || item.scoring],
+    ['Herhalen', item.repeat],
+    ['Intonatie', item.intonation],
+    ...(isTaalbegrip ? [['Verboden hulp', item.forbiddenHelp]] : [])
+  ];
   const detailFacts = secondaryFacts.filter(([key]) => !['Materiaal', 'Herhalen'].includes(key));
   const factsHtml = `
     <div class="sch-facts sch-facts--compact">
@@ -1384,8 +1394,8 @@ function renderCockpit(type) {
       ${type === 'taalbegrip' ? taalbegripPrivateSectionsHtml(item) : ''}
       <div class="sch-script-line">${escapeHtml(displayScript(item))}</div>
       ${factsHtml}
-      ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
-      ${type === 'zinsontwikkeling' ? rawSourceHtml(item) : ''}
+      ${['taalbegrip', 'zinsontwikkeling'].includes(type) ? materialChecklistHtml(item) : ''}
+      ${['taalbegrip', 'zinsontwikkeling'].includes(type) ? rawSourceHtml(item, domain) : ''}
       ${audioCheckHtml(item)}
       ${scoreButtons(`${type}:${item.number}`, `${type} item ${item.number}`)}
     </article>
@@ -1396,7 +1406,11 @@ function renderCockpit(type) {
   bindSourceImageControls();
   bindTrainingControls();
   renderAudioFab();
-  if (state.view === type) state.scoreForm.domain = domain;
+  if (state.view === type) {
+    state.scoreForm.domain = domain;
+    if (type === 'taalbegrip') syncTaalbegripScoreFormPage(item);
+    renderScoreFormPaper();
+  }
 }
 
 function displayScript(item) {
@@ -1429,13 +1443,32 @@ function taalbegripSectionForItem(itemNumber) {
   }) || null;
 }
 
+function currentTaalbegripSection(contextItem = null) {
+  if (contextItem?.number) return taalbegripSectionForItem(contextItem.number);
+  const sections = state.data?.taalbegrip?.sections || [];
+  return sections[clamp(state.itemIndex.taalbegrip, 0, sections.length - 1)] || null;
+}
+
+function syncTaalbegripScoreFormPage(contextItem = null) {
+  if ((state.scoreForm.domain || 'ZO') !== 'TB') return;
+  const section = currentTaalbegripSection(contextItem);
+  const page = TB_SCORE_FORM_SECTION_PAGES[String(section?.section || '').toUpperCase()];
+  if (page) state.scoreForm.page = page;
+}
+
 function taalbegripSectionCockpitHtml() {
   const sections = state.data?.taalbegrip?.sections || [];
   const index = clamp(state.itemIndex.taalbegrip, 0, sections.length - 1);
   state.itemIndex.taalbegrip = index;
   const section = sections[index];
+  if (state.view === 'taalbegrip') {
+    state.scoreForm.domain = 'TB';
+    syncTaalbegripScoreFormPage();
+  }
   if (state.view === 'taalbegrip') markTrainingItem('taalbegrip', index + 1, sections.length);
   const range = section.itemRange ? `items ${section.itemRange[0]}-${section.itemRange[1]}` : 'itemreeks onbekend';
+  const sectionItem = taalbegripSectionAsItem(section);
+  const factsHtml = taalbegripSectionFactsHtml(sectionItem);
   return `
     ${trainingProgressHtml('taalbegrip', sections.length)}
     <article class="sch-item-card sch-item-card--wide">
@@ -1449,26 +1482,12 @@ function taalbegripSectionCockpitHtml() {
           ${factHtml('Bereik', range)}
         </div>
       </div>
-      <div class="sch-private-sections">
-        <details class="sch-private-section sch-private-section--handleiding" open>
-          <summary>
-            <span>Afnamehandleiding</span>
-            <small>${escapeHtml(section.source || section.title)}</small>
-          </summary>
-          <div class="sch-private-section-body">${formatPrivateText(section.body)}</div>
-        </details>
-        <details class="sch-private-section">
-          <summary>
-            <span>Testmap</span>
-            <small>lokaal toevoegen per item zodra de TB-items zijn geïmporteerd</small>
-          </summary>
-          <div class="sch-private-section-body">
-            <span class="sch-empty-note">Nog leeg. Importeer straks de Taalbegrip-items of voeg per item een testmapfoto toe.</span>
-          </div>
-        </details>
-      </div>
+      ${privateSectionsHtml(sectionItem, 'TB')}
+      <div class="sch-script-line">${escapeHtml(displayScript(sectionItem))}</div>
+      ${factsHtml}
+      ${materialChecklistHtml(sectionItem)}
       ${sectionAudioControlsHtml(section)}
-      <div class="sch-script-line">Sectie-afname geladen. Gebruik vorige/volgende om door Taalbegrip te lopen; importeer daarna de itemlijst voor itemniveau.</div>
+      ${scoreButtons(`taalbegrip-sectie:${section.section || index + 1}`, `Taalbegrip sectie ${section.section || index + 1}`)}
     </article>
   `;
 }
@@ -1483,6 +1502,68 @@ function sectionAudioControlsHtml(section) {
       <div class="sch-audio-section-buttons">
         ${audioSequenceButtonHtml(groups, label)}
       </div>
+    </div>
+  `;
+}
+
+function taalbegripSectionAsItem(section) {
+  const sectionLetter = section.section || '';
+  const [start, end] = section.itemRange || [];
+  return {
+    id: `taalbegrip-sectie-${sectionLetter || section.id || 'x'}`,
+    number: start || sectionLetter || section.id || 'sectie',
+    title: section.title,
+    source: section.source || section.title,
+    material: section.material || `Sectie ${sectionLetter || ''}${start && end ? ` · items ${start}-${end}` : ''}`,
+    repeat: section.repeat || 'Zie Afnamehandleiding.',
+    scoring: section.scoring || '0/1',
+    target: section.title,
+    instructionSteps: section.steps || ['Volg de Afnamehandleiding hierboven als leidend script.'],
+    correctExamples: section.correctExamples || ['1 punt bij correcte respons volgens de handleiding.'],
+    incorrectExamples: section.incorrectExamples || ['0 punten bij fout, onvolledig of geen respons volgens de handleiding.'],
+    allowedVariations: section.allowedVariations || ['Zie scoringsaanwijzingen in Afnamehandleiding.'],
+    scoringDetails: section.scoringDetails || ['Gebruik de sectieregels hierboven; breekregels en herhaling staan in de handleiding.'],
+    intonation: section.intonation || 'Volg de intonatie-instructies uit de Afnamehandleiding.',
+    pitfalls: section.pitfalls || ['Scoreformulierpagina controleren.'],
+    handleidingText: section.body,
+    handleidingSource: section.source || section.title,
+    testmapText: '',
+    testmapSource: 'lokaal toevoegen per item zodra de TB-items zijn geïmporteerd',
+    privateSections: [
+      {
+        id: 'handleiding',
+        title: 'Afnamehandleiding',
+        source: section.source || section.title,
+        body: section.body,
+        open: true
+      },
+      {
+        id: 'testmap',
+        title: 'Testmap',
+        source: 'lokaal toevoegen per item zodra de TB-items zijn geïmporteerd',
+        body: 'Nog leeg. Importeer straks de Taalbegrip-items of voeg per item een testmapfoto toe.',
+        open: false
+      }
+    ]
+  };
+}
+
+function taalbegripSectionFactsHtml(item) {
+  const facts = [
+    ['Scoring', scoreText(item)],
+    ['Bron', item.source],
+    ['Handelingen', listText(item.instructionSteps)],
+    ['Doelconstructie', item.target],
+    ['Correcte voorbeelden', listText(item.correctExamples)],
+    ['Incorrecte voorbeelden', listText(item.incorrectExamples)],
+    ['Toegestane variaties', listText(item.allowedVariations)],
+    ['Scoringdetails', listText(item.scoringDetails)],
+    ['Intonatie', item.intonation],
+    ['Valkuilen', listText(item.pitfalls)]
+  ];
+  return `
+    <div class="sch-facts sch-facts--compact">
+      ${facts.map(([key, value]) => factHtml(key, value)).join('')}
     </div>
   `;
 }
@@ -1547,11 +1628,11 @@ function materialChecklistHtml(item) {
   `;
 }
 
-function rawSourceHtml(item) {
+function rawSourceHtml(item, domain = 'ZO') {
   if (!item.rawBlock) return '';
   return `
     <details class="sch-source-card">
-      <summary>Volledige lokale bronkaart ZO ${escapeHtml(item.number)}</summary>
+      <summary>Volledige lokale bronkaart ${escapeHtml(domain)} ${escapeHtml(item.number)}</summary>
       <pre>${escapeHtml(item.rawBlock)}</pre>
     </details>
   `;
