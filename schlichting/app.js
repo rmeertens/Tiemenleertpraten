@@ -519,6 +519,8 @@ function parseImportText(text) {
     }
     const privateMarkdownItems = parsePrivateMarkdownSections(trimmed);
     if (privateMarkdownItems.length) return mergePartialImports([{ items: privateMarkdownItems }]);
+    const taalbegripChapter = parseTaalbegripChapterMarkdown(trimmed);
+    if (taalbegripChapter.length) return mergePartialImports([{ taalbegrip: { sections: taalbegripChapter } }]);
     const rawItems = parseRawZinsontwikkelingText(trimmed);
     if (rawItems.length) return mergePartialImports([{ items: rawItems }]);
     throw firstError;
@@ -565,6 +567,55 @@ function parseJsonObjects(text) {
     }
   }
   return objects;
+}
+
+function parseTaalbegripChapterMarkdown(text) {
+  if (!/#\s*Hoofdstuk\s*5/i.test(text) && !/##\s*5\.\d+\s+Sectie/i.test(text)) return [];
+  const blocks = splitMarkdownByHeading(text, /^##\s+(5\.\d+)\s+(.+)$/m);
+  return blocks
+    .map(block => {
+      const match = block.heading.match(/^##\s+(5\.\d+)\s+(.+)$/i);
+      if (!match) return null;
+      const sectionLetter = (match[2].match(/Sectie\s+([A-G])/i)?.[1] || '').toUpperCase();
+      return {
+        id: sectionLetter ? `sectie-${sectionLetter.toLowerCase()}` : match[1],
+        number: match[1],
+        title: match[2].trim(),
+        section: sectionLetter,
+        itemRange: taalbegripSectionRange(sectionLetter),
+        body: block.body.trim(),
+        source: 'Hoofdstuk 5 privé-import'
+      };
+    })
+    .filter(Boolean);
+}
+
+function splitMarkdownByHeading(text, headingPattern) {
+  const matches = [...text.matchAll(new RegExp(headingPattern.source, 'gmi'))];
+  return matches.map((match, index) => {
+    const next = matches[index + 1];
+    const start = match.index || 0;
+    const end = next?.index ?? text.length;
+    const block = text.slice(start, end).trim();
+    const lines = block.split('\n');
+    return {
+      heading: lines[0].trim(),
+      body: lines.slice(1).join('\n').trim()
+    };
+  });
+}
+
+function taalbegripSectionRange(sectionLetter) {
+  const ranges = {
+    A: [1, 12],
+    B: [13, 33],
+    C: [34, 41],
+    D: [42, 49],
+    E: [50, 55],
+    F: [56, 63],
+    G: [64, 71]
+  };
+  return ranges[sectionLetter] || null;
 }
 
 function mergePartialImports(parts) {
@@ -615,6 +666,12 @@ function mergePartialImports(parts) {
     if (Array.isArray(part.items)) {
       merged.zinsontwikkeling.items = mergeItemsByNumber(merged.zinsontwikkeling.items, part.items);
     }
+    if (Array.isArray(part.taalbegrip?.sections)) {
+      merged.taalbegrip.sections = mergeSectionsById(merged.taalbegrip.sections, part.taalbegrip.sections);
+    }
+    if (Array.isArray(part.taalbegrip?.items)) {
+      merged.taalbegrip.items = mergeItemsByNumber(merged.taalbegrip.items, part.taalbegrip.items);
+    }
     if (Array.isArray(part.zinsontwikkeling?.items)) {
       merged.zinsontwikkeling.items = mergeItemsByNumber(merged.zinsontwikkeling.items, part.zinsontwikkeling.items);
     }
@@ -637,7 +694,9 @@ function mergeSchlichtingData(current, incoming) {
         ...(current.taalbegrip?.rules || {}),
         ...(incoming.taalbegrip?.rules || {})
       },
-      sections: incoming.taalbegrip?.sections?.length ? incoming.taalbegrip.sections : (current.taalbegrip?.sections || []),
+      sections: incoming.taalbegrip?.sections?.length
+        ? mergeSectionsById(current.taalbegrip?.sections || [], incoming.taalbegrip.sections)
+        : (current.taalbegrip?.sections || []),
       items: mergeItemsByNumber(current.taalbegrip?.items || [], incoming.taalbegrip?.items || [])
     },
     zinsontwikkeling: {
@@ -663,6 +722,16 @@ function mergeItemsByNumber(baseItems = [], newItems = []) {
     byNumber.set(number, { ...(byNumber.get(number) || {}), ...withoutEmptyImportValues(item) });
   });
   return [...byNumber.values()].sort((a, b) => Number(a.number) - Number(b.number));
+}
+
+function mergeSectionsById(baseSections = [], newSections = []) {
+  const byId = new Map();
+  baseSections.forEach(section => byId.set(section.id || section.title, { ...section }));
+  newSections.forEach(section => {
+    const id = section.id || section.title;
+    byId.set(id, { ...(byId.get(id) || {}), ...section });
+  });
+  return [...byId.values()];
 }
 
 function withoutEmptyImportValues(item) {
@@ -1227,7 +1296,9 @@ function renderCockpit(type) {
   const target = els[type];
   const items = getItems(type);
   if (!state.data || !items.length) {
-    target.innerHTML = emptyStateHtml(type);
+    target.innerHTML = type === 'taalbegrip' && state.data?.taalbegrip?.sections?.length
+      ? taalbegripSectionsOverviewHtml()
+      : emptyStateHtml(type);
     return;
   }
   const index = clamp(state.itemIndex[type], 0, items.length - 1);
@@ -1280,7 +1351,8 @@ function renderCockpit(type) {
           ${factHtml('Herhalen', item.repeat)}
         </div>
       </div>
-      ${type === 'zinsontwikkeling' ? privateSectionsHtml(item) : ''}
+      ${type === 'zinsontwikkeling' ? privateSectionsHtml(item, 'ZO') : ''}
+      ${type === 'taalbegrip' ? taalbegripPrivateSectionsHtml(item) : ''}
       <div class="sch-script-line">${escapeHtml(displayScript(item))}</div>
       ${factsHtml}
       ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
@@ -1305,6 +1377,55 @@ function displayScript(item) {
     return 'Korte cue uit import verborgen om verwarring te voorkomen. Gebruik de bronkaart hierboven.';
   }
   return item.fullScript || item.completeScript || item.script || 'Geen script in import.';
+}
+
+function taalbegripPrivateSectionsHtml(item) {
+  const section = taalbegripSectionForItem(item.number);
+  if (!section) return '';
+  return privateSectionsHtml({
+    ...item,
+    handleidingText: section.body,
+    handleidingSource: section.title,
+    testmapText: item.testmapText || '',
+    testmapSource: item.testmapSource || ''
+  }, 'TB');
+}
+
+function taalbegripSectionForItem(itemNumber) {
+  const number = Number(itemNumber);
+  return (state.data?.taalbegrip?.sections || []).find(section => {
+    const [start, end] = section.itemRange || [];
+    return start && end && number >= start && number <= end;
+  }) || null;
+}
+
+function taalbegripSectionsOverviewHtml() {
+  const sections = state.data?.taalbegrip?.sections || [];
+  return `
+    <article class="sch-item-card sch-item-card--wide">
+      <div class="sch-item-headline">
+        <div>
+          <p class="sch-label">Taalbegrip</p>
+          <h3>Afnamehandleiding geïmporteerd</h3>
+        </div>
+        <div class="sch-item-headline-facts">
+          ${factHtml('Secties', sections.length)}
+          ${factHtml('Volgende stap', 'Importeer of plak de itemlijst/scoreformulierdata')}
+        </div>
+      </div>
+      <div class="sch-private-sections">
+        ${sections.map((section, index) => `
+          <details class="sch-private-section ${index === 0 ? 'sch-private-section--handleiding' : ''}" ${index === 0 ? 'open' : ''}>
+            <summary>
+              <span>${escapeHtml(section.title)}</span>
+              ${section.itemRange ? `<small>items ${escapeHtml(section.itemRange[0])}-${escapeHtml(section.itemRange[1])}</small>` : ''}
+            </summary>
+            <div class="sch-private-section-body">${formatPrivateText(section.body)}</div>
+          </details>
+        `).join('')}
+      </div>
+    </article>
+  `;
 }
 
 function trainingProgressHtml(totalItems) {
@@ -1371,7 +1492,7 @@ function rawSourceHtml(item) {
   `;
 }
 
-function privateSectionsHtml(item) {
+function privateSectionsHtml(item, domain = 'ZO') {
   const sections = normalizePrivateSections(item);
   return `
     <div class="sch-private-sections">
@@ -1381,7 +1502,7 @@ function privateSectionsHtml(item) {
             <span>${escapeHtml(section.title || 'Privé tekst')}</span>
             ${section.source ? `<small>${escapeHtml(section.source)}</small>` : ''}
           </summary>
-          ${sourceImageInlineHtml(item.number, section.id)}
+          ${sourceImageInlineHtml(item.number, section.id, domain)}
           <div class="sch-private-section-body">
             ${hasUsefulText(section.body)
               ? formatPrivateText(section.body)
@@ -1522,14 +1643,14 @@ function inlineMarkdown(value) {
     .replace(/\*([^*]+)\*/g, '<em>$1</em>');
 }
 
-function sourceImageInlineHtml(itemNumber, kindId) {
+function sourceImageInlineHtml(itemNumber, kindId, domain = 'ZO') {
   const kind = SOURCE_IMAGE_KINDS.find(candidate => candidate.id === kindId);
   if (!kind) return '';
-  return `<div class="sch-source-image-inline">${sourceImageSlotHtml(itemNumber, kind)}</div>`;
+  return `<div class="sch-source-image-inline">${sourceImageSlotHtml(itemNumber, kind, domain)}</div>`;
 }
 
-function sourceImageSlotHtml(itemNumber, kind) {
-  const record = state.sourceImages[sourceImageId(itemNumber, kind.id)];
+function sourceImageSlotHtml(itemNumber, kind, domain = 'ZO') {
+  const record = state.sourceImages[sourceImageId(itemNumber, kind.id, domain)];
   return `
     <article class="sch-source-image-slot">
       <strong>${escapeHtml(kind.label)}</strong>
@@ -1538,11 +1659,11 @@ function sourceImageSlotHtml(itemNumber, kind) {
           <img src="${escapeHtml(record.url)}" alt="${escapeHtml(kind.label)} ZO ${escapeHtml(itemNumber)}" />
         </a>
         <span class="sch-audio-mini">${escapeHtml(record.fileName || 'bronfoto')}</span>
-        <button class="btn btn--ghost" type="button" data-source-image-delete="${escapeHtml(kind.id)}" data-source-image-item="${escapeHtml(itemNumber)}">Verwijder</button>
+        <button class="btn btn--ghost" type="button" data-source-image-delete="${escapeHtml(kind.id)}" data-source-image-item="${escapeHtml(itemNumber)}" data-source-image-domain="${escapeHtml(domain)}">Verwijder</button>
       ` : '<div class="sch-source-image-empty">Nog geen foto</div>'}
       <label class="sch-source-image-upload">
         <span>${record ? 'Vervang foto' : 'Upload foto'}</span>
-        <input type="file" accept="image/png,image/jpeg,image/webp" data-source-image-upload="${escapeHtml(kind.id)}" data-source-image-item="${escapeHtml(itemNumber)}" />
+        <input type="file" accept="image/png,image/jpeg,image/webp" data-source-image-upload="${escapeHtml(kind.id)}" data-source-image-item="${escapeHtml(itemNumber)}" data-source-image-domain="${escapeHtml(domain)}" />
       </label>
     </article>
   `;
@@ -1584,14 +1705,14 @@ function bindSourceImageControls() {
     input.addEventListener('change', () => {
       const file = input.files?.[0];
       if (!file) return;
-      saveSourceImage(Number(input.dataset.sourceImageItem), input.dataset.sourceImageUpload, file);
+      saveSourceImage(Number(input.dataset.sourceImageItem), input.dataset.sourceImageUpload, file, input.dataset.sourceImageDomain || 'ZO');
     });
   });
   document.querySelectorAll('[data-source-image-delete]').forEach(button => {
     if (button.dataset.bound === 'true') return;
     button.dataset.bound = 'true';
     button.addEventListener('click', () => {
-      deleteSourceImage(Number(button.dataset.sourceImageItem), button.dataset.sourceImageDelete);
+      deleteSourceImage(Number(button.dataset.sourceImageItem), button.dataset.sourceImageDelete, button.dataset.sourceImageDomain || 'ZO');
     });
   });
 }
@@ -2748,14 +2869,15 @@ async function loadScoreFormPages() {
   }
 }
 
-async function saveSourceImage(itemNumber, kind, file) {
+async function saveSourceImage(itemNumber, kind, file, domain = 'ZO') {
   if (!file.type.startsWith('image/')) {
     window.alert('Kies een PNG, JPG of WebP-afbeelding.');
     return;
   }
-  const id = sourceImageId(itemNumber, kind);
+  const id = sourceImageId(itemNumber, kind, domain);
   const record = {
     id,
+    domain,
     itemNumber,
     kind,
     fileName: file.name,
@@ -2771,21 +2893,22 @@ async function saveSourceImage(itemNumber, kind, file) {
     ...record,
     url: URL.createObjectURL(file)
   };
-  renderCockpit('zinsontwikkeling');
+  renderCockpit(domain === 'TB' ? 'taalbegrip' : 'zinsontwikkeling');
 }
 
-async function deleteSourceImage(itemNumber, kind) {
-  const id = sourceImageId(itemNumber, kind);
+async function deleteSourceImage(itemNumber, kind, domain = 'ZO') {
+  const id = sourceImageId(itemNumber, kind, domain);
   await deleteSourceImageRecord(id);
   if (state.sourceImages[id]?.url) URL.revokeObjectURL(state.sourceImages[id].url);
   delete state.sourceImages[id];
-  renderCockpit('zinsontwikkeling');
+  renderCockpit(domain === 'TB' ? 'taalbegrip' : 'zinsontwikkeling');
 }
 
 async function serializeSourceImages() {
   const records = await getAllSourceImageRecords();
   return Promise.all(records.map(async record => ({
     id: record.id,
+    domain: record.domain || inferSourceImageDomain(record.id),
     itemNumber: record.itemNumber,
     kind: record.kind,
     fileName: record.fileName,
@@ -2807,6 +2930,7 @@ async function restoreSourceImages(records) {
     const blob = dataUrlToBlob(record.dataUrl);
     const restored = {
       id: record.id,
+      domain: record.domain || inferSourceImageDomain(record.id),
       itemNumber: Number(record.itemNumber),
       kind: record.kind,
       fileName: record.fileName || 'bronfoto',
@@ -2861,8 +2985,12 @@ async function restoreScoreFormPages(records) {
   state.scoreForm.page = state.scoreForm.pages[0]?.pageNumber || 1;
 }
 
-function sourceImageId(itemNumber, kind) {
-  return `ZO-${itemNumber}:${kind}`;
+function sourceImageId(itemNumber, kind, domain = 'ZO') {
+  return `${domain}-${itemNumber}:${kind}`;
+}
+
+function inferSourceImageDomain(id = '') {
+  return String(id).startsWith('TB-') ? 'TB' : 'ZO';
 }
 
 function openSourceImageDb() {
