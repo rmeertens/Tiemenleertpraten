@@ -1530,17 +1530,21 @@ function extractMarkdownHeadingSections(text, labels) {
 }
 
 function normalizeGuideHeading(line) {
-  const stripped = String(line || '')
+  const raw = String(line || '').trim();
+  const stripped = raw
     .trim()
     .replace(/^#{1,6}\s*/, '')
     .replace(/^\*\*/, '')
     .replace(/\*\*$/, '')
+    .replace(/^\*/, '')
+    .replace(/\*$/, '')
     .replace(/:$/, '')
     .trim();
   if (!stripped) return '';
-  const isMarkdownHeading = /^#{1,6}\s+/.test(String(line || '').trim());
-  const isBoldHeading = /^\*\*[^*]+\*\*$/.test(String(line || '').trim());
-  if (!isMarkdownHeading && !isBoldHeading) return '';
+  const isMarkdownHeading = /^#{1,6}\s+/.test(raw);
+  const isBoldHeading = /^\*\*[^*]+\*\*$/.test(raw);
+  const isItalicHeading = /^\*[^*]+\*$/.test(raw);
+  if (!isMarkdownHeading && !isBoldHeading && !isItalicHeading) return '';
   return stripped.replace(/\s+/g, ' ').toUpperCase();
 }
 
@@ -1552,6 +1556,13 @@ function taalbegripSectionAsItem(section) {
   const instruction = taalbegripGuideText(section, ['INSTRUCTIE EN OEFENING', 'INSTRUCTIE EN OEFENITEMS']);
   const administration = taalbegripGuideText(section, ['AFNAME']);
   const scoring = taalbegripGuideText(section, ['SCORING']);
+  const individualScoring = taalbegripGuideText(section, [
+    'SCORINGSAANWIJZINGEN BIJ INDIVIDUELE ITEMS',
+    'AFNAME- EN SCORINGSAANWIJZINGEN BIJ INDIVIDUELE ITEMS',
+    'AFNAME- EN SCOREAANWIJZINGEN BIJ INDIVIDUELE ITEMS',
+    'SCOREAANWIJZING BIJ INDIVIDUEEL ITEM',
+    'SCORINGSAANWIJZINGEN'
+  ]);
   const repeat = taalbegripGuideText(section, ['HERHALING']);
   const intonation = taalbegripGuideText(section, ['INTONATIE']);
   const stopRules = taalbegripGuideText(section, ['AFBREKEN', 'AFBREKEN EN TERUGKEREN', 'INSTAPPEN EN TERUGKEREN', 'INSTAPPEN']);
@@ -1564,30 +1575,32 @@ function taalbegripSectionAsItem(section) {
     'VRAGEN OM VOORWERPEN'
   ]);
   const actionText = cleanupText([setup, instruction, administration].filter(Boolean).join('\n\n'));
-  const scoringText = scoring || 'Score volgens het scoreformulier bij deze sectie.';
+  const scoringText = cleanupText([scoring, individualScoring].filter(Boolean).join('\n\n')) || 'Score volgens het scoreformulier bij deze sectie.';
   const checklist = splitInstruction(cleanupText([material, setup, administration].filter(Boolean).join('\n\n'))).slice(0, 10);
   const scoringLines = splitInstruction(scoringText);
   const correctLines = scoringLines.filter(line => /juist|goed|correct|1\b/i.test(line)).slice(0, 8);
   const incorrectLines = scoringLines.filter(line => /fout|geen respons|0\b|onvolledig/i.test(line)).slice(0, 8);
   const variationLines = splitInstruction(cleanupText([repeat, placementRules].filter(Boolean).join('\n\n'))).slice(0, 8);
   const pitfallLines = splitInstruction(cleanupText([stopRules, placementRules].filter(Boolean).join('\n\n'))).slice(0, 10);
+  const actionLines = splitInstruction(actionText || section.body).slice(0, 14);
+  const checklistLines = checklist.length ? checklist : actionLines.slice(0, 8);
   return {
     id: `taalbegrip-sectie-${sectionLetter || section.id || 'x'}`,
     number: start || sectionLetter || section.id || 'sectie',
     title: section.title,
-    source: section.source || section.title,
+    source: section.source || `Hoofdstuk 5 · Sectie ${sectionLetter || '?'}${start && end ? ` · items ${start}-${end}` : ''}`,
     material: section.material || material || `Sectie ${sectionLetter || ''}${start && end ? ` · items ${start}-${end}` : ''}`,
     repeat: section.repeat || repeat || 'Zie Afnamehandleiding.',
     scoring: section.scoring || '0/1',
     target: section.title,
-    instructionSteps: section.steps || splitInstruction(actionText || section.body),
+    instructionSteps: section.steps || actionLines,
     correctExamples: section.correctExamples || (correctLines.length ? correctLines : ['Juiste uitvoering of aanwijzing volgens het scoreformulier.']),
     incorrectExamples: section.incorrectExamples || (incorrectLines.length ? incorrectLines : ['Foute, onvolledige of ontbrekende respons volgens het scoreformulier.']),
     allowedVariations: section.allowedVariations || (variationLines.length ? variationLines : ['Zie herhalings- en afnameaanwijzingen hierboven.']),
     scoringDetails: section.scoringDetails || scoringLines,
     intonation: section.intonation || intonation || 'Volg de intonatie-instructies uit de Afnamehandleiding.',
     pitfalls: section.pitfalls || (pitfallLines.length ? pitfallLines : ['Controleer instap-, afbreek- en herhaalregels per sectie.']),
-    actionChecklist: section.actionChecklist || checklist,
+    actionChecklist: section.actionChecklist || checklistLines,
     handleidingText: section.body,
     handleidingSource: section.source || section.title,
     testmapText: '',
