@@ -1354,26 +1354,27 @@ function renderCockpit(type) {
   }
   const isTaalbegrip = type === 'taalbegrip';
   const domain = isTaalbegrip ? 'TB' : 'ZO';
-  const title = isTaalbegrip ? `Item ${item.number}` : `Zinsontwikkeling ${item.number}`;
+  const cardItem = isTaalbegrip ? enrichTaalbegripItem(item) : item;
+  const title = isTaalbegrip ? `Item ${cardItem.number}` : `Zinsontwikkeling ${cardItem.number}`;
   const secondaryFacts = [
-    ['Materiaal', item.material],
-    ['Handelingen', listText(item.instructionSteps) || item.action || item.task],
-    ['Doelconstructie', item.target || item.skill || item.construct || (isTaalbegrip ? item.title : '')],
-    ['Correcte voorbeelden', listText(item.correctExamples) || item.correct],
-    ['Incorrecte voorbeelden', listText(item.incorrectExamples) || item.incorrect],
-    ['Toegestane variaties', listText(item.allowedVariations) || item.allowed],
-    ['Scoringdetails', listText(item.scoringDetails) || item.scoring],
-    ['Herhalen', item.repeat],
-    ['Intonatie', item.intonation],
-    ...(isTaalbegrip ? [['Verboden hulp', item.forbiddenHelp]] : [])
+    ['Materiaal', cardItem.material],
+    ['Handelingen', listText(cardItem.instructionSteps) || cardItem.action || cardItem.task],
+    ['Doelconstructie', cardItem.target || cardItem.skill || cardItem.construct || (isTaalbegrip ? cardItem.title : '')],
+    ['Correcte voorbeelden', listText(cardItem.correctExamples) || cardItem.correct],
+    ['Incorrecte voorbeelden', listText(cardItem.incorrectExamples) || cardItem.incorrect],
+    ['Toegestane variaties', listText(cardItem.allowedVariations) || cardItem.allowed],
+    ['Scoringdetails', listText(cardItem.scoringDetails) || cardItem.scoring],
+    ['Herhalen', cardItem.repeat],
+    ['Intonatie', cardItem.intonation],
+    ...(isTaalbegrip ? [['Verboden hulp', cardItem.forbiddenHelp]] : [])
   ];
   const detailFacts = secondaryFacts.filter(([key]) => !['Materiaal', 'Herhalen'].includes(key));
   const factsHtml = `
     <div class="sch-facts sch-facts--compact">
-      ${factHtml('Scoring', scoreText(item))}
-      ${factHtml('Bron', item.source)}
+      ${factHtml('Scoring', scoreText(cardItem))}
+      ${factHtml('Bron', cardItem.source)}
       ${detailFacts.map(([key, value]) => factHtml(key, value)).join('')}
-      ${factHtml('Valkuilen', listText(item.pitfalls))}
+      ${factHtml('Valkuilen', listText(cardItem.pitfalls))}
     </div>
   `;
 
@@ -1386,18 +1387,18 @@ function renderCockpit(type) {
           <h3>${escapeHtml(title)}</h3>
         </div>
         <div class="sch-item-headline-facts">
-          ${factHtml('Materiaal', item.material)}
-          ${factHtml('Herhalen', item.repeat)}
+          ${factHtml('Materiaal', cardItem.material)}
+          ${factHtml('Herhalen', cardItem.repeat)}
         </div>
       </div>
-      ${type === 'zinsontwikkeling' ? privateSectionsHtml(item, 'ZO') : ''}
-      ${type === 'taalbegrip' ? taalbegripPrivateSectionsHtml(item) : ''}
-      <div class="sch-script-line">${escapeHtml(displayScript(item))}</div>
+      ${type === 'zinsontwikkeling' ? privateSectionsHtml(cardItem, 'ZO') : ''}
+      ${type === 'taalbegrip' ? taalbegripPrivateSectionsHtml(cardItem) : ''}
+      <div class="sch-script-line">${escapeHtml(displayScript(cardItem))}</div>
       ${factsHtml}
-      ${['taalbegrip', 'zinsontwikkeling'].includes(type) ? materialChecklistHtml(item) : ''}
-      ${['taalbegrip', 'zinsontwikkeling'].includes(type) ? rawSourceHtml(item, domain) : ''}
-      ${audioCheckHtml(item)}
-      ${scoreButtons(`${type}:${item.number}`, `${type} item ${item.number}`)}
+      ${['taalbegrip', 'zinsontwikkeling'].includes(type) ? materialChecklistHtml(cardItem) : ''}
+      ${['taalbegrip', 'zinsontwikkeling'].includes(type) ? rawSourceHtml(cardItem, domain) : ''}
+      ${audioCheckHtml(cardItem)}
+      ${scoreButtons(`${type}:${cardItem.number}`, `${type} item ${cardItem.number}`)}
     </article>
   `;
   bindScoreButtons();
@@ -1408,7 +1409,7 @@ function renderCockpit(type) {
   renderAudioFab();
   if (state.view === type) {
     state.scoreForm.domain = domain;
-    if (type === 'taalbegrip') syncTaalbegripScoreFormPage(item);
+    if (type === 'taalbegrip') syncTaalbegripScoreFormPage(cardItem);
     renderScoreFormPaper();
   }
 }
@@ -1425,7 +1426,7 @@ function displayScript(item) {
 
 function taalbegripPrivateSectionsHtml(item) {
   const section = taalbegripSectionForItem(item.number);
-  if (!section) return '';
+  if (!section) return privateSectionsHtml(item, 'TB');
   return privateSectionsHtml({
     ...item,
     handleidingText: section.body,
@@ -1506,25 +1507,87 @@ function sectionAudioControlsHtml(section) {
   `;
 }
 
+function taalbegripGuideText(section, labels) {
+  return cleanupText(extractMarkdownHeadingSections(section?.body || '', labels).join('\n\n'));
+}
+
+function extractMarkdownHeadingSections(text, labels) {
+  const lines = String(text || '').replace(/\r/g, '').split('\n');
+  const normalizedLabels = labels.map(normalizeGuideHeading);
+  const sections = [];
+  for (let index = 0; index < lines.length; index += 1) {
+    const heading = normalizeGuideHeading(lines[index]);
+    if (!heading || !normalizedLabels.some(label => heading === label || heading.startsWith(`${label} `))) continue;
+    const body = [];
+    for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
+      if (normalizeGuideHeading(lines[cursor])) break;
+      body.push(lines[cursor]);
+    }
+    const value = cleanupText(body.join('\n'));
+    if (value) sections.push(value);
+  }
+  return sections;
+}
+
+function normalizeGuideHeading(line) {
+  const stripped = String(line || '')
+    .trim()
+    .replace(/^#{1,6}\s*/, '')
+    .replace(/^\*\*/, '')
+    .replace(/\*\*$/, '')
+    .replace(/:$/, '')
+    .trim();
+  if (!stripped) return '';
+  const isMarkdownHeading = /^#{1,6}\s+/.test(String(line || '').trim());
+  const isBoldHeading = /^\*\*[^*]+\*\*$/.test(String(line || '').trim());
+  if (!isMarkdownHeading && !isBoldHeading) return '';
+  return stripped.replace(/\s+/g, ' ').toUpperCase();
+}
+
 function taalbegripSectionAsItem(section) {
   const sectionLetter = section.section || '';
   const [start, end] = section.itemRange || [];
+  const material = taalbegripGuideText(section, ['MATERIAAL']);
+  const setup = taalbegripGuideText(section, ['VOORBEREIDING']);
+  const instruction = taalbegripGuideText(section, ['INSTRUCTIE EN OEFENING', 'INSTRUCTIE EN OEFENITEMS']);
+  const administration = taalbegripGuideText(section, ['AFNAME']);
+  const scoring = taalbegripGuideText(section, ['SCORING']);
+  const repeat = taalbegripGuideText(section, ['HERHALING']);
+  const intonation = taalbegripGuideText(section, ['INTONATIE']);
+  const stopRules = taalbegripGuideText(section, ['AFBREKEN', 'AFBREKEN EN TERUGKEREN', 'INSTAPPEN EN TERUGKEREN', 'INSTAPPEN']);
+  const placementRules = taalbegripGuideText(section, [
+    'CORRECTE PLAATSING MATERIAAL BIJ FOUTE RESPONS',
+    'CORRECTE PLAATSING BIJ FOUTE RESPONS',
+    'TERUGPLAATSING MATERIAAL BIJ GOEDE RESPONS',
+    'TERUGPLAATSING MATERIAAL NA RESPONS',
+    'SPONTANE BENOEMING',
+    'VRAGEN OM VOORWERPEN'
+  ]);
+  const actionText = cleanupText([setup, instruction, administration].filter(Boolean).join('\n\n'));
+  const scoringText = scoring || 'Score volgens het scoreformulier bij deze sectie.';
+  const checklist = splitInstruction(cleanupText([material, setup, administration].filter(Boolean).join('\n\n'))).slice(0, 10);
+  const scoringLines = splitInstruction(scoringText);
+  const correctLines = scoringLines.filter(line => /juist|goed|correct|1\b/i.test(line)).slice(0, 8);
+  const incorrectLines = scoringLines.filter(line => /fout|geen respons|0\b|onvolledig/i.test(line)).slice(0, 8);
+  const variationLines = splitInstruction(cleanupText([repeat, placementRules].filter(Boolean).join('\n\n'))).slice(0, 8);
+  const pitfallLines = splitInstruction(cleanupText([stopRules, placementRules].filter(Boolean).join('\n\n'))).slice(0, 10);
   return {
     id: `taalbegrip-sectie-${sectionLetter || section.id || 'x'}`,
     number: start || sectionLetter || section.id || 'sectie',
     title: section.title,
     source: section.source || section.title,
-    material: section.material || `Sectie ${sectionLetter || ''}${start && end ? ` · items ${start}-${end}` : ''}`,
-    repeat: section.repeat || 'Zie Afnamehandleiding.',
+    material: section.material || material || `Sectie ${sectionLetter || ''}${start && end ? ` · items ${start}-${end}` : ''}`,
+    repeat: section.repeat || repeat || 'Zie Afnamehandleiding.',
     scoring: section.scoring || '0/1',
     target: section.title,
-    instructionSteps: section.steps || ['Volg de Afnamehandleiding hierboven als leidend script.'],
-    correctExamples: section.correctExamples || ['1 punt bij correcte respons volgens de handleiding.'],
-    incorrectExamples: section.incorrectExamples || ['0 punten bij fout, onvolledig of geen respons volgens de handleiding.'],
-    allowedVariations: section.allowedVariations || ['Zie scoringsaanwijzingen in Afnamehandleiding.'],
-    scoringDetails: section.scoringDetails || ['Gebruik de sectieregels hierboven; breekregels en herhaling staan in de handleiding.'],
-    intonation: section.intonation || 'Volg de intonatie-instructies uit de Afnamehandleiding.',
-    pitfalls: section.pitfalls || ['Scoreformulierpagina controleren.'],
+    instructionSteps: section.steps || splitInstruction(actionText || section.body),
+    correctExamples: section.correctExamples || (correctLines.length ? correctLines : ['Juiste uitvoering of aanwijzing volgens het scoreformulier.']),
+    incorrectExamples: section.incorrectExamples || (incorrectLines.length ? incorrectLines : ['Foute, onvolledige of ontbrekende respons volgens het scoreformulier.']),
+    allowedVariations: section.allowedVariations || (variationLines.length ? variationLines : ['Zie herhalings- en afnameaanwijzingen hierboven.']),
+    scoringDetails: section.scoringDetails || scoringLines,
+    intonation: section.intonation || intonation || 'Volg de intonatie-instructies uit de Afnamehandleiding.',
+    pitfalls: section.pitfalls || (pitfallLines.length ? pitfallLines : ['Controleer instap-, afbreek- en herhaalregels per sectie.']),
+    actionChecklist: section.actionChecklist || checklist,
     handleidingText: section.body,
     handleidingSource: section.source || section.title,
     testmapText: '',
@@ -1689,6 +1752,34 @@ function privateSectionText(item, sectionId) {
     : null;
   if (hasUsefulText(explicit?.body)) return explicit.body;
   return fallbackPrivateText(item, sectionId);
+}
+
+function enrichTaalbegripItem(item) {
+  const section = taalbegripSectionForItem(item.number);
+  if (!section) return item;
+  const defaults = taalbegripSectionAsItem(section);
+  return {
+    ...defaults,
+    ...item,
+    material: item.material || defaults.material,
+    repeat: item.repeat || defaults.repeat,
+    scoring: item.scoring || defaults.scoring,
+    source: item.source || defaults.source,
+    target: item.target || item.skill || item.construct || defaults.target,
+    instructionSteps: hasListItems(item.instructionSteps) ? item.instructionSteps : defaults.instructionSteps,
+    correctExamples: hasListItems(item.correctExamples) ? item.correctExamples : defaults.correctExamples,
+    incorrectExamples: hasListItems(item.incorrectExamples) ? item.incorrectExamples : defaults.incorrectExamples,
+    allowedVariations: hasListItems(item.allowedVariations) ? item.allowedVariations : defaults.allowedVariations,
+    scoringDetails: hasListItems(item.scoringDetails) ? item.scoringDetails : defaults.scoringDetails,
+    intonation: item.intonation || defaults.intonation,
+    pitfalls: hasListItems(item.pitfalls) ? item.pitfalls : defaults.pitfalls,
+    actionChecklist: hasListItems(item.actionChecklist) ? item.actionChecklist : defaults.actionChecklist,
+    privateSections: item.privateSections || defaults.privateSections
+  };
+}
+
+function hasListItems(value) {
+  return Array.isArray(value) && value.some(item => hasUsefulText(item));
 }
 
 function fallbackPrivateText(item, sectionId) {
