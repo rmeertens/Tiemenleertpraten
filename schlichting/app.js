@@ -241,6 +241,7 @@ const state = {
     groups: {},
     segments: {},
     activeStop: null,
+    sequence: null,
     currentItem: null,
     saved: readJson(AUDIO_TIMES_KEY, {})
   },
@@ -332,8 +333,13 @@ function bindEvents() {
   document.getElementById('privacy-check').addEventListener('click', privacyCheck);
   document.getElementById('clear-audio').addEventListener('click', clearAudio);
   els.audioFab?.addEventListener('click', () => {
+    if (state.audio.sequence) {
+      toggleAudioSequence(state.audio.sequence.groupIds);
+      return;
+    }
     const target = currentAudioTarget();
-    if (target) playAudioSegment(target.itemNumber, 0, target.domain);
+    if (target?.groupIds) toggleAudioSequence(target.groupIds);
+    else if (target) playAudioSegment(target.itemNumber, 0, target.domain);
   });
   document.getElementById('open-scoreform-dock')?.addEventListener('click', openScoreFormForCurrentView);
   document.getElementById('scoreform-fab')?.addEventListener('click', openScoreFormForCurrentView);
@@ -1315,9 +1321,12 @@ function renderCockpit(type) {
   const target = els[type];
   const items = getItems(type);
   if (!state.data || !items.length) {
-    target.innerHTML = type === 'taalbegrip' && state.data?.taalbegrip?.sections?.length
-      ? taalbegripSectionCockpitHtml()
-      : emptyStateHtml(type);
+    const hasTaalbegripSections = type === 'taalbegrip' && state.data?.taalbegrip?.sections?.length;
+    target.innerHTML = hasTaalbegripSections ? taalbegripSectionCockpitHtml() : emptyStateHtml(type);
+    if (hasTaalbegripSections) {
+      bindAudioButtons();
+      renderAudioFab();
+    }
     return;
   }
   const index = clamp(state.itemIndex[type], 0, items.length - 1);
@@ -1467,19 +1476,12 @@ function taalbegripSectionCockpitHtml() {
 function sectionAudioControlsHtml(section) {
   const groups = audioGroupsForRange(section.itemRange, 'TB');
   if (!groups.length) return '';
+  const label = section.section === 'B' ? 'Speel sectie B compleet' : `Speel ${groups[0]?.label || 'sectie-audio'}`;
   return `
     <div class="sch-audio-check">
       <p class="sch-label">Audio</p>
       <div class="sch-audio-section-buttons">
-        ${groups.map(group => {
-          const loaded = state.audio.groups[group.id];
-          return loaded ? `
-            <button class="btn btn--primary" type="button" data-audio-domain="TB" data-audio-play="${escapeHtml(group.start)}">${escapeHtml(group.label)}</button>
-            <span class="sch-audio-mini">${escapeHtml(loaded.fileName || '')}</span>
-          ` : `
-            <span class="sch-audio-mini">${escapeHtml(group.label)} nog niet gekoppeld</span>
-          `;
-        }).join('')}
+        ${audioSequenceButtonHtml(groups, label)}
       </div>
     </div>
   `;
@@ -1969,6 +1971,7 @@ function renderAudioImport() {
   els.audioImport.innerHTML = `
     <div class="sch-audio-domain">
       <p class="sch-label">Taalbegrip audio</p>
+      <div class="sch-audio-mini">Sectie B heeft drie lokale mp3-velden. Na koppelen speelt de Sectie B-knop ze automatisch achter elkaar af.</div>
       ${AUDIO_GROUPS.filter(group => group.domain === 'TB').map(audioDropHtml).join('')}
     </div>
     <div class="sch-audio-domain">
@@ -2165,6 +2168,7 @@ function renderAudioPanel() {
   }
   els.audioPanel.innerHTML = `
     <div class="sch-audio-tools">
+      ${audioPanelSequenceControlsHtml()}
       ${AUDIO_GROUPS.map(group => groupControlHtml(group)).join('')}
     </div>
     <div class="sch-audio-table">
@@ -2177,6 +2181,7 @@ function renderAudioPanel() {
   els.audioPanel.querySelectorAll('[data-audio-context]').forEach(button => {
     button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioContext), 1.25, button.dataset.audioDomain || 'ZO'));
   });
+  bindAudioSequenceButtons(els.audioPanel);
   els.audioPanel.querySelectorAll('[data-audio-autosplit]').forEach(button => {
     button.addEventListener('click', () => resplitAudioGroup(button.dataset.audioAutosplit, 'auto'));
   });
@@ -2189,6 +2194,39 @@ function renderAudioPanel() {
   els.audioPanel.querySelectorAll('[data-audio-time]').forEach(input => {
     input.addEventListener('change', () => updateAudioTime(input));
   });
+}
+
+function audioPanelSequenceControlsHtml() {
+  const groups = AUDIO_GROUPS.filter(group => ['tb-b-13-19', 'tb-b-20-26', 'tb-b-27-33'].includes(group.id));
+  if (!groups.some(group => state.audio.groups[group.id])) return '';
+  return `
+    <div class="sch-audio-group-control sch-audio-sequence-control">
+      <strong>TB Sectie B compleet</strong>
+      ${audioSequenceButtonHtml(groups, 'Speel alle 3 fragmenten')}
+    </div>
+  `;
+}
+
+function audioSequenceButtonHtml(groups, label) {
+  const groupIds = groups.map(group => group.id);
+  const loaded = groups.filter(group => state.audio.groups[group.id]);
+  const ready = loaded.length === groups.length;
+  const sequenceId = audioSequenceId(groupIds);
+  const isActive = state.audio.sequence?.id === sequenceId;
+  const buttonText = isActive
+    ? (els.audioPlayer?.paused ? 'Hervat' : 'Pauze')
+    : label;
+  const status = ready
+    ? `${loaded.length}/${groups.length} fragment${groups.length === 1 ? '' : 'en'} gekoppeld`
+    : `${loaded.length}/${groups.length} gekoppeld · laad eerst ${groups.filter(group => !state.audio.groups[group.id]).map(group => group.label).join(', ')}`;
+  return `
+    <button class="btn btn--primary" type="button" data-audio-sequence="${escapeHtml(groupIds.join(','))}" ${ready ? '' : 'disabled'}>${escapeHtml(buttonText)}</button>
+    <span class="sch-audio-mini">${escapeHtml(status)}</span>
+  `;
+}
+
+function audioSequenceId(groupIds) {
+  return `sequence:${groupIds.join('|')}`;
 }
 
 function groupControlHtml(group) {
@@ -2246,19 +2284,51 @@ function currentZinsItemNumber() {
 function currentAudioTarget() {
   const domain = state.view === 'taalbegrip' ? 'TB' : 'ZO';
   const itemNumber = currentZinsItemNumber();
+  if (state.view === 'taalbegrip') {
+    const sections = state.data?.taalbegrip?.sections || [];
+    const section = itemNumber
+      ? taalbegripSectionForItem(itemNumber)
+      : sections[clamp(state.itemIndex.taalbegrip, 0, sections.length - 1)];
+    const groups = audioGroupsForRange(section?.itemRange, 'TB');
+    const loaded = groups.filter(candidate => state.audio.groups[candidate.id]);
+    if (section?.section === 'B' && loaded.length === groups.length) {
+      return { domain: 'TB', groupIds: groups.map(group => group.id), label: 'TB Sectie B compleet' };
+    }
+    if (!itemNumber && loaded.length) {
+      const group = loaded[0];
+      return { domain: 'TB', itemNumber: group.start, label: group.label };
+    }
+  }
   if (itemNumber && state.audio.segments[audioSegmentId(domain, itemNumber)]) {
     return { domain, itemNumber, label: `${domain} ${itemNumber}` };
   }
   if (state.view !== 'taalbegrip') return null;
-  const sections = state.data?.taalbegrip?.sections || [];
-  const section = sections[clamp(state.itemIndex.taalbegrip, 0, sections.length - 1)];
-  const group = audioGroupsForRange(section?.itemRange, 'TB').find(candidate => state.audio.groups[candidate.id]);
-  return group ? { domain: 'TB', itemNumber: group.start, label: group.label } : null;
+  return null;
 }
 
 function renderAudioFab() {
   if (!els.audioFab) return;
+  if (state.audio.sequence) {
+    const region = state.audio.sequence.regions[state.audio.sequence.index] || state.audio.sequence.regions[0];
+    const showSequence = ['taalbegrip', 'zinsontwikkeling'].includes(state.view) && Boolean(region);
+    els.audioFab.hidden = !showSequence;
+    els.audioFab.classList.toggle('is-playing', Boolean(showSequence && !els.audioPlayer.paused));
+    if (!showSequence) return;
+    els.audioFabTitle.textContent = state.audio.sequence.label || 'Audio';
+    els.audioFabTime.textContent = region ? `${escapeHtml(region.label)} · ${state.audio.sequence.index + 1}/${state.audio.sequence.regions.length}` : '';
+    return;
+  }
   const target = currentAudioTarget();
+  if (target?.groupIds) {
+    const ready = target.groupIds.map(audioRegionForGroup).filter(Boolean);
+    const first = ready[0];
+    els.audioFab.hidden = !first;
+    els.audioFab.classList.toggle('is-playing', false);
+    if (!first) return;
+    els.audioFabTitle.textContent = target.label;
+    els.audioFabTime.textContent = `${ready.length} fragmenten gekoppeld`;
+    return;
+  }
   const segment = target ? state.audio.segments[audioSegmentId(target.domain, target.itemNumber)] : null;
   const show = ['taalbegrip', 'zinsontwikkeling'].includes(state.view) && Boolean(segment);
   els.audioFab.hidden = !show;
@@ -2534,31 +2604,124 @@ function bindAudioButtons() {
     button.dataset.audioBound = 'true';
     button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioPlay), 0, button.dataset.audioDomain || (state.view === 'taalbegrip' ? 'TB' : 'ZO')));
   });
+  bindAudioSequenceButtons(document);
+}
+
+function bindAudioSequenceButtons(root = document) {
+  root.querySelectorAll('[data-audio-sequence]').forEach(button => {
+    if (button.dataset.audioSequenceBound === 'true') return;
+    button.dataset.audioSequenceBound = 'true';
+    button.addEventListener('click', () => toggleAudioSequence(button.dataset.audioSequence.split(',').filter(Boolean)));
+  });
+}
+
+function clearAudioStop() {
+  if (!state.audio.activeStop) return;
+  els.audioPlayer.removeEventListener('timeupdate', state.audio.activeStop);
+  state.audio.activeStop = null;
+}
+
+function rerenderAudioPlaybackControls() {
+  renderAudioFab();
+  renderAudioPanel();
+  if (state.view === 'taalbegrip') renderCockpit('taalbegrip');
+  if (state.view === 'zinsontwikkeling') renderCockpit('zinsontwikkeling');
 }
 
 function playAudioSegment(itemNumber, padding = 0, domain = 'ZO') {
   const segment = state.audio.segments[audioSegmentId(domain, itemNumber)];
   const group = segment ? state.audio.groups[segment.groupId] : null;
   if (!segment || !group) return;
-  if (state.audio.activeStop) {
-    els.audioPlayer.removeEventListener('timeupdate', state.audio.activeStop);
-    state.audio.activeStop = null;
+  const currentId = audioSegmentId(domain, itemNumber);
+  if (state.audio.currentItem === currentId) {
+    if (els.audioPlayer.paused) els.audioPlayer.play().then(rerenderAudioPlaybackControls).catch(rerenderAudioPlaybackControls);
+    else els.audioPlayer.pause();
+    rerenderAudioPlaybackControls();
+    return;
   }
-  state.audio.currentItem = audioSegmentId(domain, itemNumber);
+  state.audio.sequence = null;
+  playAudioRegion({
+    groupId: segment.groupId,
+    start: Math.max(0, segment.start - padding),
+    end: Math.min(group.duration, segment.end + padding),
+    currentItem: currentId
+  });
+}
+
+function playAudioRegion(region, onDone = null) {
+  const group = state.audio.groups[region.groupId];
+  if (!group) return;
+  clearAudioStop();
+  state.audio.currentItem = region.currentItem || `region:${region.groupId}`;
   els.audioPlayer.src = group.url;
-  els.audioPlayer.currentTime = Math.max(0, segment.start - padding);
+  els.audioPlayer.currentTime = Math.max(0, region.start);
   const stop = () => {
-    if (els.audioPlayer.currentTime >= Math.min(group.duration, segment.end + padding)) {
+    if (els.audioPlayer.currentTime >= Math.min(group.duration, region.end)) {
       els.audioPlayer.pause();
       els.audioPlayer.removeEventListener('timeupdate', stop);
       state.audio.activeStop = null;
+      if (onDone) {
+        onDone();
+        return;
+      }
       state.audio.currentItem = null;
-      renderAudioFab();
+      rerenderAudioPlaybackControls();
     }
   };
   state.audio.activeStop = stop;
   els.audioPlayer.addEventListener('timeupdate', stop);
-  els.audioPlayer.play().then(renderAudioFab).catch(renderAudioFab);
+  els.audioPlayer.play().then(rerenderAudioPlaybackControls).catch(rerenderAudioPlaybackControls);
+}
+
+function toggleAudioSequence(groupIds) {
+  const id = audioSequenceId(groupIds);
+  if (state.audio.sequence?.id === id) {
+    if (els.audioPlayer.paused) els.audioPlayer.play().then(rerenderAudioPlaybackControls).catch(rerenderAudioPlaybackControls);
+    else els.audioPlayer.pause();
+    rerenderAudioPlaybackControls();
+    return;
+  }
+  const regions = groupIds.map(audioRegionForGroup).filter(Boolean);
+  if (!regions.length) return;
+  state.audio.sequence = {
+    id,
+    groupIds,
+    regions,
+    index: 0,
+    label: regions.length > 1 ? 'TB Sectie B compleet' : regions[0].label
+  };
+  playAudioSequenceIndex();
+}
+
+function playAudioSequenceIndex() {
+  const sequence = state.audio.sequence;
+  if (!sequence) return;
+  const region = sequence.regions[sequence.index];
+  if (!region) {
+    state.audio.sequence = null;
+    state.audio.currentItem = null;
+    rerenderAudioPlaybackControls();
+    return;
+  }
+  playAudioRegion({ ...region, currentItem: sequence.id }, () => {
+    const active = state.audio.sequence;
+    if (!active || active.id !== sequence.id) return;
+    active.index += 1;
+    playAudioSequenceIndex();
+  });
+}
+
+function audioRegionForGroup(groupId) {
+  const definition = AUDIO_GROUPS.find(group => group.id === groupId);
+  const group = state.audio.groups[groupId];
+  const segments = [...(group?.segments || [])].sort((a, b) => a.item - b.item);
+  if (!definition || !group || !segments.length) return null;
+  return {
+    groupId,
+    start: segments[0].start,
+    end: segments[segments.length - 1].end,
+    label: definition.label
+  };
 }
 
 function updateAudioTime(input) {
