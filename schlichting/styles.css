@@ -867,6 +867,13 @@ body.sch-scoreform-split .sch-app {
   padding: 12px;
 }
 
+.sch-audio-section-buttons {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .sch-audio-row input {
   background: var(--bg-elevated);
   border: 1px solid var(--rule);

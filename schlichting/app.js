@@ -332,8 +332,8 @@ function bindEvents() {
   document.getElementById('privacy-check').addEventListener('click', privacyCheck);
   document.getElementById('clear-audio').addEventListener('click', clearAudio);
   els.audioFab?.addEventListener('click', () => {
-    const itemNumber = currentZinsItemNumber();
-    if (itemNumber) playAudioSegment(itemNumber, 0, state.view === 'taalbegrip' ? 'TB' : 'ZO');
+    const target = currentAudioTarget();
+    if (target) playAudioSegment(target.itemNumber, 0, target.domain);
   });
   document.getElementById('open-scoreform-dock')?.addEventListener('click', openScoreFormForCurrentView);
   document.getElementById('scoreform-fab')?.addEventListener('click', openScoreFormForCurrentView);
@@ -1323,8 +1323,8 @@ function renderCockpit(type) {
   const index = clamp(state.itemIndex[type], 0, items.length - 1);
   state.itemIndex[type] = index;
   const item = items[index];
-  if (type === 'zinsontwikkeling' && state.view === 'zinsontwikkeling') {
-    markZinsTrainingItem(item.number, items.length);
+  if (['taalbegrip', 'zinsontwikkeling'].includes(type) && state.view === type) {
+    markTrainingItem(type, item.number, items.length);
   }
   const isTaalbegrip = type === 'taalbegrip';
   const domain = isTaalbegrip ? 'TB' : 'ZO';
@@ -1359,7 +1359,7 @@ function renderCockpit(type) {
   `;
 
   target.innerHTML = `
-    ${type === 'zinsontwikkeling' ? trainingProgressHtml(items.length) : ''}
+    ${['taalbegrip', 'zinsontwikkeling'].includes(type) ? trainingProgressHtml(type, items.length) : ''}
     <article class="sch-item-card sch-item-card--wide">
       <div class="sch-item-headline">
         <div>
@@ -1425,8 +1425,10 @@ function taalbegripSectionCockpitHtml() {
   const index = clamp(state.itemIndex.taalbegrip, 0, sections.length - 1);
   state.itemIndex.taalbegrip = index;
   const section = sections[index];
+  if (state.view === 'taalbegrip') markTrainingItem('taalbegrip', index + 1, sections.length);
   const range = section.itemRange ? `items ${section.itemRange[0]}-${section.itemRange[1]}` : 'itemreeks onbekend';
   return `
+    ${trainingProgressHtml('taalbegrip', sections.length)}
     <article class="sch-item-card sch-item-card--wide">
       <div class="sch-item-headline">
         <div>
@@ -1456,14 +1458,42 @@ function taalbegripSectionCockpitHtml() {
           </div>
         </details>
       </div>
+      ${sectionAudioControlsHtml(section)}
       <div class="sch-script-line">Sectie-afname geladen. Gebruik vorige/volgende om door Taalbegrip te lopen; importeer daarna de itemlijst voor itemniveau.</div>
     </article>
   `;
 }
 
-function trainingProgressHtml(totalItems) {
-  const current = ensureTrainingCurrent(totalItems, false);
-  const latest = latestCompletedTrainingSession(totalItems);
+function sectionAudioControlsHtml(section) {
+  const groups = audioGroupsForRange(section.itemRange, 'TB');
+  if (!groups.length) return '';
+  return `
+    <div class="sch-audio-check">
+      <p class="sch-label">Audio</p>
+      <div class="sch-audio-section-buttons">
+        ${groups.map(group => {
+          const loaded = state.audio.groups[group.id];
+          return loaded ? `
+            <button class="btn btn--primary" type="button" data-audio-domain="TB" data-audio-play="${escapeHtml(group.start)}">${escapeHtml(group.label)}</button>
+            <span class="sch-audio-mini">${escapeHtml(loaded.fileName || '')}</span>
+          ` : `
+            <span class="sch-audio-mini">${escapeHtml(group.label)} nog niet gekoppeld</span>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function audioGroupsForRange(range, domain) {
+  const [start, end] = range || [];
+  if (!start || !end) return [];
+  return AUDIO_GROUPS.filter(group => group.domain === domain && group.start <= end && group.end >= start);
+}
+
+function trainingProgressHtml(type, totalItems) {
+  const current = ensureTrainingCurrent(totalItems, false, type);
+  const latest = latestCompletedTrainingSession(totalItems, type);
   const completedToday = !current && latest?.date === localDateKey();
   const visitedCount = completedToday ? totalItems : current?.visited?.length || 0;
   const percent = totalItems ? Math.round((visitedCount / totalItems) * 100) : 0;
@@ -1472,14 +1502,14 @@ function trainingProgressHtml(totalItems) {
     : current?.startedAt
       ? Math.max(0, Date.now() - new Date(current.startedAt).getTime())
       : 0;
-  const streak = trainingStreak(state.training.sessions);
+  const streak = trainingStreak((state.training.sessions || []).filter(session => session.type === type));
   const statusText = completedToday
     ? `ronde klaar · streak ${streak} dag${streak === 1 ? '' : 'en'} · ${formatDuration(elapsed)}`
     : `${percent}% doorlopen · streak ${streak} dag${streak === 1 ? '' : 'en'} · ${formatDuration(elapsed)} bezig`;
   return `
     <article class="sch-training-strip">
       <div>
-        <p class="sch-label">Dagelijkse ronde</p>
+        <p class="sch-label">Dagelijkse ronde · ${escapeHtml(type === 'taalbegrip' ? 'Taalbegrip' : 'Zinsontwikkeling')}</p>
         <strong>${escapeHtml(visitedCount)} / ${escapeHtml(totalItems)} items</strong>
         <span>${escapeHtml(statusText)}</span>
       </div>
@@ -1770,18 +1800,18 @@ function moveItem(type, delta) {
   renderCockpit(type);
 }
 
-function ensureTrainingCurrent(totalItems, create = true) {
+function ensureTrainingCurrent(totalItems, create = true, type = 'zinsontwikkeling') {
   state.training.sessions = Array.isArray(state.training.sessions) ? state.training.sessions : [];
   const current = state.training.current;
-  if (current && !current.completedAt) {
+  if (current && !current.completedAt && current.type === type) {
     current.totalItems = totalItems;
     current.visited = Array.isArray(current.visited) ? current.visited : [];
     return current;
   }
-  if (!create) return current && !current.completedAt ? current : null;
+  if (!create) return null;
   state.training.current = {
-    id: `zo-${Date.now()}`,
-    type: 'zinsontwikkeling',
+    id: `${type}-${Date.now()}`,
+    type,
     startedAt: new Date().toISOString(),
     totalItems,
     visited: []
@@ -1790,8 +1820,8 @@ function ensureTrainingCurrent(totalItems, create = true) {
   return state.training.current;
 }
 
-function markZinsTrainingItem(itemNumber, totalItems) {
-  const current = ensureTrainingCurrent(totalItems, true);
+function markTrainingItem(type, itemNumber, totalItems) {
+  const current = ensureTrainingCurrent(totalItems, true, type);
   const number = Number(itemNumber);
   if (!current.visited.includes(number)) {
     current.visited.push(number);
@@ -1802,6 +1832,10 @@ function markZinsTrainingItem(itemNumber, totalItems) {
   }
 }
 
+function markZinsTrainingItem(itemNumber, totalItems) {
+  markTrainingItem('zinsontwikkeling', itemNumber, totalItems);
+}
+
 function completeZinsTrainingRound(current) {
   if (current.completedAt) return;
   const now = new Date();
@@ -1809,7 +1843,7 @@ function completeZinsTrainingRound(current) {
   const durationMs = Math.max(0, now.getTime() - started.getTime());
   const session = {
     id: current.id,
-    type: 'zinsontwikkeling',
+    type: current.type || 'zinsontwikkeling',
     date: localDateKey(now),
     startedAt: current.startedAt,
     completedAt: now.toISOString(),
@@ -1827,7 +1861,7 @@ function completeZinsTrainingRound(current) {
 function resetTrainingRound() {
   state.training.current = null;
   saveTraining();
-  renderCockpit('zinsontwikkeling');
+  renderCockpit(state.view === 'taalbegrip' ? 'taalbegrip' : 'zinsontwikkeling');
   renderDashboard();
 }
 
@@ -1865,9 +1899,9 @@ function uniqueSessionDates(sessions = []) {
   return [...new Set(sessions.map(item => item.date).filter(Boolean))].sort().reverse();
 }
 
-function latestCompletedTrainingSession(totalItems) {
+function latestCompletedTrainingSession(totalItems, type = 'zinsontwikkeling') {
   const sessions = Array.isArray(state.training.sessions) ? state.training.sessions : [];
-  return sessions.find(session => session.type === 'zinsontwikkeling' && (!totalItems || session.totalItems === totalItems)) || null;
+  return sessions.find(session => session.type === type && (!totalItems || session.totalItems === totalItems)) || null;
 }
 
 function trainingStreak(sessions = []) {
@@ -2209,16 +2243,28 @@ function currentZinsItemNumber() {
   return Number(items[index]?.number) || null;
 }
 
-function renderAudioFab() {
-  if (!els.audioFab) return;
+function currentAudioTarget() {
   const domain = state.view === 'taalbegrip' ? 'TB' : 'ZO';
   const itemNumber = currentZinsItemNumber();
-  const segment = itemNumber ? state.audio.segments[audioSegmentId(domain, itemNumber)] : null;
+  if (itemNumber && state.audio.segments[audioSegmentId(domain, itemNumber)]) {
+    return { domain, itemNumber, label: `${domain} ${itemNumber}` };
+  }
+  if (state.view !== 'taalbegrip') return null;
+  const sections = state.data?.taalbegrip?.sections || [];
+  const section = sections[clamp(state.itemIndex.taalbegrip, 0, sections.length - 1)];
+  const group = audioGroupsForRange(section?.itemRange, 'TB').find(candidate => state.audio.groups[candidate.id]);
+  return group ? { domain: 'TB', itemNumber: group.start, label: group.label } : null;
+}
+
+function renderAudioFab() {
+  if (!els.audioFab) return;
+  const target = currentAudioTarget();
+  const segment = target ? state.audio.segments[audioSegmentId(target.domain, target.itemNumber)] : null;
   const show = ['taalbegrip', 'zinsontwikkeling'].includes(state.view) && Boolean(segment);
   els.audioFab.hidden = !show;
-  els.audioFab.classList.toggle('is-playing', Boolean(show && state.audio.currentItem === audioSegmentId(domain, itemNumber) && !els.audioPlayer.paused));
+  els.audioFab.classList.toggle('is-playing', Boolean(show && state.audio.currentItem === audioSegmentId(target.domain, target.itemNumber) && !els.audioPlayer.paused));
   if (!show) return;
-  els.audioFabTitle.textContent = `${domain} ${itemNumber}`;
+  els.audioFabTitle.textContent = target.label;
   els.audioFabTime.textContent = `${formatSeconds(segment.start)} - ${formatSeconds(segment.end)}`;
 }
 
