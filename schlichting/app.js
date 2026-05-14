@@ -23,9 +23,16 @@ const PRIVATE_SECTION_DEFAULTS = [
 ];
 
 const AUDIO_GROUPS = [
-  { id: 'zo1-10', label: 'ZO 1-10', start: 1, end: 10, expected: 10 },
-  { id: 'zo11-20', label: 'ZO 11-20', start: 11, end: 20, expected: 10 },
-  { id: 'zo21-36', label: 'ZO 21-36', start: 21, end: 36, expected: 16 }
+  { id: 'tb-a-1-12', domain: 'TB', label: 'TB Sectie A · 1-12', start: 1, end: 12, expected: 12 },
+  { id: 'tb-b-13-33', domain: 'TB', label: 'TB Sectie B · 13-33', start: 13, end: 33, expected: 21 },
+  { id: 'tb-c-34-41', domain: 'TB', label: 'TB Sectie C · 34-41', start: 34, end: 41, expected: 8 },
+  { id: 'tb-d-42-49', domain: 'TB', label: 'TB Sectie D · 42-49', start: 42, end: 49, expected: 8 },
+  { id: 'tb-e-50-55', domain: 'TB', label: 'TB Sectie E · 50-55', start: 50, end: 55, expected: 6 },
+  { id: 'tb-f-56-63', domain: 'TB', label: 'TB Sectie F · 56-63', start: 56, end: 63, expected: 8 },
+  { id: 'tb-g-64-71', domain: 'TB', label: 'TB Sectie G · 64-71', start: 64, end: 71, expected: 8 },
+  { id: 'zo1-10', domain: 'ZO', label: 'ZO 1-10', start: 1, end: 10, expected: 10 },
+  { id: 'zo11-20', domain: 'ZO', label: 'ZO 11-20', start: 11, end: 20, expected: 10 },
+  { id: 'zo21-36', domain: 'ZO', label: 'ZO 21-36', start: 21, end: 36, expected: 16 }
 ];
 
 const NOTEBOOK_PROMPT = `Je bent bronextractor voor mijn privé Schlichting-toetstrainer. Gebruik uitsluitend de geüploade Schlichting-handleiding, scans, scoreformulieren en toetsinformatie. Werk exact waar exacte afname-instructies nodig zijn. Geef bij elke regel een bronverwijzing, paginanummer of scanverwijzing.
@@ -239,6 +246,7 @@ const state = {
   scoreForm: {
     pages: [],
     page: 1,
+    domain: 'ZO',
     mode: 'pencil',
     strokes: readJson(SCORE_FORM_PENCIL_KEY, {}),
     dock: {
@@ -323,10 +331,10 @@ function bindEvents() {
   document.getElementById('clear-audio').addEventListener('click', clearAudio);
   els.audioFab?.addEventListener('click', () => {
     const itemNumber = currentZinsItemNumber();
-    if (itemNumber) playAudioSegment(itemNumber);
+    if (itemNumber) playAudioSegment(itemNumber, 0, state.view === 'taalbegrip' ? 'TB' : 'ZO');
   });
-  document.getElementById('open-scoreform-dock')?.addEventListener('click', () => setScoreFormDock({ open: true, collapsed: false }));
-  document.getElementById('scoreform-fab')?.addEventListener('click', () => setScoreFormDock({ open: true, collapsed: false }));
+  document.getElementById('open-scoreform-dock')?.addEventListener('click', openScoreFormForCurrentView);
+  document.getElementById('scoreform-fab')?.addEventListener('click', openScoreFormForCurrentView);
   document.getElementById('close-scoreform-dock')?.addEventListener('click', () => setScoreFormDock({ open: false }));
   document.getElementById('collapse-scoreform-dock')?.addEventListener('click', () => setScoreFormDock({ collapsed: !state.scoreForm.dock.collapsed, open: true }));
   els.scoreFormResizer?.addEventListener('pointerdown', startScoreFormResize);
@@ -367,6 +375,8 @@ function showView(view) {
   if (view === 'scoreform') {
     setScoreFormDock({ open: true, collapsed: false });
   }
+  if (view === 'taalbegrip') state.scoreForm.domain = 'TB';
+  if (view === 'zinsontwikkeling') state.scoreForm.domain = 'ZO';
   state.view = view;
   document.querySelectorAll('.sch-tab').forEach(tab => {
     tab.classList.toggle('is-active', tab.dataset.view === view);
@@ -375,10 +385,17 @@ function showView(view) {
     section.classList.toggle('is-active', section.id === `view-${view}`);
   });
   renderAudioFab();
+  renderScoreFormPaper();
 }
 
 function persistScoreFormDock() {
   localStorage.setItem(SCORE_FORM_DOCK_KEY, JSON.stringify(state.scoreForm.dock));
+}
+
+function openScoreFormForCurrentView() {
+  if (state.view === 'taalbegrip') state.scoreForm.domain = 'TB';
+  if (state.view === 'zinsontwikkeling') state.scoreForm.domain = 'ZO';
+  setScoreFormDock({ open: true, collapsed: false });
 }
 
 function setScoreFormDock(patch) {
@@ -1308,6 +1325,7 @@ function renderCockpit(type) {
     markZinsTrainingItem(item.number, items.length);
   }
   const isTaalbegrip = type === 'taalbegrip';
+  const domain = isTaalbegrip ? 'TB' : 'ZO';
   const title = isTaalbegrip ? `Item ${item.number}` : `Zinsontwikkeling ${item.number}`;
   const secondaryFacts = isTaalbegrip
     ? [
@@ -1357,7 +1375,7 @@ function renderCockpit(type) {
       ${factsHtml}
       ${type === 'zinsontwikkeling' ? materialChecklistHtml(item) : ''}
       ${type === 'zinsontwikkeling' ? rawSourceHtml(item) : ''}
-      ${type === 'zinsontwikkeling' ? audioCheckHtml(item) : ''}
+      ${audioCheckHtml(item)}
       ${scoreButtons(`${type}:${item.number}`, `${type} item ${item.number}`)}
     </article>
   `;
@@ -1367,6 +1385,7 @@ function renderCockpit(type) {
   bindSourceImageControls();
   bindTrainingControls();
   renderAudioFab();
+  if (state.view === type) state.scoreForm.domain = domain;
 }
 
 function displayScript(item) {
@@ -1892,16 +1911,16 @@ function renderSimulation() {
 }
 
 function renderAudioImport() {
-  els.audioImport.innerHTML = AUDIO_GROUPS.map(group => {
-    const loaded = state.audio.groups[group.id];
-    return `
-      <label class="sch-audio-drop">
-        <strong>${escapeHtml(group.label)}</strong>
-        <span class="sch-audio-mini">${loaded ? `${loaded.fileName} · ${loaded.segments.length}/${group.expected} segmenten · ${loaded.method}` : 'Kies lokale mp3'}</span>
-        <input type="file" accept="audio/*" data-audio-group="${escapeHtml(group.id)}" />
-      </label>
-    `;
-  }).join('');
+  els.audioImport.innerHTML = `
+    <div class="sch-audio-domain">
+      <p class="sch-label">Taalbegrip audio</p>
+      ${AUDIO_GROUPS.filter(group => group.domain === 'TB').map(audioDropHtml).join('')}
+    </div>
+    <div class="sch-audio-domain">
+      <p class="sch-label">Zinsontwikkeling audio</p>
+      ${AUDIO_GROUPS.filter(group => group.domain === 'ZO').map(audioDropHtml).join('')}
+    </div>
+  `;
 
   els.audioImport.querySelectorAll('[data-audio-group]').forEach(input => {
     input.addEventListener('change', () => {
@@ -1910,6 +1929,17 @@ function renderAudioImport() {
       if (group && file) importAudioGroup(group, file);
     });
   });
+}
+
+function audioDropHtml(group) {
+    const loaded = state.audio.groups[group.id];
+    return `
+      <label class="sch-audio-drop">
+        <strong>${escapeHtml(group.label)}</strong>
+        <span class="sch-audio-mini">${loaded ? `${loaded.fileName} · ${loaded.segments.length}/${group.expected} segmenten · ${loaded.method}` : 'Kies lokale mp3'}</span>
+        <input type="file" accept="audio/*" data-audio-group="${escapeHtml(group.id)}" />
+      </label>
+    `;
 }
 
 async function importAudioGroup(group, file, options = {}) {
@@ -1938,12 +1968,14 @@ async function importAudioGroup(group, file, options = {}) {
     : detectSpeechSegments(decoded, group.expected);
   const segments = detected.map((segment, index) => ({
     item: group.start + index,
+    domain: group.domain || 'ZO',
     groupId: group.id,
     start: segment.start,
     end: segment.end
   }));
   state.audio.groups[group.id] = {
     fileName: file.name,
+    domain: group.domain || 'ZO',
     url: objectUrl,
     buffer: decoded,
     duration: decoded.duration,
@@ -1951,12 +1983,12 @@ async function importAudioGroup(group, file, options = {}) {
     segments
   };
   segments.forEach(segment => {
-    state.audio.segments[segment.item] = segment;
+    state.audio.segments[audioSegmentId(segment.domain, segment.item)] = segment;
   });
   saveAudioSegments(group.id);
   renderAudioImport();
   renderAudioPanel();
-  renderCockpit('zinsontwikkeling');
+  renderCockpit(group.domain === 'TB' ? 'taalbegrip' : 'zinsontwikkeling');
 }
 
 function detectSpeechSegments(buffer, expected) {
@@ -2085,10 +2117,10 @@ function renderAudioPanel() {
     </div>
   `;
   els.audioPanel.querySelectorAll('[data-audio-play]').forEach(button => {
-    button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioPlay)));
+    button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioPlay), 0, button.dataset.audioDomain || 'ZO'));
   });
   els.audioPanel.querySelectorAll('[data-audio-context]').forEach(button => {
-    button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioContext), 1.25));
+    button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioContext), 1.25, button.dataset.audioDomain || 'ZO'));
   });
   els.audioPanel.querySelectorAll('[data-audio-autosplit]').forEach(button => {
     button.addEventListener('click', () => resplitAudioGroup(button.dataset.audioAutosplit, 'auto'));
@@ -2122,14 +2154,15 @@ function groupControlHtml(group) {
 }
 
 function audioRowHtml(segment) {
+  const domain = segment.domain || state.audio.groups[segment.groupId]?.domain || 'ZO';
   return `
     <div class="sch-audio-row">
-      <strong>ZO ${escapeHtml(segment.item)}</strong>
+      <strong>${escapeHtml(domain)} ${escapeHtml(segment.item)}</strong>
       <span class="sch-audio-mini">${escapeHtml(state.audio.groups[segment.groupId]?.fileName || '')}</span>
-      <input type="number" min="0" step="0.05" value="${escapeHtml(segment.start)}" data-audio-time="start" data-audio-item="${escapeHtml(segment.item)}" aria-label="Starttijd ZO ${escapeHtml(segment.item)}" />
-      <input type="number" min="0" step="0.05" value="${escapeHtml(segment.end)}" data-audio-time="end" data-audio-item="${escapeHtml(segment.item)}" aria-label="Eindtijd ZO ${escapeHtml(segment.item)}" />
-      <button class="btn btn--primary" type="button" data-audio-play="${escapeHtml(segment.item)}">Luister</button>
-      <button class="btn btn--ghost" type="button" data-audio-context="${escapeHtml(segment.item)}">Context</button>
+      <input type="number" min="0" step="0.05" value="${escapeHtml(segment.start)}" data-audio-time="start" data-audio-domain="${escapeHtml(domain)}" data-audio-item="${escapeHtml(segment.item)}" aria-label="Starttijd ${escapeHtml(domain)} ${escapeHtml(segment.item)}" />
+      <input type="number" min="0" step="0.05" value="${escapeHtml(segment.end)}" data-audio-time="end" data-audio-domain="${escapeHtml(domain)}" data-audio-item="${escapeHtml(segment.item)}" aria-label="Eindtijd ${escapeHtml(domain)} ${escapeHtml(segment.item)}" />
+      <button class="btn btn--primary" type="button" data-audio-domain="${escapeHtml(domain)}" data-audio-play="${escapeHtml(segment.item)}">Luister</button>
+      <button class="btn btn--ghost" type="button" data-audio-domain="${escapeHtml(domain)}" data-audio-context="${escapeHtml(segment.item)}">Context</button>
     </div>
   `;
 }
@@ -2148,31 +2181,40 @@ function audioForItemHtml(itemNumber) {
 }
 
 function currentZinsItemNumber() {
-  const items = getItems('zinsontwikkeling');
+  const type = state.view === 'taalbegrip' ? 'taalbegrip' : 'zinsontwikkeling';
+  const items = getItems(type);
   if (!items.length) return null;
-  const index = clamp(state.itemIndex.zinsontwikkeling, 0, items.length - 1);
+  const index = clamp(state.itemIndex[type], 0, items.length - 1);
   return Number(items[index]?.number) || null;
 }
 
 function renderAudioFab() {
   if (!els.audioFab) return;
+  const domain = state.view === 'taalbegrip' ? 'TB' : 'ZO';
   const itemNumber = currentZinsItemNumber();
-  const segment = itemNumber ? state.audio.segments[itemNumber] : null;
-  const show = state.view === 'zinsontwikkeling' && Boolean(segment);
+  const segment = itemNumber ? state.audio.segments[audioSegmentId(domain, itemNumber)] : null;
+  const show = ['taalbegrip', 'zinsontwikkeling'].includes(state.view) && Boolean(segment);
   els.audioFab.hidden = !show;
-  els.audioFab.classList.toggle('is-playing', Boolean(show && state.audio.currentItem === itemNumber && !els.audioPlayer.paused));
+  els.audioFab.classList.toggle('is-playing', Boolean(show && state.audio.currentItem === audioSegmentId(domain, itemNumber) && !els.audioPlayer.paused));
   if (!show) return;
-  els.audioFabTitle.textContent = `ZO ${itemNumber}`;
+  els.audioFabTitle.textContent = `${domain} ${itemNumber}`;
   els.audioFabTime.textContent = `${formatSeconds(segment.start)} - ${formatSeconds(segment.end)}`;
 }
 
 function renderScoreFormPaper() {
   if (!els.scoreFormPaper) return;
-  const pages = state.scoreForm.pages.sort((a, b) => Number(a.pageNumber) - Number(b.pageNumber));
+  const domain = state.scoreForm.domain || 'ZO';
+  const pages = state.scoreForm.pages
+    .filter(record => (record.domain || 'ZO') === domain)
+    .sort((a, b) => Number(a.pageNumber) - Number(b.pageNumber));
   const active = pages.find(record => Number(record.pageNumber) === Number(state.scoreForm.page)) || pages[0];
   if (active) state.scoreForm.page = Number(active.pageNumber);
   els.scoreFormPaper.innerHTML = `
     <div class="sch-paper-tool">
+      <div class="sch-paper-context">
+        <p class="sch-label">${domain === 'TB' ? 'Taalbegrip' : 'Zinsontwikkeling'}</p>
+        <strong>Scoreformulier ${domain}</strong>
+      </div>
       <div class="sch-paper-toolbar">
         <label class="sch-paper-upload">
           <span>${pages.length ? 'Vervang pagina’s' : 'Upload pagina’s'}</span>
@@ -2245,6 +2287,7 @@ function bindScoreFormPaper() {
 }
 
 async function importScoreFormPages(fileList) {
+  const domain = state.scoreForm.domain || 'ZO';
   const files = [...(fileList || [])]
     .filter(file => file.type.startsWith('image/'))
     .sort((a, b) => a.name.localeCompare(b.name, 'nl', { numeric: true }));
@@ -2252,17 +2295,20 @@ async function importScoreFormPages(fileList) {
     window.alert('Kies PNG/JPG/WebP-afbeeldingen van je scoreformulier.');
     return;
   }
-  await clearScoreFormPageRecords();
-  state.scoreForm.pages.forEach(record => {
+  await clearScoreFormPageRecords(domain);
+  state.scoreForm.pages.filter(record => (record.domain || 'ZO') === domain).forEach(record => {
     if (record.url) URL.revokeObjectURL(record.url);
   });
-  state.scoreForm.pages = [];
-  state.scoreForm.strokes = {};
-  localStorage.removeItem(SCORE_FORM_PENCIL_KEY);
+  state.scoreForm.pages = state.scoreForm.pages.filter(record => (record.domain || 'ZO') !== domain);
+  Object.keys(state.scoreForm.strokes).forEach(key => {
+    if (key.startsWith(`${domain}_`)) delete state.scoreForm.strokes[key];
+  });
+  localStorage.setItem(SCORE_FORM_PENCIL_KEY, JSON.stringify(state.scoreForm.strokes));
   for (let index = 0; index < files.length; index += 1) {
     const file = files[index];
     const record = {
-      id: `scoreform-page-${index + 1}`,
+      id: `${domain}-scoreform-page-${index + 1}`,
+      domain,
       pageNumber: index + 1,
       fileName: file.name,
       type: file.type,
@@ -2278,7 +2324,7 @@ async function importScoreFormPages(fileList) {
 }
 
 function scoreFormPageKey() {
-  return `page_${state.scoreForm.page}`;
+  return `${state.scoreForm.domain || 'ZO'}_page_${state.scoreForm.page}`;
 }
 
 function setupScoreFormCanvas(image, canvas) {
@@ -2383,15 +2429,18 @@ function clearScoreFormPage() {
 }
 
 async function clearScoreFormTool() {
-  if (!window.confirm('Alle scoreformulierpagina’s en potloodmarkeringen uit deze browser wissen?')) return;
-  await clearScoreFormPageRecords();
-  state.scoreForm.pages.forEach(record => {
+  const domain = state.scoreForm.domain || 'ZO';
+  if (!window.confirm(`Alle ${domain}-scoreformulierpagina’s en potloodmarkeringen uit deze browser wissen?`)) return;
+  await clearScoreFormPageRecords(domain);
+  state.scoreForm.pages.filter(record => (record.domain || 'ZO') === domain).forEach(record => {
     if (record.url) URL.revokeObjectURL(record.url);
   });
-  state.scoreForm.pages = [];
-  state.scoreForm.strokes = {};
+  state.scoreForm.pages = state.scoreForm.pages.filter(record => (record.domain || 'ZO') !== domain);
+  Object.keys(state.scoreForm.strokes).forEach(key => {
+    if (key.startsWith(`${domain}_`)) delete state.scoreForm.strokes[key];
+  });
   state.scoreForm.page = 1;
-  localStorage.removeItem(SCORE_FORM_PENCIL_KEY);
+  localStorage.setItem(SCORE_FORM_PENCIL_KEY, JSON.stringify(state.scoreForm.strokes));
   renderScoreFormPaper();
 }
 
@@ -2408,7 +2457,7 @@ async function exportScoreFormPage() {
   context.drawImage(canvas, 0, 0, output.width, output.height);
   const link = document.createElement('a');
   link.href = output.toDataURL('image/png');
-  link.download = `scoreformulier-pagina-${state.scoreForm.page}-met-markeringen.png`;
+  link.download = `${state.scoreForm.domain || 'ZO'}-scoreformulier-pagina-${state.scoreForm.page}-met-markeringen.png`;
   link.click();
 }
 
@@ -2416,19 +2465,19 @@ function bindAudioButtons() {
   document.querySelectorAll('[data-audio-play]').forEach(button => {
     if (button.dataset.audioBound === 'true') return;
     button.dataset.audioBound = 'true';
-    button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioPlay)));
+    button.addEventListener('click', () => playAudioSegment(Number(button.dataset.audioPlay), 0, button.dataset.audioDomain || (state.view === 'taalbegrip' ? 'TB' : 'ZO')));
   });
 }
 
-function playAudioSegment(itemNumber, padding = 0) {
-  const segment = state.audio.segments[itemNumber];
+function playAudioSegment(itemNumber, padding = 0, domain = 'ZO') {
+  const segment = state.audio.segments[audioSegmentId(domain, itemNumber)];
   const group = segment ? state.audio.groups[segment.groupId] : null;
   if (!segment || !group) return;
   if (state.audio.activeStop) {
     els.audioPlayer.removeEventListener('timeupdate', state.audio.activeStop);
     state.audio.activeStop = null;
   }
-  state.audio.currentItem = itemNumber;
+  state.audio.currentItem = audioSegmentId(domain, itemNumber);
   els.audioPlayer.src = group.url;
   els.audioPlayer.currentTime = Math.max(0, segment.start - padding);
   const stop = () => {
@@ -2447,7 +2496,8 @@ function playAudioSegment(itemNumber, padding = 0) {
 
 function updateAudioTime(input) {
   const item = Number(input.dataset.audioItem);
-  const segment = state.audio.segments[item];
+  const domain = input.dataset.audioDomain || 'ZO';
+  const segment = state.audio.segments[audioSegmentId(domain, item)];
   if (!segment) return;
   segment[input.dataset.audioTime] = roundTime(Number(input.value));
   const group = state.audio.groups[segment.groupId];
@@ -2458,7 +2508,7 @@ function updateAudioTime(input) {
     saveAudioSegments(segment.groupId);
     renderAudioImport();
   }
-  renderCockpit('zinsontwikkeling');
+  renderCockpit(domain === 'TB' ? 'taalbegrip' : 'zinsontwikkeling');
 }
 
 function resplitAudioGroup(groupId, mode) {
@@ -2468,6 +2518,7 @@ function resplitAudioGroup(groupId, mode) {
   const next = (mode === 'equal' ? equalSegments(groupDef.expected, group.duration) : detectSpeechSegments(group.buffer, groupDef.expected))
     .map((segment, index) => ({
       item: groupDef.start + index,
+      domain: groupDef.domain || 'ZO',
       groupId,
       start: segment.start,
       end: segment.end
@@ -2475,12 +2526,12 @@ function resplitAudioGroup(groupId, mode) {
   group.segments = next;
   group.method = mode === 'equal' ? 'evenredig verdeeld' : 'grootste pauzes';
   next.forEach(segment => {
-    state.audio.segments[segment.item] = segment;
+    state.audio.segments[audioSegmentId(segment.domain, segment.item)] = segment;
   });
   saveAudioSegments(groupId);
   renderAudioImport();
   renderAudioPanel();
-  renderCockpit('zinsontwikkeling');
+  renderCockpit(groupDef.domain === 'TB' ? 'taalbegrip' : 'zinsontwikkeling');
 }
 
 function applyImportedAudioTimes(groupId) {
@@ -2507,6 +2558,7 @@ function applyImportedAudioTimes(groupId) {
     const end = clamp(roundTime(segment.end), 0, group.duration);
     return {
       item: segment.item,
+      domain: groupDef.domain || 'ZO',
       groupId,
       start,
       end
@@ -2519,24 +2571,25 @@ function applyImportedAudioTimes(groupId) {
   group.segments = next;
   group.method = 'JSON-tijden uit import';
   next.forEach(segment => {
-    state.audio.segments[segment.item] = segment;
+    state.audio.segments[audioSegmentId(segment.domain, segment.item)] = segment;
   });
   saveAudioSegments(groupId);
   renderAudioImport();
   renderAudioPanel();
-  renderCockpit('zinsontwikkeling');
+  renderCockpit(groupDef.domain === 'TB' ? 'taalbegrip' : 'zinsontwikkeling');
 }
 
 function importedAudioSegmentsForGroup(group) {
-  return getItems('zinsontwikkeling')
+  return getItems(group.domain === 'TB' ? 'taalbegrip' : 'zinsontwikkeling')
     .filter(item => Number(item.number) >= group.start && Number(item.number) <= group.end)
     .map(item => {
-      const checkGroup = audioGroupIdFromCheck(item);
+      const checkGroup = audioGroupIdFromCheck(item, group.domain || 'ZO');
       if (checkGroup && checkGroup !== group.id) return null;
       const range = audioCheckRange(item);
       if (!range) return null;
       return {
         item: Number(item.number),
+        domain: group.domain || 'ZO',
         groupId: group.id,
         start: range.start,
         end: range.end
@@ -2546,16 +2599,27 @@ function importedAudioSegmentsForGroup(group) {
     .sort((a, b) => a.item - b.item);
 }
 
-function audioGroupIdFromCheck(item) {
+function audioGroupIdFromCheck(item, domain = 'ZO') {
   const file = String(item?.audioCheck?.audioFile || '').toLowerCase();
+  if (file.includes('tb-a') || file.includes('tb1-12') || file.includes('tb1_12')) return 'tb-a-1-12';
+  if (file.includes('tb-b') || file.includes('tb13-33') || file.includes('tb13_33')) return 'tb-b-13-33';
+  if (file.includes('tb-c') || file.includes('tb34-41') || file.includes('tb34_41')) return 'tb-c-34-41';
+  if (file.includes('tb-d') || file.includes('tb42-49') || file.includes('tb42_49')) return 'tb-d-42-49';
+  if (file.includes('tb-e') || file.includes('tb50-55') || file.includes('tb50_55')) return 'tb-e-50-55';
+  if (file.includes('tb-f') || file.includes('tb56-63') || file.includes('tb56_63')) return 'tb-f-56-63';
+  if (file.includes('tb-g') || file.includes('tb64-71') || file.includes('tb64_71')) return 'tb-g-64-71';
   if (file.includes('zo1-10') || file.includes('zo1_10')) return 'zo1-10';
   if (file.includes('zo11-20') || file.includes('zo11_20')) return 'zo11-20';
   if (file.includes('zo21-36') || file.includes('zo21_36')) return 'zo21-36';
-  return audioGroupForItem(Number(item?.number))?.id || '';
+  return audioGroupForItem(Number(item?.number), file.includes('tb') ? 'TB' : domain)?.id || '';
 }
 
-function audioGroupForItem(itemNumber) {
-  return AUDIO_GROUPS.find(group => itemNumber >= group.start && itemNumber <= group.end) || null;
+function audioGroupForItem(itemNumber, domain = 'ZO') {
+  return AUDIO_GROUPS.find(group => group.domain === domain && itemNumber >= group.start && itemNumber <= group.end) || null;
+}
+
+function audioSegmentId(domain, itemNumber) {
+  return `${domain}-${Number(itemNumber)}`;
 }
 
 function audioCheckRange(item) {
@@ -2599,7 +2663,7 @@ function syncAllAudioSegmentsIntoData() {
 
 function syncAudioSegmentsIntoData(groupId) {
   const group = state.audio.groups[groupId];
-  const items = state.data?.zinsontwikkeling?.items;
+  const items = group?.domain === 'TB' ? state.data?.taalbegrip?.items : state.data?.zinsontwikkeling?.items;
   if (!group || !Array.isArray(items)) return;
   group.segments.forEach(segment => {
     const item = items.find(candidate => Number(candidate.number) === Number(segment.item));
@@ -2646,6 +2710,7 @@ async function clearAudio() {
   renderAudioImport();
   renderAudioPanel();
   renderCockpit('zinsontwikkeling');
+  renderCockpit('taalbegrip');
 }
 
 function simulationPrompt(part) {
@@ -2862,10 +2927,11 @@ async function loadScoreFormPages() {
     if (record.url) URL.revokeObjectURL(record.url);
   });
   state.scoreForm.pages = records
-    .map(record => ({ ...record, url: URL.createObjectURL(record.blob) }))
+    .map(record => ({ ...record, domain: record.domain || inferScoreFormDomain(record.id), url: URL.createObjectURL(record.blob) }))
     .sort((a, b) => Number(a.pageNumber) - Number(b.pageNumber));
-  if (!state.scoreForm.pages.some(record => Number(record.pageNumber) === Number(state.scoreForm.page))) {
-    state.scoreForm.page = state.scoreForm.pages[0]?.pageNumber || 1;
+  const activePages = state.scoreForm.pages.filter(record => (record.domain || 'ZO') === (state.scoreForm.domain || 'ZO'));
+  if (!activePages.some(record => Number(record.pageNumber) === Number(state.scoreForm.page))) {
+    state.scoreForm.page = activePages[0]?.pageNumber || 1;
   }
 }
 
@@ -2951,6 +3017,7 @@ async function serializeScoreFormPages() {
   const records = await getAllScoreFormPageRecords();
   return Promise.all(records.map(async record => ({
     id: record.id,
+    domain: record.domain || inferScoreFormDomain(record.id),
     pageNumber: record.pageNumber,
     fileName: record.fileName,
     type: record.type,
@@ -2971,6 +3038,7 @@ async function restoreScoreFormPages(records) {
     const blob = dataUrlToBlob(record.dataUrl);
     const restored = {
       id: record.id,
+      domain: record.domain || inferScoreFormDomain(record.id),
       pageNumber: Number(record.pageNumber),
       fileName: record.fileName || `scoreformulier-pagina-${record.pageNumber}`,
       type: record.type || blob.type || 'image/png',
@@ -2983,6 +3051,10 @@ async function restoreScoreFormPages(records) {
   }
   state.scoreForm.pages.sort((a, b) => Number(a.pageNumber) - Number(b.pageNumber));
   state.scoreForm.page = state.scoreForm.pages[0]?.pageNumber || 1;
+}
+
+function inferScoreFormDomain(id = '') {
+  return String(id).startsWith('TB-') ? 'TB' : 'ZO';
 }
 
 function sourceImageId(itemNumber, kind, domain = 'ZO') {
@@ -3114,11 +3186,30 @@ async function putScoreFormPageRecord(record) {
   });
 }
 
-async function clearScoreFormPageRecords() {
+async function clearScoreFormPageRecords(domain = null) {
   const db = await openSourceImageDb();
+  if (domain) {
+    const records = await getAllScoreFormPageRecords();
+    await Promise.all(records
+      .filter(record => (record.domain || inferScoreFormDomain(record.id)) === domain)
+      .map(record => deleteScoreFormPageRecord(record.id)));
+    db.close();
+    return;
+  }
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(SCORE_FORM_PAGE_STORE, 'readwrite');
     const request = transaction.objectStore(SCORE_FORM_PAGE_STORE).clear();
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function deleteScoreFormPageRecord(id) {
+  const db = await openSourceImageDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(SCORE_FORM_PAGE_STORE, 'readwrite');
+    const request = transaction.objectStore(SCORE_FORM_PAGE_STORE).delete(id);
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
     transaction.oncomplete = () => db.close();

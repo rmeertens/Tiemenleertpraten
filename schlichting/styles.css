@@ -812,8 +812,13 @@ body.sch-scoreform-split .sch-app {
 }
 
 .sch-audio-import {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 18px;
+}
+
+.sch-audio-domain {
+  display: grid;
+  gap: 10px;
 }
 
 .sch-audio-drop {
@@ -947,6 +952,18 @@ body.sch-scoreform-split .sch-audio-fab {
 .sch-paper-tool {
   display: grid;
   gap: 14px;
+}
+
+.sch-paper-context {
+  background: var(--accent-soft);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.sch-paper-context strong {
+  display: block;
+  font-size: 20px;
 }
 
 .sch-scoreform-dock {
@@ -1131,6 +1148,7 @@ body.sch-scoreform-split .sch-audio-fab {
   .sch-prep-grid,
   .sch-wizard,
   .sch-audio-import,
+  .sch-audio-domain,
   .sch-source-image-grid,
   .sch-audio-row {
     grid-template-columns: 1fr;
