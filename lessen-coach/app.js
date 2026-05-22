@@ -7,6 +7,7 @@ const state = {
   done: JSON.parse(localStorage.getItem('lessen_done') || '{}'),
   mastery: JSON.parse(localStorage.getItem('lessen_mastery') || '{}'),
   drillStats: JSON.parse(localStorage.getItem('lessen_drill_stats') || '{}'),
+  planDone: JSON.parse(localStorage.getItem('lessen_plan_done') || '{}'),
   drill: null,
   micro: null,
 };
@@ -132,6 +133,7 @@ function renderLesson() {
   document.getElementById('lesson-zg').textContent = lesson.zg;
   document.getElementById('core-card').textContent = lesson.core;
   document.getElementById('anchor-list').innerHTML = lesson.anchors.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+  renderLessonPlan(lesson);
   answerInput.value = '';
   feedbackCard.innerHTML = '<p class="flits-note">Nog geen antwoord nagekeken.</p>';
   speechNote.textContent = '';
@@ -139,6 +141,78 @@ function renderLesson() {
   renderMode();
   renderMastery();
   renderLessonList();
+}
+
+function renderLessonPlan(lesson) {
+  const card = document.getElementById('lesson-plan-card');
+  const target = document.getElementById('lesson-plan');
+  if (!card || !target || !lesson.plan) {
+    if (card) card.hidden = true;
+    return;
+  }
+  const plan = lesson.plan;
+  card.hidden = false;
+  target.innerHTML = `
+    <div class="lesson-plan-head">
+      <div>
+        <h3>${escapeHtml(plan.title)}</h3>
+        <p>${escapeHtml(plan.lead)}</p>
+      </div>
+      ${plan.structuredPrompt ? '<button class="btn btn--ghost" type="button" data-plan-copy>Prompt voor Structured</button>' : ''}
+    </div>
+    <div class="lesson-plan-grid">
+      ${(plan.lists || []).map(list => `
+        <section class="lesson-plan-list">
+          <strong>${escapeHtml(list.title)}</strong>
+          <p>${escapeHtml(list.note || '')}</p>
+          ${(list.items || []).map((item, index) => lessonPlanCheckbox(lesson, list, item, index)).join('')}
+        </section>
+      `).join('')}
+    </div>
+    ${(plan.agenda || []).length ? `
+      <div class="lesson-plan-agenda">
+        ${(plan.agenda || []).map(slot => `
+          <article>
+            <span>${escapeHtml(slot.when)}</span>
+            <strong>${escapeHtml(slot.title)}</strong>
+            <p>${escapeHtml(slot.action)}</p>
+          </article>
+        `).join('')}
+      </div>
+    ` : ''}
+    <p class="flits-note" data-plan-copy-status>${escapeHtml(plan.footer || '')}</p>
+  `;
+  target.querySelectorAll('[data-plan-check]').forEach(input => {
+    input.addEventListener('change', () => {
+      state.planDone[input.dataset.planCheck] = input.checked;
+      localStorage.setItem('lessen_plan_done', JSON.stringify(state.planDone));
+    });
+  });
+  target.querySelector('[data-plan-copy]')?.addEventListener('click', () => copyStructuredPlan(lesson));
+}
+
+function lessonPlanCheckbox(lesson, list, item, index) {
+  const key = planKey(lesson.id, list.id || list.title, index);
+  return `
+    <label class="lesson-plan-check">
+      <input type="checkbox" data-plan-check="${escapeHtml(key)}" ${state.planDone[key] ? 'checked' : ''} />
+      <span>${escapeHtml(item)}</span>
+    </label>
+  `;
+}
+
+function planKey(lessonId, listId, index) {
+  return `${lessonId}:${normalize(listId)}:${index}`;
+}
+
+async function copyStructuredPlan(lesson) {
+  const status = document.querySelector('[data-plan-copy-status]');
+  try {
+    await navigator.clipboard.writeText(lesson.plan.structuredPrompt);
+    if (status) status.textContent = 'Structured-prompt gekopieerd. Plak hem in je planner en check de datums nog even.';
+  } catch {
+    if (status) status.textContent = 'Kopieren lukte niet. Open de plannerkaart en kopieer de prompt handmatig uit de lesdata.';
+  }
 }
 
 function renderFlitsLinks(lesson) {

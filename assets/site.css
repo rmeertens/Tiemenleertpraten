@@ -1109,6 +1109,85 @@ a { color: inherit; }
   margin: 0;
 }
 
+.lesson-plan-card {
+  display: grid;
+  gap: 16px;
+}
+
+.lesson-plan-card[hidden] {
+  display: none;
+}
+
+.lesson-plan-head {
+  align-items: start;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  padding-bottom: 14px;
+}
+
+.lesson-plan-head h3,
+.lesson-plan-head p,
+.lesson-plan-list p,
+.lesson-plan-agenda p {
+  margin: 0;
+}
+
+.lesson-plan-head p,
+.lesson-plan-list p,
+.lesson-plan-agenda p {
+  color: var(--ink-soft);
+}
+
+.lesson-plan-grid,
+.lesson-plan-agenda {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lesson-plan-list,
+.lesson-plan-agenda article {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.lesson-plan-list > strong,
+.lesson-plan-agenda span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lesson-plan-check {
+  align-items: start;
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: calc(var(--radius) - 4px);
+  cursor: pointer;
+  display: grid;
+  gap: 9px;
+  grid-template-columns: 18px minmax(0, 1fr);
+  padding: 10px;
+}
+
+.lesson-plan-check input {
+  margin-top: 2px;
+}
+
+.lesson-plan-check span {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
 /* ============ Pak de 10 ============ */
 
 .accent-app {
@@ -6170,8 +6249,14 @@ body[data-split-mode="sounds"] .split-block--pattern {
   .note-grid,
   .note-fields,
   .note-radar-grid,
+  .lesson-plan-grid,
+  .lesson-plan-agenda,
   .lesson-flits-links > div {
     grid-template-columns: 1fr;
+  }
+
+  .lesson-plan-head {
+    flex-direction: column;
   }
 
   .note-actions,

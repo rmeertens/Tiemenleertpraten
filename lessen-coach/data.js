@@ -289,28 +289,29 @@ window.LESSEN_DATA = {
     ),
     lesson(
       'w11',
-      'W11 · Start behandeling spraak en taal',
-      'vooruitblik',
-      'Behandeling',
-      ['behandeling', 'fonologie', 'taaltherapie'],
-      'W11 start het behandeldeel: je vertaalt diagnostiek naar behandelmethoden voor spraak, semantiek, syntaxis en morfologie.',
-      'De leskern: methodekeuze volgt uit beginsituatie, diagnose, doel en generalisatie. Niet de methode noemen, maar verdedigen.',
+      'W11 · Van analyse naar behandeling',
+      '22 mei 2026',
+      'Analyse & behandeling',
+      ['ICF', 'behandelplan', 'methodekeuze', 'spraak-taal'],
+      'W11 maakt de draai van diagnostiek naar behandeling: je harmoniseert casusgegevens in ICF, formuleert voorzichtig je conclusie en kiest daarna een methode die bij probleemmechanisme, doel en context past.',
+      'De leskern: behandeling start niet bij een leuk materiaal. Je onderbouwt eerst indicatie, behandeldoel en methode; daarna kies je het materiaal en de sessieopbouw.',
       [
-        'Behandeling spraak: fonetiek/fonologie vraagt keuze tussen articulatorisch, fonologisch of planninggericht werken.',
-        'Behandeling taal: semantiek, syntaxis en morfologie vraagt doelen net boven huidig niveau.',
-        'Mondmotoriekoefeningen zijn geen vanzelfsprekende spraakbehandeling.',
-        'Lees de diagnostiekuitwerking van je casus voordat je een behandelplan maakt.'
+        'ICF helpt bevindingen ordenen van functie en activiteit naar participatie, context, indicatie en behandeldoel.',
+        'Consistentie en foutmechanisme sturen spraakbehandeling: fonetisch, fonologisch en planning/dyspraxie vragen een andere route.',
+        'Methode en materiaal zijn niet hetzelfde: kies eerst de onderbouwde aanpak, dan pas werkbladen, spel of pictosteun.',
+        'Taalbehandeling kan vroeg en functioneel zijn: semantiek, morfosyntaxis en pragmatiek vragen doelen net boven het huidige niveau en transfer naar thuis of school.'
       ],
       [
-        topic('methodekeuze spraak', 'Fonetisch, fonologisch en planninggericht behandelen onderscheiden.', ['fonetisch', 'fonologisch', 'planning', 'methode', 'spraak']),
-        topic('methodekeuze taal', 'Semantiek, syntaxis en morfologie koppelen aan functionele doelen.', ['semantiek', 'syntaxis', 'morfologie', 'doel', 'taaltherapie']),
-        topic('beginsituatie naar doel', 'Diagnose vertalen naar LT-doel, KT-doel en behandelstap.', ['beginsituatie', 'diagnose', 'lt-doel', 'kt-doel', 'behandelplan']),
-        topic('evidence en valkuilen', 'Niet-effectieve of niet-passende aanpak kunnen afwijzen.', ['evidence', 'mondmotoriek', 'onderbouwing', 'valkuil'])
+        topic('ICF naar indicatie', 'Onderzoeksgegevens harmoniseren tot voorzichtig logopedisch oordeel, indicatie en participatiegericht doel.', ['icf', 'indicatie', 'participatie', 'analyse', 'conclusie', 'vermoeden']),
+        topic('spraakdifferentiaal naar methode', 'Fonetisch, fonologisch en planninggericht probleem onderscheiden met consistentie en behandellogica.', ['fonetisch', 'fonologisch', 'dyspraxie', 'consistentie', 'metaphon', 'planning']),
+        topic('methode versus materiaal', 'Eerst methode en werkzame principes kiezen, daarna passend materiaal.', ['methode', 'materiaal', 'evidence', 'doel', 'materiaalkeuze']),
+        topic('taalmethoden matchen', 'Semantiek, morfosyntaxis, pragmatiek, leeftijd en ouder-/contextrol koppelen aan taaltherapie.', ['semantiek', 'morfosyntaxis', 'pragmatiek', 'hanen', 'tent', 'communicatieve taaltherapie']),
+        topic('behandelopdracht bouwen', 'Globaal halfjaarplan en specifieke sessie logisch laten volgen uit casus en doelen.', ['behandelopdracht', 'globaal behandelplan', 'sessie', 'doel', 'evaluatie'])
       ],
-      'Je krijgt een kind met fonologische processen én zwakke zinsbouw. Hoe voorkom je dat je behandelplan een losse methodenlijst wordt?',
-      'Schrijf een korte onderbouwing voor een gekozen behandelmethode vanuit diagnose, doel en generalisatie.',
-      'Ik vertrek vanuit de diagnostiek: welk probleem beperkt de verstaanbaarheid of taalredzaamheid het meest? Bij fonologische processen kies ik een contrastgerichte aanpak, bijvoorbeeld minimale paren of Metaphon, als het kind contrasten moet leren gebruiken. Bij zinsbouw formuleer ik een doel net boven huidig niveau en kies ik taaltherapie met modeling, recasting en scaffolding. Ik verantwoord steeds hoe de methode past bij diagnose, doel, leeftijd en transfer.',
-      'Een behandelmethode kies je niet omdat je hem kent, maar omdat hij past bij de beginsituatie. Ik benoem de diagnose, het concrete LT- en KT-doel, de werkzame principes van de methode en hoe ik generalisatie naar thuis of school organiseer. Daardoor wordt de methodekeuze toetswaardig onderbouwd.'
+      'Je casus heeft diagnostische gegevens, participatieproblemen en meerdere mogelijke methoden. Hoe laat je hardop horen dat jouw behandelplan geen grabbelton is?',
+      'Onderbouw voor één spraak- of taaldoel de stap van analyse naar methode, materiaal en evaluatie.',
+      'Ik begin met de analyse: welke bevindingen zijn logopedisch relevant, wat is nog een vermoeden en waar belemmert dit het kind in activiteit en participatie? Daarna kies ik één prioriteit. Bij spraak weeg ik of het foutpatroon fonetisch, fonologisch of planninggericht is, omdat dat mijn methode verandert. Bij taal koppel ik het taalniveau en ontwikkelingsniveau aan een functioneel doel. Pas daarna kies ik methode, materiaal, ouder- of schooltransfer en een meetbaar evaluatiemoment.',
+      'Mijn behandelkeuze volgt uit vier stappen. Eerst benoem ik het casusbewijs en het participatieprobleem. Daarna formuleer ik een doel dat bij het niveau van het kind past. Vervolgens kies ik een methode op werkzame principes, bijvoorbeeld contrastbewustzijn, oudercoaching of functionele taaluitlokking, en onderscheid ik die van materiaal. Tot slot beschrijf ik hoe ik in de sessie oefen en hoe ik transfer en voortgang evalueer.'
     ),
     lesson(
       'w12',
@@ -491,10 +492,10 @@ const lessonMeta = {
     zg: 'Je zegt hardop wat je zeker weet, wat je nog mist, waarom dat toetskundig uitmaakt en welke concrete vervolgstap logisch is.'
   },
   w11: {
-    criteria: 'Je vertaalt diagnostiek naar onderbouwde behandeling voor spraak en taal.',
-    writtenFocus: 'Koppel diagnose, doel, methode, werkzame principes en generalisatie.',
-    pitfall: 'Een methode noemen zonder uit te leggen waarom die past bij dit kind.',
-    zg: 'Je laat horen dat methodekeuze volgt uit probleemmechanisme, doel en transfer.'
+    criteria: 'Je harmoniseert analyse, ICF, indicatie, doel en behandelkeuze tot één verdedigbare route.',
+    writtenFocus: 'Schrijf de keten uit: casusbewijs -> probleemmechanisme -> participatiedoel -> methode -> materiaal -> evaluatie.',
+    pitfall: 'Methode en materiaal verwarren, of één behandelmethode noemen zonder indicatie, doel en transfer.',
+    zg: 'Je maakt duidelijk wat je zeker weet, wat nog een vermoeden is en waarom jouw behandeling juist nu bij dit kind past.'
   },
   w12: {
     criteria: 'Je vergelijkt behandelmethoden als keuze-instrument, niet als losse lijst.',
@@ -584,8 +585,9 @@ const lessonFlits = {
     flits('Plagiaat en APA', 'Bronnen in eigen woorden gebruiken in hand-out, verslag en toetsargument.')
   ],
   w11: [
-    flits('Behandeling Fonetiek - fonologie', 'Voorbereiding behandeling: fonetisch/fonologisch behandelen, contrast, generalisatie en methodekeuze.'),
-    flits('Behandeling: Semantiek/ syntaxis/ morfologie', 'Voorbereiding behandeling: taaltherapie koppelen aan beginsituatie en doelen.', null)
+    flits('Behandeling Fonetiek - fonologie', 'Spraakdifferentiaal omzetten naar behandelroute: articulatorisch, contrastgericht of planninggericht.'),
+    flits('Behandeling: Semantiek/ syntaxis/ morfologie', 'Taalmethoden koppelen aan niveau, doelen, ouderrol, functionele taal en transfer.', null),
+    flits('Behandeling - pragmatiek', 'Functionele communicatie als doel en context voor transfer.', null)
   ],
   w13: [
     flits('Behandeling - pragmatiek', 'Voorbereiding les 13: pragmatische behandeling, transfer, ouders en school.')
@@ -595,6 +597,57 @@ const lessonFlits = {
   ]
 };
 
+const lessonPlans = {
+  w11: {
+    title: 'W11 afronden en W12 slim voorbereiden',
+    lead: 'Je doel deze week is niet meer losse behandelmethoden verzamelen. Maak een korte casusroute die je volgende les kunt vergelijken, bespreken en verdedigen.',
+    lists: [
+      {
+        id: 'nu',
+        title: 'Nu afmaken',
+        note: 'W11 verwerken tot casuskeuze.',
+        items: [
+          'Zet je casus in ICF: logopedisch relevante functies, activiteit, participatie, externe en persoonlijke factoren.',
+          'Schrijf een voorzichtige conclusie en logopedische indicatie: wat weet je, wat is nog een vermoeden?',
+          'Kies één eerste behandelprioriteit en formuleer een globaal halfjaarspoor plus een concreet sessiedoel.',
+          'Maak je methodenlijst per taal- of spraakniveau met het label methode of materiaal en het behandeldoel.'
+        ]
+      },
+      {
+        id: 'vooruit',
+        title: 'Voor W12',
+        note: 'Voorbereiding methodevergelijking.',
+        items: [
+          'Vergelijk twee behandelroutes voor je casus op doelgroep, leeftijd/niveau, doel, werkzame principes, sessieopbouw en transfer.',
+          'Neem één spraakdifferentiaal mee: fonetisch, fonologisch of planninggericht, met consistentie als argument.',
+          'Neem één taalmethode of ouder-/contextaanpak mee die past bij semantiek, morfosyntaxis of pragmatiek.',
+          'Noteer één vraag voor je groep of docent waar je behandelplan nog op vastloopt.'
+        ]
+      }
+    ],
+    agenda: [
+      { when: 'Vandaag · 20 min', title: 'Casuskompas', action: 'ICF en behandelprioriteit naast elkaar zetten; geen methode kiezen zonder doel.' },
+      { when: 'Weekend · 45 min', title: 'Behandelopdracht', action: 'Globaal halfjaarplan schetsen en sessie 6 vullen met doel, werkwijze, materiaal en evaluatie.' },
+      { when: 'Voor W12 · 30 min', title: 'Methodevergelijking', action: 'Twee methoden vergelijken en je Structured- of agendalijst bijwerken.' }
+    ],
+    footer: 'Check de officiële Brightspace-deadlines en presentatiedatum nog tegen je rooster.',
+    structuredPrompt: `Maak in Structured een compacte studieplanning voor Spraak-Taal W11 naar W12.
+
+Doel: diagnostiek omzetten naar een verdedigbaar behandelplan voor mijn kindcasus.
+Plan deze taken als afvinkbare blokken:
+1. ICF bijwerken: functies/anatomie, activiteit, participatie, externe en persoonlijke factoren.
+2. Voorzichtige conclusie en logopedische indicatie formuleren: zekerheden en vermoedens scheiden.
+3. Eerste behandelprioriteit kiezen en een globaal halfjaarspoor schetsen.
+4. Sessie 6 uitwerken met doel, methode, materiaal, ouder/schooltransfer en evaluatie.
+5. Methoden/materialenlijst maken per spraak- of taalniveau met doel en casusmatch.
+6. Voor W12 twee behandelroutes vergelijken op doelgroep, niveau/leeftijd, werkzame principes, opbouw en transfer.
+7. Eén inhoudelijke vraag voor groep/docent noteren.
+
+Maak drie blokken: Vandaag 20 min, Weekend 45 min, Voor volgende les 30 min.
+Zet bij elk blok een duidelijke eindoutput en laat ruimte voor een korte herhaalcheck.`
+  }
+};
+
 window.LESSEN_DATA.lessons.forEach(lesson => {
   Object.assign(lesson, lessonMeta[lesson.id] || {
     criteria: 'Vakinhoud toepassen op casus, toetsvorm en vervolgstap.',
@@ -602,7 +655,8 @@ window.LESSEN_DATA.lessons.forEach(lesson => {
     pitfall: 'Losse kennis noemen zonder klinische consequentie.',
     zg: 'Kort, concreet en verantwoord redeneren.'
   }, {
-    flits: lessonFlits[lesson.id] || []
+    flits: lessonFlits[lesson.id] || [],
+    plan: lessonPlans[lesson.id] || null
   });
 });
 
