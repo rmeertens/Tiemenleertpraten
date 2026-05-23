@@ -211,7 +211,7 @@ function renderProgress() {
   document.getElementById('flits-ready').textContent = `${ready}%`;
   document.getElementById('flits-hint').textContent = ready >= 80
     ? 'Sterk. Herhaal alleen wat nog openstaat hardop.'
-    : `${mastered}/${total} onderwerpen beheerst · ${doneCount}/${data.lessons.length} flitscolleges rond.`;
+    : `${mastered}/${total} onderwerpen beheerst · ${doneCount} gekozen verdiepingen afgerond.`;
 }
 
 function renderSession() {

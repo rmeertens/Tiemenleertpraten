@@ -57,16 +57,6 @@ const tracks = [
     boss: 'Pak-de-10 boss: casus verdedigen zonder modelantwoord.'
   },
   {
-    id: 'lesnotitie-alpha',
-    title: 'Lesnotitie Alpha',
-    href: '/lesnotitie-alpha/',
-    storage: () => lessonNoteProgress(),
-    max: 100,
-    red: 'Maak van transcriptie een toetsnotitie: leerdoel, begrippen, toetsankers en toepassing.',
-    quick: 'Werk één lesnotitie op: scan ruis/AVG en formuleer één oefenvraag.',
-    boss: 'Lesnotitie boss: ruwe lesstof omzetten naar 5 bullets, casuslink en toetsvraag.'
-  },
-  {
     id: 'stotter-alpha',
     title: 'Stotter Alpha',
     href: '/stotter-alpha/',
@@ -243,23 +233,6 @@ function stutterProgress() {
   const dailyScore = Object.values(daily).filter(Boolean).length * 14;
   const logScore = Math.min(30, logs.length * 6);
   return Math.min(100, dailyScore + logScore);
-}
-
-function lessonNoteProgress() {
-  const notes = readJson('lesnotitie_alpha_notes', []);
-  const draft = readJson('lesnotitie_alpha_draft', {});
-  const savedScore = notes.length ? Number(notes[0].score || 0) : 0;
-  const draftScore = [
-    draft.title,
-    draft.theme,
-    draft.goal,
-    String(draft.transcript || '').split(/\s+/).filter(Boolean).length >= 30,
-    draft.concepts,
-    draft.anchors,
-    draft.application,
-    draft.privacy
-  ].filter(Boolean).length * 12;
-  return Math.min(100, Math.max(savedScore, draftScore));
 }
 
 function readJson(key, fallback) {

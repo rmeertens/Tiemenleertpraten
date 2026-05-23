@@ -8,7 +8,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Spraak-Taal &middot; Tiemen Leert Praten</title>
-  <link rel="stylesheet" href="/assets/site.css?v=31" />
+  <link rel="stylesheet" href="/assets/site.css?v=32" />
 </head>
 <body>
   <div class="version-stamp">v1 &middot; spraak-taal</div>
@@ -39,25 +39,62 @@
       </div>
     </section>
 
-    <section class="route-cta" aria-labelledby="route-heading">
-      <div>
-        <p class="route-cta__label">Start hier</p>
-        <h2 id="route-heading" class="route-cta__title">Collegecoach</h2>
-        <p class="route-cta__body">
-          W1-W15, studietaken en alle bestaande flitscolleges gekoppeld aan de lessen.
-        </p>
+    <section class="journey" aria-labelledby="journey-title">
+      <div class="journey__head">
+        <p class="route-cta__label">Start je studieroute</p>
+        <h2 id="journey-title">Waar ben je nu?</h2>
+        <p>Kies je situatie, niet de toolnaam. Zo kom je vanzelf in de juiste fase terecht.</p>
       </div>
-      <a class="route-cta__button" href="/lessen-coach/">Start &rarr;</a>
+      <ol class="journey__track" aria-label="Zes leerfasen">
+        <li><span>1</span>Vangen</li>
+        <li><span>2</span>Verwerken</li>
+        <li><span>3</span>Verdiepen</li>
+        <li><span>4</span>Toepassen</li>
+        <li><span>5</span>Performen</li>
+        <li><span>6</span>Herhalen</li>
+      </ol>
+      <div class="journey__choices">
+        <article>
+          <strong>Ik kom net uit een les</strong>
+          <p>Heb je al een opgeschoonde Plaud-samenvatting? Verwerk hem direct. Nog ruw? Schoon eerst op.</p>
+          <div class="journey__actions">
+            <a href="/lessen-coach/">Samenvatting is klaar</a>
+            <a class="is-secondary" href="/lesnotitie-alpha/">Eerst opschonen</a>
+          </div>
+        </article>
+        <article>
+          <strong>Ik snap een onderdeel nog niet</strong>
+          <p>Open geen brede leersessie: verdiep alleen het toetsanker waar je op vastloopt.</p>
+          <div class="journey__actions">
+            <a href="/lessen-coach/">Zoek mijn les en verdieping</a>
+          </div>
+        </article>
+        <article>
+          <strong>Ik moet iets toepassen</strong>
+          <p>Werk een casus, ICF-redenering of behandelkeuze uit nadat de leskern helder is.</p>
+          <div class="journey__actions">
+            <a href="/pak-de-10/">Start toepassing</a>
+          </div>
+        </article>
+        <article>
+          <strong>Ik wil uitvoeren of herhalen</strong>
+          <p>Train een toetsperformance of doe een korte herhaalronde van eerder verwerkte stof.</p>
+          <div class="journey__actions">
+            <a href="/mondeling-10/">Mondeling trainen</a>
+            <a class="is-secondary" href="/toetsversneller/">Kort herhalen</a>
+          </div>
+        </article>
+      </div>
     </section>
 
     <section class="tools" aria-labelledby="tools-heading">
       <h2 id="tools-heading" class="tools__heading">Kern-tools</h2>
       <ul class="tools__grid">
-        <li class="tool tool--featured"><a class="tool__link" href="/mondeling-10/"><span class="tool__badge">Toets</span><span class="tool__title">Mondeling 10</span><span class="tool__sub">Schlichting + behandeling</span><p class="tool__body">Volledige mondelinge simulatie met rubric 0-4 en kritische criteria.</p><span class="tool__cta">Open &rarr;</span></a></li>
-        <li class="tool tool--featured"><a class="tool__link" href="/schlichting/"><span class="tool__badge">Privétrainer</span><span class="tool__title">Schlichting</span><span class="tool__sub">Zinsontwikkeling &middot; audio &middot; scoreformulier</span><p class="tool__body">Browser-only oefencockpit voor dagelijkse rondes, intonatie, lokaal scoreformulier en toetsgerichte zelfscore.</p><span class="tool__cta">Open &rarr;</span></a></li>
-        <li class="tool tool--featured"><a class="tool__link" href="/pak-de-10/"><span class="tool__title">Pak de 10</span><span class="tool__sub">casus &middot; ICF &middot; behandelplan</span><p class="tool__body">Van diagnose naar doelen, methode, advies en toetswaardige verantwoording.</p><span class="tool__cta">Open &rarr;</span></a></li>
-        <li class="tool"><a class="tool__link" href="/regelcheck/"><span class="tool__title">Regelcheck</span><span class="tool__sub">afname hardop</span><p class="tool__body">Start, stop, afbreekregel en foutverantwoording strak formuleren.</p><span class="tool__cta">Open &rarr;</span></a></li>
-        <li class="tool"><a class="tool__link" href="/spraak-taal-kompas/schlichting-simulator/"><span class="tool__title">Schlichting Simulator</span><span class="tool__sub">leeftijd &middot; startpunt</span><p class="tool__body">Oefen leeftijd berekenen, startsectie kiezen en neutraal aanbieden.</p><span class="tool__cta">Open &rarr;</span></a></li>
+        <li class="tool tool--featured"><a class="tool__link" href="/mondeling-10/"><span class="tool__badge">Fase 5 · performen</span><span class="tool__title">Mondeling 10</span><span class="tool__sub">Schlichting + behandeling</span><p class="tool__body">Volledige mondelinge simulatie met rubric 0-4 en kritische criteria.</p><span class="tool__cta">Open &rarr;</span></a></li>
+        <li class="tool tool--featured"><a class="tool__link" href="/schlichting/"><span class="tool__badge">Fase 5 · performen</span><span class="tool__title">Schlichting</span><span class="tool__sub">Zinsontwikkeling &middot; audio &middot; scoreformulier</span><p class="tool__body">Browser-only oefencockpit voor dagelijkse rondes, intonatie, lokaal scoreformulier en toetsgerichte zelfscore.</p><span class="tool__cta">Open &rarr;</span></a></li>
+        <li class="tool tool--featured"><a class="tool__link" href="/pak-de-10/"><span class="tool__badge">Fase 4 · toepassen</span><span class="tool__title">Pak de 10</span><span class="tool__sub">casus &middot; ICF &middot; behandelplan</span><p class="tool__body">Van diagnose naar doelen, methode, advies en toetswaardige verantwoording.</p><span class="tool__cta">Open &rarr;</span></a></li>
+        <li class="tool"><a class="tool__link" href="/regelcheck/"><span class="tool__badge">Fase 5</span><span class="tool__title">Regelcheck</span><span class="tool__sub">afname hardop</span><p class="tool__body">Start, stop, afbreekregel en foutverantwoording strak formuleren.</p><span class="tool__cta">Open &rarr;</span></a></li>
+        <li class="tool"><a class="tool__link" href="/spraak-taal-kompas/schlichting-simulator/"><span class="tool__badge">Fase 5</span><span class="tool__title">Schlichting Simulator</span><span class="tool__sub">leeftijd &middot; startpunt</span><p class="tool__body">Oefen leeftijd berekenen, startsectie kiezen en neutraal aanbieden.</p><span class="tool__cta">Open &rarr;</span></a></li>
         <li class="tool"><a class="tool__link" href="/ipa-studio/"><span class="tool__title">IPA Studio</span><span class="tool__sub">klanken &middot; transcriptie</span><p class="tool__body">Train symbolen, klankeigenschappen en foutloos transcriberen.</p><span class="tool__cta">Open &rarr;</span></a></li>
         <li class="tool"><a class="tool__link" href="/minimale-paren/"><span class="tool__title">Minimale Paren</span><span class="tool__sub">fonologie</span><p class="tool__body">Scherp je oor voor contrast, plaats, manier en stem.</p><span class="tool__cta">Open &rarr;</span></a></li>
       </ul>
