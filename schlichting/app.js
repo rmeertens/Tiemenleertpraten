@@ -37,16 +37,6 @@ const AUDIO_GROUPS = [
   { id: 'zo21-36', domain: 'ZO', label: 'ZO 21-36', start: 21, end: 36, expected: 16 }
 ];
 
-const TB_SCORE_FORM_SECTION_PAGES = {
-  A: 3,
-  B: 3,
-  C: 5,
-  D: 6,
-  E: 6,
-  F: 7,
-  G: 7
-};
-
 const NOTEBOOK_PROMPT = `Je bent bronextractor voor mijn privé Schlichting-toetstrainer. Gebruik uitsluitend de geüploade Schlichting-handleiding, scans, scoreformulieren en toetsinformatie. Werk exact waar exacte afname-instructies nodig zijn. Geef bij elke regel een bronverwijzing, paginanummer of scanverwijzing.
 
 Maak output als geldige JSON volgens schema schlichting-v1. Gebruik dubbele aanhalingstekens en geen Markdown rondom de JSON.
@@ -396,7 +386,6 @@ function showView(view) {
   if (view === 'taalbegrip') state.scoreForm.domain = 'TB';
   if (view === 'zinsontwikkeling') state.scoreForm.domain = 'ZO';
   state.view = view;
-  if (view === 'taalbegrip') syncTaalbegripScoreFormPage();
   document.querySelectorAll('.sch-tab').forEach(tab => {
     tab.classList.toggle('is-active', tab.dataset.view === view);
   });
@@ -414,7 +403,6 @@ function persistScoreFormDock() {
 function openScoreFormForCurrentView() {
   if (state.view === 'taalbegrip') state.scoreForm.domain = 'TB';
   if (state.view === 'zinsontwikkeling') state.scoreForm.domain = 'ZO';
-  if (state.view === 'taalbegrip') syncTaalbegripScoreFormPage();
   setScoreFormDock({ open: true, collapsed: false });
 }
 
@@ -1409,7 +1397,6 @@ function renderCockpit(type) {
   renderAudioFab();
   if (state.view === type) {
     state.scoreForm.domain = domain;
-    if (type === 'taalbegrip') syncTaalbegripScoreFormPage(cardItem);
     renderScoreFormPaper();
   }
 }
@@ -1444,19 +1431,6 @@ function taalbegripSectionForItem(itemNumber) {
   }) || null;
 }
 
-function currentTaalbegripSection(contextItem = null) {
-  if (contextItem?.number) return taalbegripSectionForItem(contextItem.number);
-  const sections = state.data?.taalbegrip?.sections || [];
-  return sections[clamp(state.itemIndex.taalbegrip, 0, sections.length - 1)] || null;
-}
-
-function syncTaalbegripScoreFormPage(contextItem = null) {
-  if ((state.scoreForm.domain || 'ZO') !== 'TB') return;
-  const section = currentTaalbegripSection(contextItem);
-  const page = TB_SCORE_FORM_SECTION_PAGES[String(section?.section || '').toUpperCase()];
-  if (page) state.scoreForm.page = page;
-}
-
 function taalbegripSectionCockpitHtml() {
   const sections = state.data?.taalbegrip?.sections || [];
   const index = clamp(state.itemIndex.taalbegrip, 0, sections.length - 1);
@@ -1464,7 +1438,6 @@ function taalbegripSectionCockpitHtml() {
   const section = sections[index];
   if (state.view === 'taalbegrip') {
     state.scoreForm.domain = 'TB';
-    syncTaalbegripScoreFormPage();
   }
   if (state.view === 'taalbegrip') markTrainingItem('taalbegrip', index + 1, sections.length);
   const range = section.itemRange ? `items ${section.itemRange[0]}-${section.itemRange[1]}` : 'itemreeks onbekend';
