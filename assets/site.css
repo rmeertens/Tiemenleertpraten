@@ -141,115 +141,84 @@ a { color: inherit; }
   transform: translateY(-1px);
 }
 
-.journey {
+.study-command {
   background: var(--bg-elevated);
   border: 1px solid var(--accent);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   display: grid;
-  gap: 22px;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.8fr);
   margin: -24px 0 58px;
   padding: 30px;
 }
 
-.journey__head h2 {
+.study-command__main {
+  align-content: start;
+  display: grid;
+  gap: 14px;
+}
+
+.study-command__main h2 {
   font-family: var(--font-display);
   font-size: clamp(30px, 4vw, 42px);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.08;
-  margin: 0 0 10px;
-}
-
-.journey__head p:last-child {
-  color: var(--ink-soft);
   margin: 0;
 }
 
-.journey__track {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.journey__track li {
-  align-items: center;
-  background: var(--bg);
-  border: 1px solid var(--rule);
-  border-radius: 10px;
+.study-command__main p {
   color: var(--ink-soft);
-  display: flex;
-  flex-direction: column;
-  font-size: 12px;
-  font-weight: 700;
-  gap: 5px;
-  min-width: 0;
-  padding: 9px 3px;
-  text-align: center;
+  max-width: 52ch;
+  margin: 0;
 }
 
-.journey__track span {
-  align-items: center;
-  background: var(--accent-soft);
-  border-radius: 50%;
-  color: var(--accent);
-  display: flex;
-  font-size: 12px;
-  height: 23px;
-  justify-content: center;
-  width: 23px;
+.study-command__main .route-cta__button {
+  justify-self: start;
+  margin-top: 4px;
 }
 
-.journey__choices {
+.study-command__side {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.journey__choices article {
+.study-command__side a {
   background: var(--bg);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 17px;
-}
-
-.journey__choices strong {
-  font-size: 17px;
-}
-
-.journey__choices p {
   color: var(--ink-soft);
-  font-size: 14px;
-  margin: 0 0 5px;
-}
-
-.journey__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: auto;
-}
-
-.journey__actions a {
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 7px 12px;
+  display: grid;
+  gap: 2px;
+  padding: 14px;
   text-decoration: none;
+  transition: border-color 0.18s ease, transform 0.18s ease;
 }
 
-.journey__actions a.is-secondary {
-  background: var(--bg-elevated);
+.study-command__side a:hover,
+.study-command__side a:focus {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.study-command__side span {
   color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.study-command__side strong {
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.study-command__side small {
+  font-size: 14px;
+  line-height: 1.35;
 }
 
 .study-phase {
@@ -438,17 +407,10 @@ a { color: inherit; }
     grid-template-columns: 1fr;
   }
 
-  .journey {
+  .study-command {
+    grid-template-columns: 1fr;
     margin-top: -8px;
     padding: 22px;
-  }
-
-  .journey__track {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .journey__choices {
-    grid-template-columns: 1fr;
   }
 
   .study-phase {
