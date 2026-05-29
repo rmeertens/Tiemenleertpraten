@@ -12,7 +12,6 @@ Gehost als statische site op GitHub Pages: <https://tiemenleertpraten.meertens.d
   - **De Kaart** — klikbaar IPA-rooster met audio en de drie kenmerken (plaats / manier / stem).
   - **Drie Knoppen** — drillmodus met Leitner-spaced-repetition.
 - **Spraak Splitter** (`/spraak-splitter/`) — deelt woorden en korte zinnen op in lettergrepen, klankgroepen, clusters en oefenstappen.
-- **Studiecoach** (`/studiecoach/`) — AI-coach voor Schlichting Taalbegrip-3 en Zinsontwikkeling met eigen Anthropic API-sleutel.
 
 ## Lokaal draaien
 

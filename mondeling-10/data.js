@@ -40,8 +40,8 @@ window.ORAL_10_DATA = {
   prepTools: [
     {
       title: '1. Leeftijd en startpunt',
-      href: '/spraak-taal-kompas/schlichting-simulator/',
-      text: 'Gebruik de Schlichting Simulator als rekentool voor leeftijd, startkeuze en hardop onderbouwen.'
+      href: '/mondeling-10/',
+      text: 'Gebruik de opdrachten in Deel 1 om leeftijd, startkeuze en hardop onderbouwen te trainen.'
     },
     {
       title: '2. Afbreekregel hardop',
@@ -54,9 +54,9 @@ window.ORAL_10_DATA = {
       text: 'Gebruik Pak de 10 om diagnose, ICF, doelen en advies toetsgericht klaar te zetten.'
     },
     {
-      title: '4. Strenge AI-check',
-      href: '/studiecoach/',
-      text: 'Gebruik Studiecoach voor een laatste kritische check op je Schlichting-afname.'
+      title: '4. Examenmodus',
+      href: '/mondeling-10/',
+      text: 'Gebruik Examenmodus om je afname en foutverantwoording zonder hulp te testen.'
     }
   ],
   therapyPrepTools: [

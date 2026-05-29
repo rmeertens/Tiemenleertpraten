@@ -598,7 +598,7 @@ function saveNote() {
 
 function updatePrompt() {
   const data = collectData();
-  aiPrompt.value = `Je bent een strenge maar behulpzame studiecoach voor een logopediestudent.
+  aiPrompt.value = `Je bent een strenge maar behulpzame leercoach voor een logopediestudent.
 
 Maak van onderstaande lesnotitie een korte, toetsgerichte samenvatting. Gebruik geen lange algemene samenvatting zonder toepassing.
 
