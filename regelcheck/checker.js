@@ -1,5 +1,8 @@
 'use strict';
 
+const REGELCHECK_PROGRESS_KEY = 'regelcheck_progress';
+const REGELCHECK_SCENARIO_KEY = 'regelcheck_scores';
+
 // ---------------------------------------------------------------------------
 // SCENARIO-DATA
 // Pas de rubric-inhoud hier aan als de exacte Schlichting-getallen afwijken.
@@ -342,12 +345,31 @@ function runCheck() {
   const score = document.createElement('p');
   score.className = 'rc-score';
   const allGood = passCount === results.length;
+  saveProgress(s.id, Math.round((passCount / results.length) * 100));
   score.innerHTML =
     'Score: <strong>' + passCount + ' / ' + results.length + '</strong>' +
     (allGood ? ' — Alles benoemd! 🎉' : ' — Probeer de gemiste punten erbij te noemen.');
   container.appendChild(score);
 
   container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function saveProgress(id, pct) {
+  const scores = readJson(REGELCHECK_SCENARIO_KEY, {});
+  scores[id] = Math.max(Number(scores[id] || 0), pct);
+  localStorage.setItem(REGELCHECK_SCENARIO_KEY, JSON.stringify(scores));
+  const average = Math.round(
+    SCENARIOS.reduce((sum, scenario) => sum + Number(scores[scenario.id] || 0), 0) / SCENARIOS.length
+  );
+  localStorage.setItem(REGELCHECK_PROGRESS_KEY, String(average));
+}
+
+function readJson(key, fallback) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+  } catch {
+    return fallback;
+  }
 }
 
 // ---------------------------------------------------------------------------

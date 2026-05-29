@@ -184,7 +184,7 @@ a { color: inherit; }
   gap: 10px;
 }
 
-.study-command__side a {
+.study-command__side article {
   background: var(--bg);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
@@ -192,14 +192,6 @@ a { color: inherit; }
   display: grid;
   gap: 2px;
   padding: 14px;
-  text-decoration: none;
-  transition: border-color 0.18s ease, transform 0.18s ease;
-}
-
-.study-command__side a:hover,
-.study-command__side a:focus {
-  border-color: var(--accent);
-  transform: translateY(-1px);
 }
 
 .study-command__side span {
@@ -219,6 +211,34 @@ a { color: inherit; }
 .study-command__side small {
   font-size: 14px;
   line-height: 1.35;
+}
+
+.domain-progress {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0;
+  max-width: 420px;
+}
+
+.domain-progress span {
+  align-items: baseline;
+  color: var(--ink-soft);
+  display: flex;
+  font-size: 14px;
+  gap: 8px;
+}
+
+.domain-progress strong {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.domain-progress meter {
+  height: 10px;
+  width: 100%;
 }
 
 .study-phase {
@@ -513,6 +533,44 @@ a { color: inherit; }
   color: var(--ink-soft);
   font-size: 15px;
 }
+
+.tool__progress {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-top: 8px;
+}
+
+.tool__progress span {
+  background: var(--rule);
+  border-radius: 999px;
+  display: block;
+  height: 9px;
+  overflow: hidden;
+}
+
+.tool__progress i {
+  background: var(--bad);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  transition: width 0.25s ease;
+}
+
+.tool__progress em {
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
+  min-width: 38px;
+  text-align: right;
+}
+
+.tool[data-progress-state="yellow"] .tool__progress i { background: #c58a1d; }
+.tool[data-progress-state="green"] .tool__progress i { background: var(--good); }
+.tool[data-progress-state="red"] { border-color: rgba(192, 57, 43, 0.5); }
+.tool[data-progress-state="green"] { border-color: rgba(47, 138, 74, 0.55); }
 
 .tool__cta {
   margin-top: 14px;
