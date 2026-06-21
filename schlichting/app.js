@@ -1631,13 +1631,12 @@ function trainingProgressHtml(type, totalItems) {
   const percent = totalItems ? Math.round((visitedCount / totalItems) * 100) : 0;
   const elapsed = completedToday
     ? latest.durationMs
-    : current?.startedAt
-      ? Math.max(0, Date.now() - new Date(current.startedAt).getTime())
-      : 0;
+    : current ? trainingElapsedMs(current) : 0;
   const streak = trainingStreak((state.training.sessions || []).filter(session => session.type === type));
+  const paused = Boolean(current?.pausedAt);
   const statusText = completedToday
     ? `ronde klaar · streak ${streak} dag${streak === 1 ? '' : 'en'} · ${formatDuration(elapsed)}`
-    : `${percent}% doorlopen · streak ${streak} dag${streak === 1 ? '' : 'en'} · ${formatDuration(elapsed)} bezig`;
+    : `${percent}% doorlopen · streak ${streak} dag${streak === 1 ? '' : 'en'} · ${formatDuration(elapsed)} ${paused ? 'gepauzeerd' : 'bezig'}`;
   return `
     <article class="sch-training-strip">
       <div>
@@ -1649,6 +1648,7 @@ function trainingProgressHtml(type, totalItems) {
         <span style="width:${escapeHtml(percent)}%"></span>
       </div>
       <div class="sch-actions">
+        ${current ? `<button class="btn btn--ghost" type="button" data-training-toggle data-training-type="${escapeHtml(type)}" data-training-total="${escapeHtml(totalItems)}">${paused ? 'Hervat' : 'Pauze'}</button>` : ''}
         <button class="btn btn--ghost" type="button" data-training-reset>Nieuwe ronde</button>
         <button class="btn btn--primary" type="button" data-view-score>Bekijk progressie</button>
       </div>
@@ -1966,6 +1966,7 @@ function ensureTrainingCurrent(totalItems, create = true, type = 'zinsontwikkeli
   if (current && !current.completedAt && current.type === type) {
     current.totalItems = totalItems;
     current.visited = Array.isArray(current.visited) ? current.visited : [];
+    current.pausedMs = Number(current.pausedMs || 0);
     return current;
   }
   if (!create) return null;
@@ -1973,6 +1974,8 @@ function ensureTrainingCurrent(totalItems, create = true, type = 'zinsontwikkeli
     id: `${type}-${Date.now()}`,
     type,
     startedAt: new Date().toISOString(),
+    pausedAt: null,
+    pausedMs: 0,
     totalItems,
     visited: []
   };
@@ -1999,8 +2002,7 @@ function markZinsTrainingItem(itemNumber, totalItems) {
 function completeZinsTrainingRound(current) {
   if (current.completedAt) return;
   const now = new Date();
-  const started = new Date(current.startedAt);
-  const durationMs = Math.max(0, now.getTime() - started.getTime());
+  const durationMs = trainingElapsedMs(current, now);
   const session = {
     id: current.id,
     type: current.type || 'zinsontwikkeling',
@@ -2018,6 +2020,31 @@ function completeZinsTrainingRound(current) {
   state.training.current = null;
 }
 
+function trainingElapsedMs(current, now = new Date()) {
+  if (!current?.startedAt) return 0;
+  const started = new Date(current.startedAt).getTime();
+  const pausedMs = Number(current.pausedMs || 0);
+  const activePause = current.pausedAt
+    ? Math.max(0, now.getTime() - new Date(current.pausedAt).getTime())
+    : 0;
+  return Math.max(0, now.getTime() - started - pausedMs - activePause);
+}
+
+function toggleTrainingRound(type, totalItems) {
+  const current = ensureTrainingCurrent(totalItems, false, type);
+  if (!current) return;
+  const now = new Date();
+  if (current.pausedAt) {
+    current.pausedMs = Number(current.pausedMs || 0) + Math.max(0, now.getTime() - new Date(current.pausedAt).getTime());
+    current.pausedAt = null;
+  } else {
+    current.pausedAt = now.toISOString();
+  }
+  saveTraining();
+  renderCockpit(type);
+  renderDashboard();
+}
+
 function resetTrainingRound() {
   state.training.current = null;
   saveTraining();
@@ -2030,6 +2057,13 @@ function saveTraining() {
 }
 
 function bindTrainingControls() {
+  document.querySelectorAll('[data-training-toggle]').forEach(button => {
+    if (button.dataset.bound === 'true') return;
+    button.dataset.bound = 'true';
+    button.addEventListener('click', () => {
+      toggleTrainingRound(button.dataset.trainingType || 'zinsontwikkeling', Number(button.dataset.trainingTotal || 0));
+    });
+  });
   document.querySelectorAll('[data-training-reset]').forEach(button => {
     if (button.dataset.bound === 'true') return;
     button.dataset.bound = 'true';

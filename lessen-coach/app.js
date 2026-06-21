@@ -101,9 +101,10 @@ function renderLessonList() {
   list.innerHTML = data.lessons.map((lesson, index) => {
     const active = index === state.index ? ' is-active' : '';
     const done = lessonIsMastered(lesson) ? ' is-done' : '';
+    const routeNumber = lesson.id === 'alle-lessen' ? '' : index;
     return `
       <button class="flits-list-item${active}${done}" type="button" data-index="${index}">
-        <span>${index + 1}</span>
+        <span>${routeNumber}</span>
         <strong>${escapeHtml(lesson.title)}</strong>
         <small>${escapeHtml(lesson.domain)}</small>
       </button>
@@ -122,7 +123,9 @@ function renderLessonList() {
 function renderLesson() {
   const lesson = currentLesson();
   select.value = String(state.index);
-  document.getElementById('lesson-meta').textContent = `${lesson.date} · ${state.index + 1} van ${data.lessons.length} · ${lesson.domain}`;
+  document.getElementById('lesson-meta').textContent = lesson.id === 'alle-lessen'
+    ? `${lesson.date} · moduleoverzicht · ${lesson.domain}`
+    : `${lesson.date} · les ${state.index} van ${data.lessons.length - 1} · ${lesson.domain}`;
   document.getElementById('lesson-title').textContent = lesson.title;
   document.getElementById('lesson-summary').textContent = lesson.summary;
   document.getElementById('lesson-tags').innerHTML = lesson.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');

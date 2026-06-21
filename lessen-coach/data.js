@@ -13,8 +13,8 @@ window.LESSEN_DATA = {
       [
         'W1-W6: preventie, taalontwikkeling, spraakontwikkeling, meertaligheid en projectmatig voorlichten.',
         'W7-W10: pathologie en diagnostiek, TOS, testleer, ICF, MDO en complexe casussen.',
-        'W11-W14: behandeling kiezen, methoden vergelijken, pragmatiek en behandelplan presenteren.',
-        'W15: hiaten dichten en mondeling/schriftelijk toetsgedrag trainen.'
+        'W11-W13: van analyse naar methodekeuze, SMART-doelen, spraakdifferentiaal en professioneel behandelproces.',
+        'W14-W15: complexe behandelplannen prioriteren, evalueren, presenteren en toetsgericht verdedigen.'
       ],
       [
         topic('modulelijn uitleggen', 'De volgorde preventie -> diagnostiek -> behandeling -> toets kunnen uitleggen.', ['modulelijn', 'preventie', 'diagnostiek', 'behandeling', 'toets']),
@@ -315,103 +315,111 @@ window.LESSEN_DATA = {
     ),
     lesson(
       'w12',
-      'W12 · Behandelmethoden vergelijken',
-      'vooruitblik',
-      'Behandeling',
-      ['behandelmethoden', 'schema', 'casus'],
-      'W12 draait om overzicht: welke behandelmethoden bestaan er, voor wie zijn ze bedoeld en wanneer kies je welke aanpak?',
-      'De leskern: je kunt behandelmethoden vergelijken op doelgroep, doel, uitgangspunten, onderdelen, opbouw en algemene indruk.',
+      'W12 · Taaltherapie, fonologie en SMART-doelen',
+      '29 mei 2026',
+      'Behandeling & doelen',
+      ['taaltherapie', 'fonologie', 'SMART', 'SDM'],
+      'W12 verbindt behandelmethoden aan taalleeftijd, probleemmechanisme en participatie. Je kiest eerst doel en methode, daarna pas materiaal, en formuleert het resultaat SMART samen met kind en omgeving.',
+      'De leskern: een behandelplan is sterk wanneer methode, materiaal, fasering, communicatieve techniek en meetbaar participatiedoel logisch uit de casus volgen.',
       [
-        'Maak een methodeschema met doelgroep, diagnose/leeftijd, doel, uitgangspunten en opbouw.',
-        'Denk aan methoden zoals communicatieve taaltherapie, beginnende communicatie, Metaphon, dyspraxieprogramma en Van Riper.',
-        'Koppel de methode steeds aan je kindcasus en niet alleen aan een stoornislabel.',
-        'Bespreek verschillen en vragen met je groep: methodekeuze is klinisch redeneren.'
+        'Methode is de onderbouwde werkwijze; materiaal ondersteunt die werkwijze en is nooit het doel op zichzelf.',
+        'Taaltherapie volgt aanbod -> begrip -> productie en werkt net boven het huidige taalniveau met modeling, expanderen en corrigeren.',
+        'Bij fonologie kies je op ernst, leeftijd, contrastbewustzijn en leerbaarheid tussen bijvoorbeeld Hodson & Paden, Metaphon en minimale paren.',
+        'Niet-spraakgerichte mondmotoriek heeft geen vanzelfsprekende transfer naar spraak; spraak oefen je functioneel door te spreken.',
+        'SMART-doelen zijn positief, participatiegericht, meetbaar en tijdgebonden; Shared Decision Making maakt ze acceptabel en relevant.'
       ],
       [
-        topic('methodeschema', 'Doelgroep, doel, uitgangspunten, onderdelen en therapieopbouw kunnen vergelijken.', ['schema', 'doelgroep', 'doel', 'uitgangspunten', 'opbouw']),
-        topic('casusmatch', 'Methode koppelen aan leeftijd, diagnose, ernst, hulpvraag en leerbaarheid.', ['casus', 'leeftijd', 'diagnose', 'ernst', 'leerbaarheid']),
-        topic('behandelprincipes', 'Werkzame principes van een methode kunnen benoemen.', ['principes', 'methode', 'therapie', 'onderbouwing']),
-        topic('kritisch vergelijken', 'Waarom methode A beter past dan methode B kunnen uitleggen.', ['vergelijken', 'argumenteren', 'keuze', 'valkuil'])
+        topic('methode versus materiaal', 'Eerst behandeldoel en werkzame principes kiezen, daarna passend materiaal.', ['methode', 'materiaal', 'doel', 'werkzame principes']),
+        topic('taaltherapeutische technieken', 'Modeling, expanderen, corrigeren en VAT/KWL functioneel inzetten.', ['modeling', 'expanderen', 'corrigeren', 'vat', 'kwl']),
+        topic('aanbod begrip productie', 'Taalbehandeling faseren en niveau-plus-een toepassen.', ['aanbod', 'begrip', 'productie', 'niveau plus 1']),
+        topic('fonologische methodekeuze', 'Hodson & Paden, Metaphon en minimale paren vergelijken op casusmatch.', ['hodson', 'paden', 'metaphon', 'minimale paren', 'fonologie']),
+        topic('SMART en SDM', 'Een positief participatiedoel samen met client en omgeving meetbaar maken.', ['smart', 'shared decision making', 'participatie', 'meetbaar', 'tijdgebonden'])
       ],
-      'Je docent vraagt waarom je Metaphon kiest en niet alleen articulatie-oefeningen. Wat moet je dan zeker noemen?',
-      'Maak een puntscorend schema-antwoord voor één behandelmethode.',
-      'Ik kies Metaphon wanneer het kind fonologische contrasten en bewustzijn van klankverschillen moet opbouwen. Dan is alleen articulatieplaats oefenen te smal, omdat het probleem niet alleen motorisch hoeft te zijn. Ik benoem doelgroep, diagnose, doel, uitgangspunten, opbouw en hoe ik generalisatie meet.',
-      'Bij een behandelmethode noteer ik doelgroep, leeftijd/diagnose, doel, uitgangspunten, onderdelen en therapieopbouw. Daarna voeg ik toe voor welke casus hij wel of niet passend is. Zo wordt het schema geen opsomming, maar een keuze-instrument voor klinisch redeneren.'
+      'Een kind heeft een kleine woordenschat, korte zinnen en ernstige fonologische processen. Hoe prioriteer je en waarom?',
+      'Formuleer een SMART-participatiedoel en onderbouw welke methode en welk materiaal daarbij passen.',
+      'Ik start bij de hulpvraag en participatie: wat belemmert het kind het meest? Daarna bepaal ik of taalbegrip, productie of verstaanbaarheid eerst nodig is. Ik kies een methode op probleemmechanisme en taalleeftijd, gebruik materiaal alleen ter uitvoering en bouw op van aanbod naar begrip en productie. Het doel formuleer ik samen met ouders positief, meetbaar en tijdgebonden.',
+      'Binnen zes weken gebruikt het kind tijdens drie dagelijkse spelsituaties zelfstandig een tweewoorduiting om een wens te uiten, in vier van vijf kansen. Ik kies een functionele taaltherapeutische aanpak met modeling en expanderen, omdat die aansluit bij het huidige niveau. Spelmateriaal lokt de uiting uit; ouderobservaties en een turflijst meten transfer.'
     ),
     lesson(
       'w13',
-      'W13 · Pragmatiek en therapie-apps',
-      'vooruitblik',
-      'Behandeling',
-      ['pragmatiek', 'apps', 'transfer'],
-      'W13 richt zich op pragmatische behandeling en het kritisch kiezen van digitale hulpmiddelen.',
-      'De leskern: pragmatiek behandel je functioneel in context; apps zijn hulpmiddelen, geen behandeldoel.',
+      'W13 · Spraakdifferentiaal, CELF en professioneel behandelen',
+      '5 juni 2026',
+      'Diagnostiek & behandelproces',
+      ['fonetiek', 'fonologie', 'dyspraxie', 'CELF', 'EBP'],
+      'W13 scherpt de differentiaaldiagnose bij spraak aan en koppelt die aan testkeuze en behandeling. Daarnaast wordt behandelen neergezet als een cyclisch proces van doelen, gedragsverandering, evaluatie en bijsturing.',
+      'De leskern: lokaliseer eerst het probleem, kies daarna vraaggestuurd onderzoek en een behandelroute die past bij het mechanisme, de client en de beschikbare evidentie.',
       [
-        'Pragmatische behandeling vraagt doelen rond beurt, perspectief, verhaalopbouw, herstel en interactie.',
-        'Effectieve taaltherapie vraagt transfer naar thuis, school en spel.',
-        'Apps beoordeel je op doel, taalniveau, feedback, motivatie en generalisatie.',
-        'Blijf werken aan de kindcasus behandeling en verdedig je keuzes.'
+        'Onderzoek stimulabiliteit, consistentie en positie om fonetisch, fonologisch, dyspraxie en dysartrie te onderscheiden.',
+        'Levelt helpt lokaliseren: fonologische codering, motorische planning en uitvoering vragen verschillende behandelroutes.',
+        'Kies CELF-onderdelen vraaggestuurd voor een breed taalprofiel; interpreteer ruwe scores via normering en context.',
+        'Prioriteer processen die verstaanbaarheid het meest beperken en oefen bij planning direct in functionele woorden en zinnen.',
+        'Behandeling is cyclisch en evidence-based: doelen, modeling/shaping, therapeutische relatie, clientvoorkeur en evaluatie horen samen.'
       ],
       [
-        topic('pragmatisch doel', 'Functioneel doel formuleren voor taalgebruik in interactie.', ['pragmatiek', 'beurtwisseling', 'perspectief', 'narratief', 'doel']),
-        topic('transfer', 'Ouders, school en dagelijkse context inbouwen in behandeling.', ['transfer', 'ouders', 'school', 'context', 'generalisatie']),
-        topic('apps beoordelen', 'Apps kiezen op behandelinhoud, niet op leuk of nieuw.', ['app', 'doel', 'feedback', 'motivatie', 'generalisatie']),
-        topic('casusverantwoording', 'Pragmatische aanpak koppelen aan casusbewijs.', ['casus', 'bewijs', 'behandelplan', 'onderbouwing'])
+        topic('spraakdifferentiaal', 'Fonetisch, fonologisch, dyspraxie en dysartrie onderbouwd onderscheiden.', ['fonetisch', 'fonologisch', 'dyspraxie', 'dysartrie', 'consistentie']),
+        topic('articulatie- en positieonderzoek', 'Klanken en woordposities systematisch controleren.', ['stimulabiliteit', 'initiaal', 'mediaal', 'finaal', 'positieonderzoek']),
+        topic('CELF vraaggestuurd kiezen', 'Subtests, normscore en index koppelen aan de onderzoeksvraag.', ['celf', 'subtest', 'ruwe score', 'normscore', 'index']),
+        topic('prioriteren op verstaanbaarheid', 'Eerst het proces behandelen met de grootste functionele impact.', ['verstaanbaarheid', 'stopping', 'fronting', 'clusterreductie', 'prioriteit']),
+        topic('EBP en leertheorie', 'Evidentie, expertise, clientcontext, modeling en shaping combineren.', ['ebp', 'modeling', 'shaping', 'client', 'evaluatie'])
       ],
-      'Een kind vertelt chaotisch, mist beurtwisseling en gebruikt een app graag. Hoe maak je hier een verantwoord behandelplan van?',
-      'Onderbouw waarom een app wel of niet past bij een logopedisch behandeldoel.',
-      'Ik formuleer eerst het functionele pragmatische doel, bijvoorbeeld een verhaal met begin, midden en einde vertellen of beurtwisseling vasthouden. Daarna kies ik oefeningen in echte interactie met modeling, visuele steun en feedback. Een app mag ik gebruiken als middel voor motivatie of herhaling, maar ik plan expliciet transfer naar gesprek, spel, thuis en school.',
-      'Een app past alleen als hij het gekozen behandeldoel ondersteunt. Ik beschrijf welk taalniveau wordt geoefend, welke feedback het kind krijgt, hoe de app aansluit bij leeftijd en motivatie en hoe ik generalisatie buiten het scherm organiseer. Zonder transfer blijft het een leuke activiteit, geen therapie.'
+      'Een kind vervangt klanken wisselend en laat zoekend mondgedrag zien. Hoe voorkom je een verkeerde behandelroute?',
+      'Vergelijk CELF en een kortere taaltest en onderbouw aanvullend onderzoek voor deze casus.',
+      'Ik beschrijf eerst het patroon en onderzoek stimulabiliteit, consistentie en woordpositie. Met Levelt onderscheid ik fonologische codering van motorische planning en uitvoering. Zoekend mondgedrag en brede inconsistentie maken dyspraxie waarschijnlijker, maar ik sluit fonologische factoren niet zonder onderzoek uit. Daarna kies ik functionele, planninggerichte behandeling of contrasttherapie en evalueer ik de respons.',
+      'Ik kies het instrument op leeftijd, belastbaarheid en onderzoeksvraag. Voor een breed profiel kan CELF met vraaggestuurde subtests receptieve en expressieve domeinen differentieren; bij een jonger of minder belastbaar kind past een kortere test beter. Ik interpreteer normscore en index nooit los van observatie, gehoor, meertaligheid en functioneren.'
     ),
     lesson(
       'w14',
-      'W14 · Behandelplan presenteren',
-      'vooruitblik',
-      'Behandeling',
-      ['globaal behandelplan', 'specifiek behandelplan', 'presenteren'],
-      'W14 is de week waarin je het globale en specifieke behandelplan bijna afmaakt en presenteert.',
-      'De leskern: laat zien dat jouw behandeling logisch volgt uit diagnose, ICF, hulpvraag, doelen, methode en evaluatie.',
+      'W14 · Behandelplannen presenteren, prioriteren en evalueren',
+      '12 juni 2026',
+      'Behandelplanning',
+      ['prioriteren', 'evalueren', 'complexe casus', 'presenteren'],
+      'W14 gebruikt complexe kindcasussen om behandelplannen kritisch te beoordelen. De nadruk ligt op haalbare prioriteiten, functionele spraakoefening, realistische prognose en transfer via ouders, school en andere disciplines.',
+      'De leskern: niet alles tegelijk behandelen. Kies het doel met de grootste participatie-impact, onderbouw de volgorde en gebruik product- en procesevaluatie om per sessie bij te sturen.',
       [
-        'Geen nieuwe flitscolleges; verdiep en rond je behandelplan af.',
-        'Presenteer globaal behandelplan en specifieke sessieopbouw kernachtig.',
-        'Gebruik ICF, doelen, methode, materiaal, therapievorm, frequentie en evaluatie.',
-        'Laat zien hoe ouders, school en andere disciplines bijdragen aan transfer.'
+        'Pragmatiek en communicatieve intentie vormen de basis; daarna prioriteer je taal- of spraakniveau op hulpvraag en impact.',
+        'Bij gecombineerde fonologie en dyspraxie leg je eerst een stabiele fonologische basis en beoordeel je daarna planning en uitvoering opnieuw.',
+        'Losse mondmotoriek verbetert spraak niet vanzelf; taak-specifiek motorisch leren vraagt spreken in functionele context.',
+        'Productevaluatie zegt wat behaald is; procesevaluatie verklaart waarom en stuurt doel, methode, materiaal of context bij.',
+        'Bij cognitieve, medische of gedragsfactoren maak je de prognose realistisch en organiseer je multidisciplinaire en omgevingssteun.'
       ],
       [
-        topic('globaal behandelplan', 'Van diagnose naar LT-doel, prioriteiten en behandelroute redeneren.', ['globaal behandelplan', 'diagnose', 'lt-doel', 'prioriteit']),
-        topic('specifiek behandelplan', 'Een sessie concreet opbouwen met doel, materiaal, stappen en feedback.', ['specifiek behandelplan', 'sessie', 'materiaal', 'feedback']),
-        topic('evaluatie', 'Meten wanneer het doel bereikt is en hoe je bijstuurt.', ['evaluatie', 'meten', 'criterium', 'bijstellen']),
-        topic('presenteren', 'Binnen tijd overtuigend uitleggen waarom jouw plan passend is.', ['presentatie', 'argumentatie', 'casusbewijs', 'tijd'])
+        topic('behandelprioriteit', 'Doelen rangschikken op hulpvraag, participatie, ernst, leerbaarheid en belastbaarheid.', ['prioriteit', 'hulpvraag', 'participatie', 'ernst', 'belastbaarheid']),
+        topic('fonologie voor planning', 'Behandelvolgorde onderbouwen met taal-spraakverwerkingsniveau.', ['fonologie', 'dyspraxie', 'planning', 'levelt', 'verstaanbaarheid']),
+        topic('functioneel motorisch leren', 'Spraak door spreken oefenen en niet-functionele transferclaims vermijden.', ['motorisch leren', 'spraak', 'mondmotoriek', 'transfer']),
+        topic('product- en procesevaluatie', 'Resultaat en verklaring scheiden en gericht bijstellen.', ['productevaluatie', 'procesevaluatie', 'bijstellen', 'context']),
+        topic('omgeving en prognose', 'Ouders, school, ondersteunende communicatie en andere disciplines passend inzetten.', ['ouders', 'school', 'gebaren', 'multidisciplinair', 'prognose'])
       ],
-      'Je hebt 10 minuten om je behandelplan te presenteren. Welke volgorde zorgt dat je geen punten laat liggen?',
-      'Schrijf een behandelplan-alinea waarin diagnose, doel, methode en evaluatie logisch verbonden zijn.',
-      'Ik presenteer eerst kort diagnose en hulpvraag, daarna de ICF-koppeling en behandelprioriteit. Vervolgens noem ik LT-doel, KT-doel, methode, therapievorm, materiaal en opbouw van de sessie. Ik sluit af met evaluatie, transfer naar ouders/school en eventuele samenwerking. Zo blijft het plan logisch, toetsbaar en casusgebonden.',
-      'Op basis van de diagnose kies ik een functioneel LT-doel en een meetbaar KT-doel. De methode past bij het onderliggende probleem en de leeftijd van het kind. Ik beschrijf de sessieopbouw, het materiaal en de feedbackvorm en evalueer met een concreet criterium. Ouders en school worden betrokken voor transfer.'
+      'Een kind heeft fonologische, planning-, taal- en gedragsproblemen maar raakt snel vermoeid. Hoe verdedig je wat je eerst doet?',
+      'Schrijf een evaluatie waarin product, proces en concrete bijstelling duidelijk gescheiden zijn.',
+      'Ik start bij de hulpvraag en kies het probleem dat communicatie en participatie het meest belemmert. Ik behandel niet vier domeinen in een korte sessie, maar formuleer een haalbare eerste prioriteit. Bij fonologie en dyspraxie werk ik eerst aan klankrepresentatie en auditieve input; daarna beoordeel ik welke planningproblemen overblijven. Ik pas duur, structuur en ouder-/schooltransfer aan de belastbaarheid aan.',
+      'Het productdoel is gedeeltelijk behaald: het kind produceerde de doelklank in zes van tien kansen. Procesmatig waren vermoeidheid en te veel wisselingen belemmerend, terwijl visuele markering hielp. De volgende sessie verlaag ik de taakomvang, oefen ik een functionele woordenreeks en plan ik het moeilijkste onderdeel aan het begin.'
     ),
     lesson(
       'w15',
-      'W15 · Tentamenvoorbereiding en cirkel rond',
-      'vooruitblik',
-      'Toetsvoorbereiding',
-      ['herhalen', 'leeruitkomsten', 'tentamen'],
-      'W15 maakt de module rond: je verzamelt vragen, dicht gaten en oefent richting mondeling en schriftelijk tentamen.',
-      'De leskern: train niet alles opnieuw, maar zoek de laagste score en maak die toetsklaar.',
+      'W15 · Casusprioritering en toetsverantwoording',
+      '19 juni 2026',
+      'Integratie & toets',
+      ['interventieplan', 'meertaligheid', 'TOS', 'fonologie', 'toets'],
+      'W15 sluit de module af met casussen waarin je multidisciplinaire beoordeling, behandelprioriteit en interventieplan zelfstandig moet verdedigen. Niet de hoeveelheid doelen, maar de klinische samenhang telt.',
+      'De leskern: kies vanuit participatie en casusbewijs een haalbare eerste behandelroute, benoem ontbrekende informatie en laat zien hoe je effect en hardnekkigheid evalueert.',
       [
-        'Er zijn geen nieuwe flitscolleges of literatuur; focus op hiaten.',
-        'Gebruik leeruitkomsten om te bepalen wat je nog moet kunnen bewijzen.',
-        'Oefen mondelinge criteria, schriftelijke casusantwoorden en behandelverantwoording apart.',
-        'Maak een laatste lijst met vragen voor docent of groep.'
+        'Prioriteer verstaanbaarheid of communicatieve intentie wanneer die participatie direct beperken; maak het plan niet te ambitieus.',
+        'Bij meertaligheid bewijst een lage Nederlandse score geen TOS: weeg thuistaal, blootstelling, leerbaarheid en hardnekkigheid.',
+        'Bij fonologische problemen kies je een leeftijds- en bewustzijnspassende methode en combineer je die met ouderbegeleiding en transfer.',
+        'Gebruik officiele testterminologie en interpreteer scores voorzichtig; dagen tellen niet mee bij leeftijdsnormering.',
+        'Voor de theorietoets formuleer je zelf diagnose en onderbouwing; bij de praktijktoets volg je de gegeven diagnose en procedure.'
       ],
       [
-        topic('leeruitkomsten checken', 'Per leeruitkomst kunnen zeggen welk bewijs je hebt.', ['leeruitkomst', 'bewijs', 'check', 'toetsklaar']),
-        topic('zwakste punt kiezen', 'Niet breed herhalen maar gericht de laagste score trainen.', ['zwakste punt', 'score', 'prioriteit', 'oefenen']),
-        topic('mondeling en schriftelijk scheiden', 'Rubricantwoord en schriftelijke puntenstructuur apart oefenen.', ['mondeling', 'schriftelijk', 'rubric', 'punten']),
-        topic('laatste vragen formuleren', 'Vragen concreet maken: begrip, casus, criterium of methode.', ['vraag', 'begrip', 'casus', 'criterium', 'methode'])
+        topic('multidisciplinaire beoordeling', 'Zekerheden, hypothesen, ontbrekende informatie en disciplines benoemen.', ['multidisciplinair', 'hypothese', 'ontbrekende informatie', 'onderzoek']),
+        topic('interventieprioriteit', 'Eerste doel kiezen op participatie, urgentie, ernst en generaliseerbaarheid.', ['prioriteit', 'participatie', 'urgentie', 'ernst', 'generalisatie']),
+        topic('meertaligheid versus TOS', 'Thuistaal, aanbod, leerbaarheid en hardnekkigheid wegen.', ['meertaligheid', 'tos', 'thuistaal', 'blootstelling', 'hardnekkigheid']),
+        topic('fonologische casusroute', 'Proces, leeftijd, methode, ouderrol en evaluatie verbinden.', ['fonologie', 'hodson', 'metaphon', 'ouderbegeleiding', 'evaluatie']),
+        topic('toetstaal en normering', 'Professionele scoretaal en correcte leeftijdsberekening gebruiken.', ['beneden gemiddeld', 'normering', 'leeftijd', 'praktijktoets', 'theorietoets'])
       ],
-      'Je hebt nog één les voor de toets. Hoe bepaal je wat je nu wel en niet meer oefent?',
-      'Maak een laatste toetsplan voor jezelf met drie prioriteiten en bewijs per prioriteit.',
-      'Ik kies mijn laagste scoregebied en koppel dat aan een leeruitkomst. Daarna oefen ik één mondelinge prompt, één schriftelijke casusvraag en één behandelverantwoording. Wat al groen is, herhaal ik kort. Mijn laatste vragen formuleer ik concreet: welk begrip, welke casus, welk criterium of welke methode is nog onzeker?',
-      'Mijn toetsplan bevat drie prioriteiten: de laagste mondelinge criteria, de zwakste schriftelijke casusstructuur en één behandelkeuze die ik nog niet strak kan verdedigen. Per prioriteit noteer ik welk bewijs ik moet leveren, welke oefenvraag ik maak en wanneer ik het voldoende vind.'
+      'Een jong kind is slecht verstaanbaar, heeft een zeer zwakke zinsontwikkeling en trekt zich sociaal terug. Wat behandel je eerst?',
+      'Bouw een toetsantwoord waarin je meertaligheid, TOS, behandelprioriteit en evaluatie zorgvuldig afweegt.',
+      'Ik kies eerst het probleem dat participatie het meest belemmert. Als slechte verstaanbaarheid maakt dat het kind zich terugtrekt, start ik met de meest impactvolle fonologische processen, mits diagnostiek dit ondersteunt. Zinsbouw blijft een belangrijk tweede spoor. Ik sluit gehoorproblemen uit, coach ouders op niveau-plus-een en evalueer na enkele maanden groei en hardnekkigheid voordat ik een harde TOS-conclusie trek.',
+      'Een lage Nederlandse score alleen bewijst geen TOS. Ik verzamel gegevens over beide talen, hoeveelheid en kwaliteit van aanbod, leerbaarheid en functioneren. Daarna formuleer ik een eerste participatiegerichte prioriteit en kies ik een methode die past bij leeftijd en probleemmechanisme. Ik meet de functionele vooruitgang en heroverweeg diagnose en plan bij onvoldoende groei.'
     )
   ]
 };
@@ -498,28 +506,28 @@ const lessonMeta = {
     zg: 'Je maakt duidelijk wat je zeker weet, wat nog een vermoeden is en waarom jouw behandeling juist nu bij dit kind past.'
   },
   w12: {
-    criteria: 'Je vergelijkt behandelmethoden als keuze-instrument, niet als losse lijst.',
-    writtenFocus: 'Beschrijf doelgroep, doel, uitgangspunten, opbouw en casusmatch.',
-    pitfall: 'Alle methoden even passend maken of alleen de naam van de methode noemen.',
-    zg: 'Je kunt verdedigen waarom methode A beter past dan methode B.'
+    criteria: 'Je koppelt taal- of fonologiemethode, communicatieve techniek en SMART-participatiedoel aan taalleeftijd en casusbewijs.',
+    writtenFocus: 'Schrijf de keten: participatieprobleem -> doel -> methode -> materiaal -> fasering -> meting.',
+    pitfall: 'Methode en materiaal verwarren, niet-functionele mondmotoriek als spraakbehandeling inzetten of een methode in het doel schrijven.',
+    zg: 'Je verdedigt de methode op probleemmechanisme en ontwikkelingsniveau en maakt de transfer samen met kind en omgeving meetbaar.'
   },
   w13: {
-    criteria: 'Je behandelt pragmatiek functioneel en beoordeelt apps kritisch.',
-    writtenFocus: 'Noem doel, context, transfer en waarom een hulpmiddel wel of niet past.',
-    pitfall: 'Pragmatiek reduceren tot sociale trucjes of apps gebruiken omdat ze leuk zijn.',
-    zg: 'Je maakt van interactiegedrag een meetbaar doel met transfer naar thuis en school.'
+    criteria: 'Je differentieert spraakproblemen, kiest taalonderzoek vraaggestuurd en verantwoordt behandeling als cyclisch EBP-proces.',
+    writtenFocus: 'Bouw vanuit onderzoekssignaal naar Levelt-niveau, aanvullend onderzoek, behandelroute en evaluatie.',
+    pitfall: 'Inconsistentie automatisch dyspraxie noemen, een volledige testbatterij zonder onderzoeksvraag afnemen of techniek los van clientcontext kiezen.',
+    zg: 'Je combineert stimulabiliteit, consistentie, positie, normering, evidentie en clientfactoren tot een toetsbare behandelbeslissing.'
   },
   w14: {
-    criteria: 'Je presenteert een globaal en specifiek behandelplan logisch en toetsbaar.',
-    writtenFocus: 'Verbind diagnose, ICF, LT-doel, KT-doel, methode, sessieopbouw en evaluatie.',
-    pitfall: 'Een mooie sessie tonen zonder diagnose, doel of evaluatiecriterium.',
-    zg: 'Je plan klinkt alsof elke stap uit de casus voortkomt en meetbaar bij te sturen is.'
+    criteria: 'Je prioriteert bij complexe casuistiek en stuurt een behandelplan bij met product- en procesevaluatie.',
+    writtenFocus: 'Onderbouw eerst-doel, behandelvolgorde, realistische prognose, omgevingsrol en concrete bijstelling.',
+    pitfall: 'Te veel doelen in een korte sessie, losse mondmotoriek als spraaktransfer presenteren of procesfactoren niet meenemen.',
+    zg: 'Je laat horen waarom dit doel nu voorrang krijgt, hoe belastbaarheid en context het plan veranderen en wat je na evaluatie anders doet.'
   },
   w15: {
-    criteria: 'Je stuurt je laatste voorbereiding op leeruitkomsten en laagste score.',
-    writtenFocus: 'Maak prioriteiten met bewijs: wat moet je kunnen zeggen of schrijven?',
-    pitfall: 'Alles opnieuw lezen in plaats van gericht oefenen op toetsgedrag.',
-    zg: 'Je traint alleen nog hiaten en kunt per leeruitkomst je bewijs hardop leveren.'
+    criteria: 'Je verantwoordt multidisciplinaire beoordeling en interventieplan met casusbewijs, ontbrekende gegevens en evaluatie.',
+    writtenFocus: 'Schrijf voorzichtig: profiel -> differentiaal -> participatieprioriteit -> methode -> omgeving -> herbeoordeling.',
+    pitfall: 'Te veel doelen kiezen, lage Nederlandse scores direct TOS noemen of een officiële diagnose uit de praktijkcasus negeren.',
+    zg: 'Je prioriteert overtuigend, gebruikt professionele testtaal en maakt duidelijk wat je weet, nog moet onderzoeken en wanneer je bijstuurt.'
   }
 };
 
@@ -589,8 +597,27 @@ const lessonFlits = {
     flits('Behandeling: Semantiek/ syntaxis/ morfologie', 'Taalmethoden koppelen aan niveau, doelen, ouderrol, functionele taal en transfer.', null),
     flits('Behandeling - pragmatiek', 'Functionele communicatie als doel en context voor transfer.', null)
   ],
+  w12: [
+    flits('Behandeling: Semantiek/ syntaxis/ morfologie', 'Taaltherapie faseren van aanbod naar begrip en productie met functionele transfer.', null),
+    flits('Behandeling Fonetiek - fonologie', 'Hodson & Paden, Metaphon en contrasttherapie koppelen aan probleemmechanisme.'),
+    flits('Behandeling - pragmatiek', 'Participatie en communicatieve intentie als basis voor doelen en SDM.', null)
+  ],
   w13: [
-    flits('Behandeling - pragmatiek', 'Voorbereiding les 13: pragmatische behandeling, transfer, ouders en school.')
+    flits('Diagnostiek Fonetiek - fonologie', 'Stimulabiliteit, consistentie en positieonderzoek voor de spraakdifferentiaal.'),
+    flits('Model van Levelt', 'Fonologische codering, motorische planning en uitvoering lokaliseren.'),
+    flits('Testleer', 'Vraaggestuurde testkeuze, normscore, index en voorzichtige interpretatie.'),
+    flits('Behandeling Fonetiek - fonologie', 'Behandelroute en prioritering koppelen aan de diagnostische conclusie.')
+  ],
+  w14: [
+    flits('Behandeling Fonetiek - fonologie', 'Behandelvolgorde bij gecombineerde fonologische en planningproblemen.'),
+    flits('Behandeling: Semantiek/ syntaxis/ morfologie', 'Doelen beperken en afstemmen op ontwikkelingsniveau en belastbaarheid.', null),
+    flits('Behandeling - pragmatiek', 'Communicatieve intentie, ondersteunende communicatie en omgevingstransfer.', null)
+  ],
+  w15: [
+    flits('(Multidisciplinaire) Diagnostiek spraak- en taalproblemen', 'Ontbrekende gegevens en disciplines in complexe casussen benoemen.', null),
+    flits('Diagnostiek bij meertaligheid', 'Blootstelling, thuistaal en hardnekkigheid wegen voordat je TOS concludeert.', null),
+    flits('Behandeling Fonetiek - fonologie', 'Verstaanbaarheid prioriteren en methodekeuze toetsgericht verdedigen.'),
+    flits('Richtlijn Logopedie bij TOS tbv', 'Behandeling, omgeving en herbeoordeling verbinden aan hardnekkigheid.')
   ],
   overige: [
     flits('Plagiaat en APA', 'Studievaardigheid: bronnen in eigen woorden koppelen aan casus en toetsargument.')
